@@ -24,3 +24,6 @@
 
 # The compiled scanner
 */scanner
+
+# Mac hidden files
+*/.DS_Store
