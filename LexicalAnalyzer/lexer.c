@@ -8,7 +8,7 @@ int main(void)
     int token;
 
     while ((token = yylex()) != EOFTOKEN) {
-        printf("%s: \"%s\" (%d)", tokenStrings[token - TOKEN_VALUE_OFFSET], yytext, yyleng);
+        printf("%s (%d): \"%s\" (%d)\n", tokenStrings[token - TOKEN_VALUE_OFFSET], token, yytext, yyleng);
     }
 
     return 0;
