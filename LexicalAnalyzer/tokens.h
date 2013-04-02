@@ -25,5 +25,16 @@ static char *tokenStrings[] =
     "FNUMCONST",
     "STRINGCONST",
     "ILLEGALTOKEN",
-    "EOFTOKEN"
+    "EOFTOKEN",
+    "ELSETOKEN",
+    "IFTOKEN",
+    "INTTOKEN",
+    "RETURNTOKEN",
+    "VOIDTOKEN",
+    "WHILETOKEN",
+    "FORTOKEN",
+    "DOTOKEN",
+    "DOUBLETOKEN",
+    "READTOKEN",
+    "PRINTTOKEN"
 };

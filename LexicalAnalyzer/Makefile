@@ -1,16 +1,16 @@
-scanner:		lex.yy.o scanner.o
-						gcc -o scanner lex.yy.o scanner.o -lfl
+lexer:		lex.yy.o lexer.o
+						gcc -o lexer lex.yy.o lexer.o -lfl
 
-lex.yy.o:		lex.yy.c
+lex.yy.o:		lex.yy.c tokens.h
 						gcc -c lex.yy.c
 
-lex.yy.c:		scanner.l
-						flex scanner.l
+lex.yy.c:		lexer.l
+						flex lexer.l
 
-scanner.o:	scanner.c
-						gcc -c scanner.c
+lexer.o:	lexer.c tokens.h
+						gcc -c lexer.c
 
 clean:
 						rm ./*.o
 						rm lex.yy.c
-						rm scanner
+						rm lexer
