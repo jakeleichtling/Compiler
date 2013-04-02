@@ -11,5 +11,6 @@ scanner.o:	scanner.c
 						gcc -c scanner.c
 
 clean:
-						yes | rm ./*.o
-						yes | rm lex.yy.c
+						rm ./*.o
+						rm lex.yy.c
+						rm scanner

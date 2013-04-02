@@ -6,6 +6,17 @@
 #define STRINGCONST 261
 #define ILLEGALTOKEN 262
 #define EOFTOKEN 263
+#define ELSETOKEN 264
+#define IFTOKEN 265
+#define INTTOKEN 266
+#define RETURNTOKEN 267
+#define VOIDTOKEN 268
+#define WHILETOKEN 269
+#define FORTOKEN 270
+#define DOTOKEN 271
+#define DOUBLETOKEN 272
+#define READTOKEN 273
+#define PRINTTOKEN 274
 
 static char *tokenStrings[] =
 {
