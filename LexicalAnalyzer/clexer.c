@@ -16,14 +16,3 @@ int main(void)
 
     return 0;
 }
-
-void getTokenName(int token, char tokenName[])
-{
-    if (token <= 256) {
-        tokenName[0] = token;
-        tokenName[1] = '\0';
-        printf("hi");
-    } else {
-        tokenName = tokenStrings[token - TOKEN_VALUE_OFFSET];
-    }
-}
