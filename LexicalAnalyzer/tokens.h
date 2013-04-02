@@ -17,6 +17,15 @@
 #define DOUBLETOKEN 272
 #define READTOKEN 273
 #define PRINTTOKEN 274
+#define INCREMENTTOKEN 275
+#define DECREMENTTOKEN 276
+#define ANDTOKEN 277
+#define ORTOKEN 278
+#define LEQTOKEN 279
+#define GEQTOKEN 280
+#define EQTOKEN 281
+#define NEQTOKEN 282
+#define OTHER 283
 
 static char *tokenStrings[] =
 {
@@ -36,5 +45,14 @@ static char *tokenStrings[] =
     "DOTOKEN",
     "DOUBLETOKEN",
     "READTOKEN",
-    "PRINTTOKEN"
+    "PRINTTOKEN",
+    "INCREMENTTOKEN",
+    "DECREMENTTOKEN",
+    "ANDTOKEN",
+    "ORTOKEN",
+    "LEQTOKEN",
+    "GEQTOKEN",
+    "EQTOKEN",
+    "NEQTOKEN",
+    "OTHER"
 };

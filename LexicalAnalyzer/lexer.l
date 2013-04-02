@@ -35,6 +35,40 @@ fixedfloat {signedint}"."{integer}?|[-+]?"."{integer}
 }
 <string>.       yymore();
 
+\/\*            BEGIN(comment);
+<comment>\*\/   BEGIN(INITIAL);
+<comment>.      /* skip comment text */
+<comment>\n     /* eat up multiline comments */
+
+\+               return '+';
+-               return '-';
+\*               return '*';
+\/               return '/';
+%               return '%';
+!               return '!';
+\<               return '<';
+>               return '>';
+=               return '=';
+;               return ';';
+,               return ',';
+\(               return '(';
+\)               return ')';
+\[               return '[';
+]               return ']';
+{               return '{';
+}               return '}';
+
+\+\+            return INCREMENTTOKEN;
+--              return DECREMENTTOKEN;
+&&              return ANDTOKEN;
+\|\|            return ORTOKEN;
+\<=             return LEQTOKEN;
+>=              return GEQTOKEN;
+==              return EQTOKEN;
+!=              return NEQTOKEN;
+.               return OTHER;
+<<EOF>>         return EOFTOKEN;
+
 %%
 
 int keywordLookup(char *s)

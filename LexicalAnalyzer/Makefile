@@ -1,5 +1,5 @@
-lexer:		lex.yy.o lexer.o
-						gcc -o lexer lex.yy.o lexer.o -lfl
+clexer:		lex.yy.o clexer.o
+						gcc -o clexer lex.yy.o clexer.o -lfl
 
 lex.yy.o:		lex.yy.c tokens.h
 						gcc -c lex.yy.c
@@ -7,10 +7,10 @@ lex.yy.o:		lex.yy.c tokens.h
 lex.yy.c:		lexer.l
 						flex lexer.l
 
-lexer.o:	lexer.c tokens.h
-						gcc -c lexer.c
+clexer.o:	clexer.c tokens.h
+						gcc -c clexer.c
 
 clean:
 						rm ./*.o
 						rm lex.yy.c
-						rm lexer
+						rm clexer
