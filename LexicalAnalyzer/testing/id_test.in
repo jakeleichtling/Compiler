@@ -1,4 +1,6 @@
-/* ID Test input for Lexical Analyzer
+/* Name: id_test.in
+ *
+ * Purpose: Input text for testing ID scanning in our Lexical Analyzer.
  *
  * Derek Salama & Jake Leichtling
  * CS57

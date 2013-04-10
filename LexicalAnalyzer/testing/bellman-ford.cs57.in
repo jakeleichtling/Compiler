@@ -1,3 +1,14 @@
+/* Name: bellman-ford.cs57.in
+ *
+ * Purpose: A large text input, specifically a C57 program, for testing our Lexical Analyzer in a realistic context.
+ *
+ * Source: CS57 website
+ *
+ * Derek Salama & Jake Leichtling
+ * CS57
+ * 4/10/2013
+ */
+
 /* bellman-ford.c57.  C57 code to run the Bellman-Ford algorithm on a
    small directed graph. */
 

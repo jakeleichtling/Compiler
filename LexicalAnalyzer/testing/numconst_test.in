@@ -1,6 +1,6 @@
-/* NUMCONSTANT Test input for Lexical Analyzer
+/* Name: numconst_test.in
  *
- * Tests for signed ints and floats
+ * Purpose: Input text for testing number constant scanning in our Lexical Analyzer.
  *
  * Derek Salama & Jake Leichtling
  * CS57

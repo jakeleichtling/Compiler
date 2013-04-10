@@ -1,3 +1,12 @@
+/* Name: small_test_program.cs57.in
+ *
+ * Purpose: A smaller text input, specifically a C57 program, for testing our Lexical Analyzer in a realistic context.
+ *
+ * Derek Salama & Jake Leichtling
+ * CS57
+ * 4/10/2013
+ */
+
 int main()
 {
   

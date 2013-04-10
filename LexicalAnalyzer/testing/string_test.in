@@ -1,4 +1,6 @@
-/* String Test text for Lexical Analyzer
+/* Name: string_test.in
+ *
+ * Purpose: Input text for testing String scanning in our Lexical Analyzer.
  *
  * Derek Salama & Jake Leichtling
  * CS57

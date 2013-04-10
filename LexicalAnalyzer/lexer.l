@@ -1,3 +1,12 @@
+/* Name: lexer.l                                                                                                                        */
+
+/* Purpose: A flex input file that specifies the rules for scanning a C57 input program. Contains both rules for pattern matching       */
+/*          and a function for looking up keywords and distinguishing them from identifiers.                                            */
+
+/* Derek Salama & Jake Leichtling                                                                                                       */
+/* CS57                                                                                                                                 */
+/* 4/10/2013                                                                                                                            */
+
 %{
 #include <string.h>
 #include "tokens.h"
