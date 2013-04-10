@@ -1,0 +1,11 @@
+TESTING
+-------
+
+The /testing subfolder contains all of our test input and output files,  as well as a convenient run script.
+
+The different token 'genres' are divided into appropriately named files - i.e. string_test, numconst_test, etc. When run_all_tests.sh is executed, corresponding .out files will be generated. These files together represent comprehensive test of all valid (and some invalid) tokens.
+
+We have also included the bellman-ford.cs57 file and a small_test_program.c57 to test the Lexical Analyzer in realistic use.
+
+Happy Testing,
+Derek & Jake

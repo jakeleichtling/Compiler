@@ -1,0 +1,11 @@
+LEXICAL ANALYZER - CS57 Compiler Project
+Derek Salama & Jake Leichtling
+04/10/2013
+
+lexer.l - Flex file for the Lexical Analyzer
+
+clexer.c - Contains main function for driving the lexer. Tokens returned by yylex() are printed to stdout with their numerical value as well as a descriptive name and the original text value.
+
+tokens.h - Definition of token values for use in lexer.l and clexer.c 
+
+/testing - Contains all files pertinant to testing (see TESTING_README for more on testing)
