@@ -1,6 +1,6 @@
-/* Operator Test input for Lexical Analyzer
+/* Name: string_test.in
  *
- * Contains all supported operators in the C57 Standard
+ * Purpose: Input text for testing operator scanning in our Lexical Analyzer.
  *
  * Derek Salama & Jake Leichtling
  * CS57

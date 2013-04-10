@@ -1,3 +1,13 @@
+/* Name: clexer.c
+ *
+ * Purpose: A driver for the scanner produced by running flex on the input file lexer.c. The main function repeatedly calls
+ *          the yylex() function of the flex output, and then prints the result in a readable format.
+ *
+ * Derek Salama & Jake Leichtling
+ * CS57
+ * 4/10/2013
+ */
+
 #include <stdio.h>
 #include "tokens.h"
 extern char *yytext;

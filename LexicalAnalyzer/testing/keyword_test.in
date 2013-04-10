@@ -1,4 +1,6 @@
-/* Keyword Test input for Lexical Analyzer
+/* Name: keyword_test.in
+ *
+ * Purpose: Input text for testing keyword scanning and identification in our Lexical Analyzer.
  *
  * Derek Salama & Jake Leichtling
  * CS57

@@ -1,3 +1,14 @@
+/* Name: tokens.h
+ *
+ * Purpose: A header file, to be included in the compilation of the Lexical Analyzer, that defines
+ *          integer values for each token (starting at 258), as well as string representations
+ *          of each token.
+ *
+ * Derek Salama & Jake Leichtling
+ * CS57
+ * 4/10/2013
+ */
+
 #define TOKEN_VALUE_OFFSET 258
 
 #define ID 258

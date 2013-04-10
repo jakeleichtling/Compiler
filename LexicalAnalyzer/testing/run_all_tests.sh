@@ -1,5 +1,13 @@
 #!/bin/bash
 
+# Name: run_all_tests.sh
+#
+# Purpose: A bash script for running the Lexical Analyzer on the text of all test input files and saving the output in corresponding test output files.
+#
+# Derek Salama & Jake Leichtling
+# CS57
+# 4/10/2013
+
 # Note: Must be run from the LexicalAnalyzer/testing directory for file paths to work.
 
 cd ..
