@@ -1,0 +1,43 @@
+int main()
+{
+  
+    int intID = 12345 + -54321 * 1.2345 / 5.4321;
+
+    for (int i = 0; i < 5 && (i % 2 == 4 || i > i - 6) && (!(i <= 4 && i >= 6 && i != 10)); ++i)
+    {
+        char *stringID = "Hello there!" /* Don't count me! */ + " Are you out there?";
+    }
+
+    --i;
+
+    /* Can comments */ i /* work */ = /* anywhere */ i + /* ? */ 10 /* ??? */;
+
+    if (i == 5) {
+        intID = intID / i;
+    } else {
+        intID = -1;
+    }
+
+    helperFunction();
+
+    return intID;
+}
+
+void helperFunction()
+{
+    do {
+        double _i = 25.12345;
+    } while (i == 10);
+
+    read;
+    print "Hello there /* Don't ignore me! */" /* Ignore me, though! */;
+
+    return;
+}
+
+/* Illegal stuff, at the end so it doesn't mess with the goodies. */
+
+"Don't have a string with a newline in it!
+I told you!!!"
+
+123int 123i = @#$^&|\.?;

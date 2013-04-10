@@ -1,0 +1,12 @@
+/* ID Test input for Lexical Analyzer
+ *
+ * Derek Salama & Jake Leichtling
+ * CS57
+ * 4/10/2013
+ */
+
+Should this be legal? Yes!
+
+123THIS_IS_A_VALID_ID_TOKEN!NOW_ANOTHER
+
+_valid_ID/* Ignore me! */okay

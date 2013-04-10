@@ -26,7 +26,7 @@ fixedfloat {signedint}"."{integer}?|[-+]?"."{integer}
 {fixedfloat}    return FNUMCONST;
 
 \"              BEGIN(string);
-<string>"\n"    return ILLEGALTOKEN;
+<string>\n    return ILLEGALTOKEN;
 <string>\\\"    yymore();
 <string>\"      {
     BEGIN(INITIAL);
