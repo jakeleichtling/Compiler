@@ -9,12 +9,15 @@
 
 %{
 #include <string.h>
-#include "tokens.h"
+#include "../LexicalAnalyzer/tokens.h"
+
+extern int lineNumber;
 
 int keywordLookup(char *);
+extern char *savedText;
 %}
 
-white [ \t\n]+
+white [ \t]+
 
 letter [a-zA-Z]
 digit [0-9]
@@ -28,18 +31,33 @@ fixedfloat {signedint}"."{integer}?|[-+]?"."{integer}
 
 %%
 
-{white}         /* skip whitespace */
+{white}         /* skip whitespace, but we need to count line numbers */
+\n              lineNumber++;
 
-{id}            return keywordLookup(yytext);
-{signedint}     return NUMCONST;
-{fixedfloat}    return FNUMCONST;
+{id}            {
+    savedText = strdup(yytext);
+    return keywordLookup(yytext);
+}
+{signedint}     {
+    savedText = strdup(yytext);
+    return NUMCONST;
+}
+{fixedfloat}    {
+    savedText = strdup(yytext);
+    return FNUMCONST;
+}
 
 \"              BEGIN(string);
-<string>\n    return ILLEGALTOKEN;
+<string>\n      {
+    savedText = strdup(yytext);
+    return ILLEGALTOKEN;
+    lineNumber++;
+}
 <string>\\\"    yymore();
 <string>\"      {
     BEGIN(INITIAL);
     yytext[--yyleng] = '\0';
+    savedText = strdup(yytext);
     return STRINGCONST;
 }
 <string>.       yymore();
@@ -47,7 +65,7 @@ fixedfloat {signedint}"."{integer}?|[-+]?"."{integer}
 \/\*            BEGIN(comment);
 <comment>\*\/   BEGIN(INITIAL);
 <comment>.      /* skip comment text */
-<comment>\n     /* eat up multiline comments */
+<comment>\n     lineNumber++; /* eat up multiline comments */
 
 \+               return '+';
 -               return '-';

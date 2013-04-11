@@ -10,8 +10,10 @@
 
 #include <stdio.h>
 #include "tokens.h"
+
 extern char *yytext;
 extern int yyleng;
+extern int lineNumber;
 
 int main(void)
 {
@@ -19,9 +21,9 @@ int main(void)
 
     while ((token = yylex()) != EOFTOKEN) {
         if (token <= 256)
-            printf("%c (%d): \"%s\" (%d)\n", token, token, yytext, yyleng);
+            printf("%c (%d): \"%s\" (%d) -- %d\n", token, token, yytext, yyleng, lineNumber);
         else
-            printf("%s (%d): \"%s\" (%d)\n", tokenStrings[token - TOKEN_VALUE_OFFSET], token, yytext, yyleng);
+            printf("%s (%d): \"%s\" (%d) -- %d\n", tokenStrings[token - TOKEN_VALUE_OFFSET], token, yytext, yyleng, lineNumber);
     }
 
     return 0;
