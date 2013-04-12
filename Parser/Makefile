@@ -11,7 +11,7 @@
 BISONFlAGS = -d -v
 
 cparser:				lex.yy.o bparser.tab.o ast.o cparser.o
-								gcc -o lex.yyo. bparser.tab.o ast.o cparser.o
+								gcc -o parser lex.yy.o bparser.tab.o ast.o cparser.o -lfl
 	
 lex.yy.o:				lex.yy.c ../LexicalAnalyzer/tokens.h
 								gcc -c lex.yy.c

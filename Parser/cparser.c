@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "ast.h"
 
 ast_node root;
