@@ -21,39 +21,39 @@ struct token_lookup {
   ast_node_type node_type;
 };
 static struct token_lookup token_table[] = {
-    { "ROOT", ROOT },
+    { "ROOT", ROOT }, //
     { "SEQ", SEQ }, //
     { "IF", IF_STMT }, //
     { "IFELSE", IF_ELSE_STMT }, //
-    { "RETURN", RETURN_STMT },
-    { "WHILE", WHILE_LOOP },
-    { "DOWHILE", DO_WHILE_LOOP },
-    { "FOR", FOR_LOOP },
-    { "READ", READ_STMT },
-    { "PRINT", PRINT_STMT },
+    { "RETURN", RETURN_STMT }, //
+    { "WHILE", WHILE_LOOP }, //
+    { "DOWHILE", DO_WHILE_LOOP }, //
+    { "FOR", FOR_LOOP }, //
+    { "READ", READ_STMT }, //
+    { "PRINT", PRINT_STMT }, //
     { "++", OP_INCREMENT }, //
     { "--", OP_DECREMENT }, //
-    { "&&", OP_AND },
-    { "||", OP_OR },
-    { "!", OP_BANG },
-    { "<=", OP_LEQ },
-    { ">=", OP_GEQ },
-    { "==", OP_EQUALS },
-    { "-", OP_NEQ },
-    { "<", OP_LT },
-    { ">", OP_GT },
+    { "&&", OP_AND }, //
+    { "||", OP_OR }, //
+    { "!", OP_BANG }, //
+    { "<=", OP_LEQ }, //
+    { ">=", OP_GEQ }, //
+    { "==", OP_EQ }, //
+    { "!=", OP_NEQ }, //
+    { "<", OP_LT }, //
+    { ">", OP_GT }, //
     { "+", OP_PLUS }, //
     { "-", OP_MINUS }, //
     { "*", OP_TIMES }, //
-    { "/", OP_DIVIDE },
-    { "%", OP_MOD },
+    { "/", OP_DIVIDE }, //
+    { "%", OP_MOD }, //
     { "-", OP_NEG }, //
     { "=", OP_ASSIGN }, //
-    { "ARRAYSUB", ARRAY_SUBSCRIPTED },
-    { "ARRAYNONSUB", ARRAY_NONSUBSCRIPTED },
+    { "ARRAYSUB", ARRAY_SUBSCRIPTED }, //
+    { "ARRAYNONSUB", ARRAY_NONSUBSCRIPTED }, //
     { "INTLIT", INT_LITERAL }, //
-    { "DOUBLELIT", DOUBLE_LITERAL },
-    { "STRINGLIT", STRING_LITERAL },
+    { "DOUBLELIT", DOUBLE_LITERAL }, //
+    { "STRINGLIT", STRING_LITERAL }, //
     { "ID", ID }, //
     { NULL, 0 }
 };

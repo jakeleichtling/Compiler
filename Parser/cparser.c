@@ -15,10 +15,12 @@ int main()
     haveRoot = yyparse();
 
     if(parseError)
-        fprintf(stderr, "WARING: There were parse erros.\nParse tree may be ill-formed.\n");
+        fprintf(stderr, "WARING: There were parse errors.\nParse tree may be ill-formed.\n");
 
     if (haveRoot == 0)
         print_ast(root, 0);
+    else
+        fprintf(stderr, "%s\n", "No root :(\n");
 
     return 0;
 }

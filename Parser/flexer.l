@@ -94,7 +94,7 @@ fixedfloat {signedint}"."{integer}?|[-+]?"."{integer}
 ==              return EQTOKEN;
 !=              return NEQTOKEN;
 .               return OTHER;
-<<EOF>>         return EOFTOKEN;
+<<EOF>>         return 0;
 
 %%
 
