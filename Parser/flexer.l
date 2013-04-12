@@ -1,4 +1,4 @@
-/* Name: lexer.l                                                                                                                        */
+/* Name: flexer.l                                                                                                                       */
 
 /* Purpose: A flex input file that specifies the rules for scanning a C57 input program. Contains both rules for pattern matching       */
 /*          and a function for looking up keywords and distinguishing them from identifiers.                                            */
@@ -9,7 +9,7 @@
 
 %{
 #include <string.h>
-#include "tokens.h"
+#include "bparser.tab.h"
 
 int lineNumber = 1;
 
@@ -121,7 +121,7 @@ int keywordLookup(char *s)
             { "double", DOUBLETOKEN },
             { "read", READTOKEN },
             { "print", PRINTTOKEN },
-            {  NULL, ID }
+            {  NULL, IDENT }
         };
 
     KeywordTokenPair *keywordTokenPair;

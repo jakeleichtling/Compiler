@@ -1,0 +1,9 @@
+{
+    aardvark = bear + cat * dog;
+    elk = ferret * (goat + hare - impala); {
+        jaguar = - killdeer;
+        llama = moose = nuthatch * 55;
+    }
+    ;
+    osprey = 7 + partridge;
+}

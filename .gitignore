@@ -29,3 +29,17 @@ LexicalAnalyzer/.DS_Store
 .DS_Store
 
 .DS_Store
+
+Parser/parser
+
+Parser/tree.5.l
+
+Parser/tree.5.y
+
+Parser/bparser.tab.c
+
+Parser/bparser.tab.h
+
+Parser/bparser.output
+
+Parser/ast_orig.c

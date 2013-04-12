@@ -67,6 +67,3 @@ static char *tokenStrings[] =
     "NEQTOKEN",
     "OTHER"
 };
-
-int lineNumber;
-char *savedText;

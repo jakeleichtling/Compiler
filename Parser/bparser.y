@@ -3,7 +3,6 @@
 #include <string.h>
 #include <stdio.h>
 #include "ast.h"
-#include "../LexicalAnalyzer/tokens.h"
 
 #define YYSTYPE ast_node
 #define YYDEBUG 1
@@ -19,20 +18,23 @@ extern ast_node root;
 extern char *savedText;
 %}
 
-%token NUM IDENT BADTOKEN IF ELSE 
+
+%token IDENT NUMCONST FNUMCONST STRINGCONST ELSETOKEN IFTOKEN INTTOKEN RETURNTOKEN VOIDTOKEN WHILETOKEN FORTOKEN DOTOKEN DOUBLETOKEN READTOKEN PRINTTOKEN INCREMENTTOKEN DECREMENTTOKEN ANDTOKEN ORTOKEN LEQTOKEN GEQTOKEN EQTOKEN NEQTOKEN ILLEGALTOKEN OTHER EOFTOKEN
+
+/* TODO */
 %right '='
 %left '+' '-'
 %left '*'
 %left UMINUS
 
-%expect 2
+%expect 2 /* shift/reduce conflicts with if-else grammar */
 
 %%
 
 code : stmtList {
   ast_node t = create_ast_node(ROOT);
   t->left_child = $1;
-  root = $$ = t; }
+  root = ($$ = t); }
 ;
 
 stmtList : /* empty */ { $$ = NULL; }
@@ -65,19 +67,19 @@ compoundStmt : '{' stmtList '}' {
   $$ = t; }
 ;
 
-ifStmt : IF '(' expr ')' stmt { 
+ifStmt : IFTOKEN '(' expr ')' stmt { 
   ast_node t = create_ast_node(IF_STMT);
   t->left_child = $3;
   t->left_child->right_sibling = $5;
   $$ = t; }
-| IF '(' expr ')' stmt ELSE stmt {
+| IFTOKEN '(' expr ')' stmt ELSETOKEN stmt {
   ast_node t = create_ast_node(IF_ELSE_STMT);
   t->left_child = $3;
   t->left_child->right_sibling = $5;
   t->left_child->right_sibling->right_sibling = $7;
   $$ = t; }
-| IF '(' error ')' stmt { $$ = NULL; }
-| IF '(' error ')' stmt ELSE stmt { $$ = NULL; }
+| IFTOKEN '(' error ')' stmt { $$ = NULL; }
+| IFTOKEN '(' error ')' stmt ELSETOKEN stmt { $$ = NULL; }
 ;
 
 
@@ -111,7 +113,7 @@ IDENT {
   t->left_child = $2;
   $$ = t; }
 | '(' expr ')' { $$ = $2; }
-| NUM {
+| NUMCONST {
   ast_node t = create_ast_node(INT_LITERAL);
   t->value.int_value = atoi(savedText);
   $$ = t; }
@@ -120,6 +122,14 @@ IDENT {
   t->value.string = strdup(savedText);
   $$ = t; }
 | '(' error ')' { $$ = NULL; }
+| INCREMENTTOKEN IDENT {
+  ast_node t = create_ast_node(OP_INCREMENT);
+  t->left_child = $2;
+  $$ = t; }
+| DECREMENTTOKEN IDENT {
+  ast_node t = create_ast_node(OP_DECREMENT);
+  t->left_child = $2;
+  $$ = t; }
 ;
 
 %%
