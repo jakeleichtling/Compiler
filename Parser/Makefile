@@ -35,5 +35,6 @@ cparser.o:			cparser.c
 								gcc -c cparser.c
 
 clean:					
-								rm ./*.output
-								rm cparser lex.yy.o lex.yy.c bparser.tab.o bparser.tab.c bparser.tab.h ast.o cparser.o
+								rm -f ./*.output
+								rm -f parser
+								rm -f cparser lex.yy.o lex.yy.c bparser.tab.o bparser.tab.c bparser.tab.h ast.o cparser.o
