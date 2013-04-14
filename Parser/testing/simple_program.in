@@ -1,19 +1,19 @@
 {
     aardvark = bear + cat * dog;
-    elk = ferret * (goat + hare - impala); {
+    elk = ferret * (goat + hare - "impala"); {
         jaguar = - killdeer;
         llama = moose = nuthatch * 55;
     }
     ;
-    osprey = 7 + partridge;
+    osprey = 7 + "partridge";
 }
 
 {
     aardvark = bear2 + cat * dog2;
-    elk = ferret2 * (goat + hare2 - impala); {
+    elk = ferret2 * (goat + hare2 - "impala"); {
         jaguar2 = - killdeer;
         llama2 = moose = nuthatch2 * 55;
     }
     ;
-    osprey = 7 + partridge2;
+    osprey = 7 + "partridge2";
 }
