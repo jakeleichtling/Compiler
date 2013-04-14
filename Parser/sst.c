@@ -83,6 +83,7 @@ void print_sst(Sst sst)
         else
             printf("%d: %s\n", i, *(sst->table_ptr + i));
     }
+    printf("\n");
 }
 
 void destroy_sst(Sst sst)

@@ -7,3 +7,13 @@
     ;
     osprey = 7 + partridge;
 }
+
+{
+    aardvark = bear2 + cat * dog2;
+    elk = ferret2 * (goat + hare2 - impala); {
+        jaguar2 = - killdeer;
+        llama2 = moose = nuthatch2 * 55;
+    }
+    ;
+    osprey = 7 + partridge2;
+}

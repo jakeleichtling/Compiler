@@ -11,15 +11,15 @@
 BISONFlAGS = -d -v
 
 cparser:				lex.yy.o bparser.tab.o ast.o cparser.o sst.o
-								gcc -o parser lex.yy.o bparser.tab.o ast.o cparser.o -lfl
+								gcc -o parser lex.yy.o bparser.tab.o ast.o cparser.o sst.o -lfl
 	
-lex.yy.o:				lex.yy.c
+lex.yy.o:				lex.yy.c bparser.tab.h
 								gcc -c lex.yy.c
 	
 lex.yy.c:				flexer.l bparser.tab.h
 								flex flexer.l
 	
-bparser.tab.o:	bparser.tab.c bparser.tab.h
+bparser.tab.o:	bparser.tab.c bparser.tab.h ast.h sst.h
 								gcc -c bparser.tab.c
 
 bparser.tab.c:	bparser.y
@@ -29,13 +29,13 @@ bparser.tab.h:	bparser.y
 								bison $(BISONFlAGS) bparser.y
 
 ast.o:					ast.c ast.h
-								gcc -c ast.c ast.h
+								gcc -c ast.c
 
-cparser.o:			cparser.c
+cparser.o:			cparser.c ast.h sst.h
 								gcc -c cparser.c
 
 sst.o:					sst.c sst.h
-								gcc -c sst.c sst.h
+								gcc -c sst.c
 
 sst_tester:			sst_tester.c sst.o
 								gcc -o sst_tester sst_tester.c sst.o

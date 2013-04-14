@@ -1,3 +1,4 @@
+#include <stdio.h>
 #include "sst.h"
 
 int main()
@@ -8,10 +9,22 @@ int main()
     sst = create_sst(2);
     print_sst(sst);
 
-    add_string(sst, "Hello there!");
+    printf("%p\n\n", add_string(sst, "Hello there!"));
     print_sst(sst);
 
-    add_string(sst, "Hi...");
+    printf("%p\n\n", add_string(sst, "Hi..."));
+    print_sst(sst);
+
+    printf("%p\n\n", add_string(sst, "Sup?"));
+    print_sst(sst);
+
+    printf("%p\n\n", add_string(sst, "Not much."));
+    print_sst(sst);
+
+    printf("%p\n\n", add_string(sst, "Totally!"));
+    print_sst(sst);
+
+    printf("%p\n\n", add_string(sst, "Hello there!"));
     print_sst(sst);
 
     destroy_sst(sst);

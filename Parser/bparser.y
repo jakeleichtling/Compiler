@@ -3,6 +3,7 @@
 #include <string.h>
 #include <stdio.h>
 #include "ast.h"
+#include "sst.h"
 
 #define YYSTYPE ast_node
 #define YYDEBUG 1
@@ -16,6 +17,8 @@ extern ast_node root;
 extern int parseError;
 
 extern char *savedText;
+extern Sst id_table;
+extern Sst stringconst_table;
 %}
 
 
@@ -114,7 +117,7 @@ forLoop : FORTOKEN '(' expr ';' expr ';' expr ')' stmt {
 expr :
 IDENT {
   ast_node t1 = create_ast_node(ID);
-  t1->value.string = strdup(savedText);
+  t1->value.string = add_string(id_table, savedText);
   $1 = t1;
  } '=' expr {
   ast_node t2 = create_ast_node(OP_ASSIGN);
@@ -150,9 +153,13 @@ IDENT {
   ast_node t = create_ast_node(DOUBLE_LITERAL);
   t->value.double_value = atof(savedText);
   $$ = t; }
+| STRINGCONST {
+  ast_node t = create_ast_node(STRING_LITERAL);
+  t->value.string = add_string(stringconst_table, savedText);
+  $$ = t; }
 | IDENT {
   ast_node t = create_ast_node(ID);
-  t->value.string = strdup(savedText);
+  t->value.string = add_string(id_table, savedText);
   $$ = t; }
 | '(' error ')' { $$ = NULL; }
 | INCREMENTTOKEN IDENT {

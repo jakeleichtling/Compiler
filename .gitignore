@@ -43,3 +43,9 @@ Parser/bparser.tab.h
 Parser/bparser.output
 
 Parser/ast_orig.c
+
+Parser/bparser.tab.h.gch
+
+Parser/sst.h.gch
+
+Parser/sst_tester
