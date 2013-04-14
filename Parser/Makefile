@@ -10,7 +10,7 @@
 
 BISONFlAGS = -d -v
 
-cparser:				lex.yy.o bparser.tab.o ast.o cparser.o
+cparser:				lex.yy.o bparser.tab.o ast.o cparser.o sst.o
 								gcc -o parser lex.yy.o bparser.tab.o ast.o cparser.o -lfl
 	
 lex.yy.o:				lex.yy.c
@@ -34,7 +34,14 @@ ast.o:					ast.c ast.h
 cparser.o:			cparser.c
 								gcc -c cparser.c
 
+sst.o:					sst.c sst.h
+								gcc -c sst.c sst.h
+
+sst_tester:			sst_tester.c sst.o
+								gcc -o sst_tester sst_tester.c sst.o
+
 clean:					
 								rm -f ./*.output
 								rm -f parser
 								rm -f cparser lex.yy.o lex.yy.c bparser.tab.o bparser.tab.c bparser.tab.h ast.o cparser.o
+								rm -f sst_tester
