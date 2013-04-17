@@ -67,23 +67,23 @@ fixedfloat {signedint}"."{integer}?|[-+]?"."{integer}
 <comment>.      /* skip comment text */
 <comment>\n     lineNumber++; /* eat up multiline comments */
 
-\+               return '+';
+\+              return '+';
 -               return '-';
-\*               return '*';
-\/               return '/';
+\*              return '*';
+\/              return '/';
 %               return '%';
 !               return '!';
-\<               return '<';
+\<              return '<';
 >               return '>';
 =               return '=';
 ;               return ';';
 ,               return ',';
-\(               return '(';
-\)               return ')';
-\[               return '[';
+\(              return '(';
+\)              return ')';
+\[              return '[';
 ]               return ']';
-\{               return '{';
-\}               return '}';
+\{              return '{';
+\}              return '}';
 
 \+\+            return INCREMENTTOKEN;
 --              return DECREMENTTOKEN;

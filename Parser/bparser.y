@@ -71,7 +71,46 @@ stmt : exprStmt { $$ = $1; }
 exprStmt : expr ';' { $$ = $1; }
 | ';'               { $$ = NULL; }
 | error ';'         { $$ = NULL; }
+| intdecl ';'       { $$ = $1; }
+| doubledecl ';'    { $$ = $1; }
 ;
+
+intdecl : INTTOKEN varlist  {
+  ast_node t = create_ast_node(INT_DECL);
+  t->left_child = $2;
+  $$ = t; }
+;
+
+doubledecl : DOUBLETOKEN varlist  {
+  ast_node t = create_ast_node(DOUBLE_DECL);
+  t->left_child = $2;
+  $$ = t; }
+;
+
+varlist : vardecl       { $$ = $1; }
+| varlist ',' vardecl   {
+  ast_node t = $1;
+  while (t->right_sibling != NULL)
+    t = t->right_sibling;
+  t->right_sibling = $3;
+  $$ = $1;
+}
+
+vardecl :
+IDENT {
+  ast_node t1 = create_ast_node(ID);
+  t1->value.string = add_string(id_table, savedText);
+  $1 = t1;
+ } '=' expr {
+  ast_node t2 = create_ast_node(OP_ASSIGN);
+  t2->left_child = $1;
+  t2->left_child->right_sibling = $4;
+  $$ = t2; }
+| IDENT {
+  ast_node t = create_ast_node(ID);
+  t->value.string = add_string(id_table, savedText);
+  $$ = t; }
+| arraysub { $$ = $1; }
 
 compoundStmt : '{' stmtList '}' {
   ast_node t = create_ast_node(SEQ);
@@ -177,85 +216,82 @@ IDENT {
 | PRINTTOKEN expr {
   ast_node t = create_ast_node(PRINT_STMT);
   t->left_child = $2;
-  $$ = t;
-  }
+  $$ = t; }
 | READTOKEN {
   ast_node t = create_ast_node(READ_STMT);
-  $$ = t;
-  }
-| IDENT '[' ']' {
-  ast_node t = create_ast_node(ARRAY_NONSUBSCRIPTED);
-  $$ = t;
-  }
-| IDENT '[' expr ']' {
-  ast_node t = create_ast_node(ARRAY_SUBSCRIPTED);
-  $$ = t;
-  }
+  $$ = t; }
+| arraysub { $$ = $1; }
+| arraysub '=' expr {
+  ast_node t = create_ast_node(OP_ASSIGN);
+  t->left_child = $1;
+  t->left_child->right_sibling = $3;
+  $$ = t; }
 | expr '<' expr {
   ast_node t = create_ast_node(OP_LT);
   t->left_child = $1;
   t->left_child->right_sibling = $3;
-  $$ = t;
-  }
+  $$ = t; }
 | expr LEQTOKEN expr {
   ast_node t = create_ast_node(OP_LEQ);
   t->left_child = $1;
   t->left_child->right_sibling = $3;
-  $$ = t;
-  }
+  $$ = t; }
 | expr '>' expr {
   ast_node t = create_ast_node(OP_GT);
   t->left_child = $1;
   t->left_child->right_sibling = $3;
-  $$ = t;
-  }
+  $$ = t; }
 | expr GEQTOKEN expr {
   ast_node t = create_ast_node(OP_GEQ);
   t->left_child = $1;
   t->left_child->right_sibling = $3;
-  $$ = t;
-  }
+  $$ = t; }
 | expr EQTOKEN expr {
   ast_node t = create_ast_node(OP_EQ);
   t->left_child = $1;
   t->left_child->right_sibling = $3;
-  $$ = t;
-  }
+  $$ = t; }
 | expr NEQTOKEN expr {
   ast_node t = create_ast_node(OP_NEQ);
   t->left_child = $1;
   t->left_child->right_sibling = $3;
-  $$ = t;
-  }
+  $$ = t; }
 | expr ANDTOKEN expr {
   ast_node t = create_ast_node(OP_AND);
   t->left_child = $1;
   t->left_child->right_sibling = $3;
-  $$ = t;
-  }
+  $$ = t; }
 | expr ORTOKEN expr {
   ast_node t = create_ast_node(OP_OR);
   t->left_child = $1;
   t->left_child->right_sibling = $3;
-  $$ = t;
-  }
+  $$ = t; }
 | '!' expr {
   ast_node t = create_ast_node(OP_BANG);
   t->left_child = $2;
-  $$ = t;
-  }
+  $$ = t; }
 | expr '/' expr {
   ast_node t = create_ast_node(OP_DIVIDE);
   t->left_child = $1;
   t->left_child->right_sibling = $3;
-  $$ = t;
-  }
+  $$ = t; }
 | expr '%' expr {
   ast_node t = create_ast_node(OP_MOD);
   t->left_child = $1;
   t->left_child->right_sibling = $3;
-  $$ = t;
-  }
+  $$ = t; }
+;
+
+arraysub :
+IDENT {
+  ast_node t_id = create_ast_node(ID);
+  t_id->value.string = add_string(id_table, savedText);
+  $1 = t_id;
+ } '[' expr ']' {
+  ast_node t = create_ast_node(ARRAY_SUBSCRIPTED);
+  t->left_child = $1;
+  t->left_child->right_sibling = $4;
+  $$ = t; }
 ;
 
 %%

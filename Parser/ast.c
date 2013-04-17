@@ -55,6 +55,8 @@ static struct token_lookup token_table[] = {
     { "DOUBLELIT", DOUBLE_LITERAL }, //
     { "STRINGLIT", STRING_LITERAL }, //
     { "ID", ID }, //
+    { "INTDECL", INT_DECL}, //
+    { "DOUBLEDECL", DOUBLE_DECL}, //
     { NULL, 0 }
 };
 

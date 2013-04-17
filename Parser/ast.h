@@ -32,7 +32,8 @@ typedef enum {
     OP_ASSIGN,
     ARRAY_SUBSCRIPTED, ARRAY_NONSUBSCRIPTED,
     INT_LITERAL, DOUBLE_LITERAL, STRING_LITERAL,
-    ID
+    ID,
+    INT_DECL, DOUBLE_DECL
 } ast_node_type; 
 
 /* Structure for nodes of the abstract syntax tree.  Uses the
