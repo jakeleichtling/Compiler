@@ -73,6 +73,81 @@ exprStmt : expr ';' { $$ = $1; }
 | error ';'         { $$ = NULL; }
 | intdecl ';'       { $$ = $1; }
 | doubledecl ';'    { $$ = $1; }
+| functionsig compoundStmt {
+  ast_node t = create_ast_node(FUNCTION_DEF);
+  t->left_child = $1;
+  t->left_child->right_sibling = $2;
+ }
+| functionsig ';' {
+  ast_node t = create_ast_node(FUNCTION_PTT);
+  t->left_child = $1;
+ }
+;
+
+functionsig :
+  rettype IDENT {
+  ast_node t_id = create_ast_node(ID);
+  t_id->value.string = add_string(id_table, savedText);
+  $2 = t_id;
+ } '(' paramlist ')' {
+  ast_node t = create_ast_node(FUNCTION_SIG);
+  t->left_child = $1;
+  t->left_child->right_sibling = $2;
+  t->left_child->right_sibling->right_sibling = $5;
+  $$ = t;
+}
+;
+
+rettype :
+  VOIDTOKEN { $$ = create_ast_node(RET_VOID); }
+| INTTOKEN { $$ = create_ast_node(RET_INT); }
+| DOUBLETOKEN { $$ = create_ast_node(RET_DOUBLE); }
+;
+
+paramlist : /* empty */ { $$ = NULL; }
+| paramlist ',' param {
+  ast_node t = $1;
+  if (t != NULL) {
+    for (; t->right_sibling != NULL; t = t->right_sibling); // <-- bitchin'
+    t->right_sibling = $3;
+    $$ = $1;
+  } else
+    $$ = $3; }
+;
+
+param :
+  INTTOKEN IDENT {
+    ast_node t_id = create_ast_node(ID);
+    t_id->value.string = add_string(id_table, savedText);
+
+    ast_node t = create_ast_node(INT_PARAM);
+    t->left_child = t_id;
+    $$ = t;
+  }
+| DOUBLETOKEN IDENT {
+    ast_node t_id = create_ast_node(ID);
+    t_id->value.string = add_string(id_table, savedText);
+
+    ast_node t = create_ast_node(DOUBLE_PARAM);
+    t->left_child = t_id;
+    $$ = t;
+  }
+| INTTOKEN IDENT '[' ']' {
+    ast_node t_id = create_ast_node(ID);
+    t_id->value.string = add_string(id_table, savedText);
+
+    ast_node t = create_ast_node(INT_ARRAY_PARAM);
+    t->left_child = t_id;
+    $$ = t;
+  }
+| DOUBLETOKEN IDENT '[' ']' {
+    ast_node t_id = create_ast_node(ID);
+    t_id->value.string = add_string(id_table, savedText);
+
+    ast_node t = create_ast_node(DOUBLE_ARRAY_PARAM);
+    t->left_child = t_id;
+    $$ = t;
+  }
 ;
 
 intdecl : INTTOKEN varlist  {
@@ -93,8 +168,8 @@ varlist : vardecl       { $$ = $1; }
   while (t->right_sibling != NULL)
     t = t->right_sibling;
   t->right_sibling = $3;
-  $$ = $1;
-}
+  $$ = $1; }
+;
 
 vardecl :
 IDENT {

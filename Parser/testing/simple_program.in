@@ -42,3 +42,5 @@
     int x;
     int a[b] = 5;
 }
+
+int x;

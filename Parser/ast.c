@@ -55,8 +55,17 @@ static struct token_lookup token_table[] = {
     { "DOUBLELIT", DOUBLE_LITERAL }, //
     { "STRINGLIT", STRING_LITERAL }, //
     { "ID", ID }, //
-    { "INTDECL", INT_DECL}, //
-    { "DOUBLEDECL", DOUBLE_DECL}, //
+    { "INTDECL", INT_DECL }, //
+    { "DOUBLEDECL", DOUBLE_DECL }, //
+    { "FUNCTION_DEF", FUNCTION_DEF }, //
+    { "FUNCTION_PTT", FUNCTION_PTT }, //
+    { "VOID_FUNCTION_SIG", VOID_FUNCTION_SIG },
+    { "INT_FUNCTION_SIG", INT_FUNCTION_SIG },
+    { "DOUBLE_FUNCTION_SIG", DOUBLE_FUNCTION_SIG },
+    { "INT_PARAM", INT_PARAM },
+    { "DOUBLE_PARAM", DOUBLE_PARAM },
+    { "INT_ARRAY_PARAM", INT_ARRAY_PARAM },
+    { "DOUBLE_ARRAY_PARAM", DOUBLE_ARRAY_PARAM },
     { NULL, 0 }
 };
 
@@ -109,4 +118,11 @@ void print_ast(ast_node root, int depth) {
   ast_node child;
   for (child = root->left_child; child != NULL; child = child->right_sibling)
     print_ast(child, depth + 1);
-}  
+}
+
+ast_node rightmost_sibling(ast_node t)
+{
+  for (; t->right_sibling != NULL; t = t->right_sibling); // <-- bitchin'
+
+  return t;
+}

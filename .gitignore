@@ -49,3 +49,5 @@ Parser/bparser.tab.h.gch
 Parser/sst.h.gch
 
 Parser/sst_tester
+
+LexicalAnalyzer/clexer

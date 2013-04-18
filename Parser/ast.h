@@ -33,7 +33,10 @@ typedef enum {
     ARRAY_SUBSCRIPTED, ARRAY_NONSUBSCRIPTED,
     INT_LITERAL, DOUBLE_LITERAL, STRING_LITERAL,
     ID,
-    INT_DECL, DOUBLE_DECL
+    INT_DECL, DOUBLE_DECL,
+    FUNCTION_DEF, FUNCTION_PTT,
+    VOID_FUNCTION_SIG, INT_FUNCTION_SIG, DOUBLE_FUNCTION_SIG,
+    INT_PARAM, DOUBLE_PARAM, INT_ARRAY_PARAM, DOUBLE_ARRAY_PARAM
 } ast_node_type; 
 
 /* Structure for nodes of the abstract syntax tree.  Uses the
@@ -58,5 +61,7 @@ ast_node create_ast_node(ast_node_type node_type);
 /* Print the contents of a subtree of an abstract syntax tree, given
    the root of the subtree and the depth of the subtree root. */
 void print_ast(ast_node root, int depth);
+
+ast_node rightmost_sibling(ast_node t);
 
 #endif
