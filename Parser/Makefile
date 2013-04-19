@@ -9,18 +9,22 @@
 # 4/19/2013
 
 BISONFlAGS = -d -v
+CFLAGS = -g
 
-cparser:				lex.yy.o bparser.tab.o ast.o cparser.o sst.o
-								gcc -o parser lex.yy.o bparser.tab.o ast.o cparser.o sst.o -lfl
+parser:				  lex.yy.o bparser.tab.o ast.o cparser.o sst.o
+								gcc $(CFLAGS) -o parser lex.yy.o bparser.tab.o ast.o cparser.o sst.o -lfl
+
+valgrind:				lex.yy.c bparser.tab.c bparser.tab.h ast.c ast.h cparser.c sst.c sst.h
+								gcc $(CFLAGS) -o parser lex.yy.c bparser.tab.c ast.c cparser.c sst.c -lfl
 	
 lex.yy.o:				lex.yy.c bparser.tab.h
-								gcc -c lex.yy.c
+								gcc $(CFLAGS) -c lex.yy.c
 	
 lex.yy.c:				flexer.l bparser.tab.h
 								flex flexer.l
 	
 bparser.tab.o:	bparser.tab.c bparser.tab.h ast.h sst.h
-								gcc -c bparser.tab.c
+								gcc $(CFLAGS) -c bparser.tab.c
 
 bparser.tab.c:	bparser.y
 								bison $(BISONFlAGS) bparser.y
@@ -29,19 +33,20 @@ bparser.tab.h:	bparser.y
 								bison $(BISONFlAGS) bparser.y
 
 ast.o:					ast.c ast.h
-								gcc -c ast.c
+								gcc $(CFLAGS) -c ast.c
 
 cparser.o:			cparser.c ast.h sst.h
-								gcc -c cparser.c
+								gcc $(CFLAGS) -c cparser.c
 
 sst.o:					sst.c sst.h
-								gcc -c sst.c
+								gcc $(CFLAGS) -c sst.c
 
 sst_tester:			sst_tester.c sst.o
-								gcc -o sst_tester sst_tester.c sst.o
+								gcc $(CFLAGS) -o sst_tester sst_tester.c sst.o
 
 clean:					
 								rm -f ./*.output
 								rm -f parser
 								rm -f cparser lex.yy.o lex.yy.c bparser.tab.o bparser.tab.c bparser.tab.h ast.o cparser.o
 								rm -f sst_tester
+								rm -f ./*.gch

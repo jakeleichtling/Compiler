@@ -14,11 +14,11 @@ cd ..
 make
 cd ./testing
 
-cat simple_program.in | ../parser > simple_program.out
+cat bellman-ford.cs57.in | ../parser > bellman-ford.cs57.out
 
 echo -------------------------------------------------
 
-cat simple_program.out
+cat bellman-ford.cs57.out
 
 echo -------------------------------------------------
 

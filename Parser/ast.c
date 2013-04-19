@@ -21,52 +21,48 @@ struct token_lookup {
   ast_node_type node_type;
 };
 static struct token_lookup token_table[] = {
-    { "ROOT", ROOT }, //
-    { "SEQ", SEQ }, //
-    { "IF", IF_STMT }, //
-    { "IFELSE", IF_ELSE_STMT }, //
-    { "RETURN", RETURN_STMT }, //
-    { "WHILE", WHILE_LOOP }, //
-    { "DOWHILE", DO_WHILE_LOOP }, //
-    { "FOR", FOR_LOOP }, //
-    { "READ", READ_STMT }, //
-    { "PRINT", PRINT_STMT }, //
-    { "++", OP_INCREMENT }, //
-    { "--", OP_DECREMENT }, //
-    { "&&", OP_AND }, //
-    { "||", OP_OR }, //
-    { "!", OP_BANG }, //
-    { "<=", OP_LEQ }, //
-    { ">=", OP_GEQ }, //
-    { "==", OP_EQ }, //
-    { "!=", OP_NEQ }, //
-    { "<", OP_LT }, //
-    { ">", OP_GT }, //
-    { "+", OP_PLUS }, //
-    { "-", OP_MINUS }, //
-    { "*", OP_TIMES }, //
-    { "/", OP_DIVIDE }, //
-    { "%", OP_MOD }, //
-    { "-", OP_NEG }, //
-    { "=", OP_ASSIGN }, //
-    { "ARRAYSUB", ARRAY_SUBSCRIPTED }, //
-    { "ARRAYNONSUB", ARRAY_NONSUBSCRIPTED }, //
-    { "INTLIT", INT_LITERAL }, //
-    { "DOUBLELIT", DOUBLE_LITERAL }, //
-    { "STRINGLIT", STRING_LITERAL }, //
-    { "ID", ID }, //
-    { "INTDECL", INT_DECL }, //
-    { "DOUBLEDECL", DOUBLE_DECL }, //
-    { "FUNCTION_DEF", FUNCTION_DEF }, //
-    { "FUNCTION_PTT", FUNCTION_PTT }, //
-    { "VOID_FUNCTION_SIG", VOID_FUNCTION_SIG },
-    { "INT_FUNCTION_SIG", INT_FUNCTION_SIG },
-    { "DOUBLE_FUNCTION_SIG", DOUBLE_FUNCTION_SIG },
-    { "INT_PARAM", INT_PARAM },
-    { "DOUBLE_PARAM", DOUBLE_PARAM },
-    { "INT_ARRAY_PARAM", INT_ARRAY_PARAM },
-    { "DOUBLE_ARRAY_PARAM", DOUBLE_ARRAY_PARAM },
-    { NULL, 0 }
+    { "ROOT", ROOT },
+    { "ID", ID },
+    { "INT_TYPE", INT_TYPE },
+    { "DBL_TYPE", DBL_TYPE },
+    { "VOID_TYPE", VOID_TYPE },
+    { "ARRAY_SUB", ARRAY_SUB },
+    { "ARRAY_NONSUB", ARRAY_NONSUB },
+    { "OP_ASSIGN", OP_ASSIGN },
+    { "OP_ADD", OP_ADD },
+    { "OP_SUB", OP_SUB },
+    { "OP_MULT", OP_MULT },
+    { "OP_DIV", OP_DIV },
+    { "OP_MOD", OP_MOD },
+    { "OP_LT", OP_LT },
+    { "OP_LEQ", OP_LEQ },
+    { "OP_GT", OP_GT },
+    { "OP_GEQ", OP_GEQ },
+    { "OP_EQ", OP_EQ },
+    { "OP_NEQ", OP_NEQ },
+    { "OP_AND", OP_AND },
+    { "OP_OR", OP_OR },
+    { "OP_BANG", OP_BANG },
+    { "OP_NEG", OP_NEG },
+    { "OP_INC", OP_INC },
+    { "OP_DEC", OP_DEC },
+    { "FUNC_DECL", FUNC_DECL },
+    { "VAR_DECL", VAR_DECL },
+    { "FORMAL_PARAM", FORMAL_PARAM },
+    { "SEQ", SEQ },
+    { "IF_STMT", IF_STMT },
+    { "WHILE_LOOP", WHILE_LOOP },
+    { "DO_WHILE_LOOP", DO_WHILE_LOOP },
+    { "FOR_STMT", FOR_STMT },
+    { "RETURN_STMT", RETURN_STMT },
+    { "READ_STMT", READ_STMT },
+    { "PRINT_STMT", PRINT_STMT },
+    { "STRING_LITERAL", STRING_LITERAL },
+    { "INT_LITERAL", INT_LITERAL },
+    { "DOUBLE_LITERAL", DOUBLE_LITERAL },
+    { "FUNC_CALL", FUNC_CALL },
+    { "EMPTY_EXPR", EMPTY_EXPR },
+    { NULL,0 }
 };
 
 /* Create a node with a given token type and return a pointer to the

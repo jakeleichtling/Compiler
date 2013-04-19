@@ -23,8 +23,7 @@ letter [a-zA-Z]
 digit [0-9]
 id ({letter}|_)({letter}|{digit}|_)*
 integer {digit}+
-signedint [-+]?{integer}
-fixedfloat {signedint}"."{integer}?|[-+]?"."{integer}
+fixedfloat {integer}"."{integer}?|"."{integer}
 
 %x string
 %x comment
@@ -38,7 +37,7 @@ fixedfloat {signedint}"."{integer}?|[-+]?"."{integer}
     savedText = strdup(yytext);
     return keywordLookup(yytext);
 }
-{signedint}     {
+{integer}     {
     savedText = strdup(yytext);
     return NUMCONST;
 }

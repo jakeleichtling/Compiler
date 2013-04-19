@@ -21,8 +21,7 @@ extern Sst id_table;
 extern Sst stringconst_table;
 %}
 
-
-%token IDENT NUMCONST FNUMCONST STRINGCONST ELSETOKEN IFTOKEN INTTOKEN RETURNTOKEN VOIDTOKEN WHILETOKEN FORTOKEN DOTOKEN DOUBLETOKEN READTOKEN PRINTTOKEN INCREMENTTOKEN DECREMENTTOKEN ANDTOKEN ORTOKEN LEQTOKEN GEQTOKEN EQTOKEN NEQTOKEN ILLEGALTOKEN OTHER
+%token INTTOKEN DOUBLETOKEN VOIDTOKEN IDENT FNUMCONST NUMCONST READTOKEN PRINTTOKEN INCREMENTTOKEN DECREMENTTOKEN IFTOKEN ELSETOKEN FORTOKEN DOTOKEN WHILETOKEN STRINGCONST LEQTOKEN GEQTOKEN EQTOKEN NEQTOKEN ANDTOKEN ORTOKEN RETURNTOKEN ILLEGALTOKEN OTHER
 
 /* from http://en.wikipedia.org/wiki/Operators_in_C_and_C%2B%2B */
 %nonassoc RETURNTOKEN
@@ -34,345 +33,486 @@ extern Sst stringconst_table;
 %left '<' LEQTOKEN '>' GEQTOKEN
 %left '+' '-'
 %left '*' '/' '%'
-%right INCREMENTTOKEN DECREMENTTOKEN UPLUS UMINUS '!'
+%right INCREMENTTOKEN DECREMENTTOKEN '!'
+%left UPLUS UMINUS
 
-%expect 2 /* shift/reduce conflicts with if-else grammar */
+%expect 1
 
 %%
 
-code : stmtList {
-  ast_node t = create_ast_node(ROOT);
-  t->left_child = $1;
-  root = ($$ = t); }
+program :
+  declaration_list {
+    ast_node t_root = create_ast_node(ROOT);
+    t_root->left_child = $1;
+    root = ($$ = t_root);
+  }
 ;
 
-stmtList : /* empty */ { $$ = NULL; }
-| stmtList stmt {
-  ast_node t = $1;
-   if (t != NULL) {
-     while (t->right_sibling != NULL)
-       t = t->right_sibling;
-     t->right_sibling = $2;
-     $$ = $1;
-   }
-   else
-     $$ = $2;
- }
+declaration_list :
+  declaration_list declaration {
+    ast_node t = $1;
+    if (t != NULL) {
+      t = rightmost_sibling(t);
+      t->right_sibling = $2;
+      $$ = $1;
+    } else
+      $$ = $2;
+  }
+| declaration {
+    $$ = $1;
+  }
 ;
 
-stmt : exprStmt { $$ = $1; }
-| compoundStmt  { $$ = $1; }
-| ifStmt        { $$ = $1; }
-| whileLoop     { $$ = $1; }
-| doWhileLoop   { $$ = $1; }
-| forLoop       { $$ = $1; }
+declaration : 
+  var_declaration {
+    $$ = $1;
+  }
+| func_declaration {
+    $$ = $1;
+  }
 ;
 
-exprStmt : expr ';' { $$ = $1; }
-| ';'               { $$ = NULL; }
-| error ';'         { $$ = NULL; }
-| intdecl ';'       { $$ = $1; }
-| doubledecl ';'    { $$ = $1; }
-| functionsig compoundStmt {
-  ast_node t = create_ast_node(FUNCTION_DEF);
-  t->left_child = $1;
-  t->left_child->right_sibling = $2;
- }
-| functionsig ';' {
-  ast_node t = create_ast_node(FUNCTION_PTT);
-  t->left_child = $1;
- }
+var_declaration :
+  type_specifier var_decl_list ';' {
+    ast_node t = create_ast_node(VAR_DECL);
+    t->left_child = $1;
+    t->left_child->right_sibling = $2;
+    $$ = t;
+  }
 ;
 
-functionsig :
-  rettype IDENT {
-  ast_node t_id = create_ast_node(ID);
-  t_id->value.string = add_string(id_table, savedText);
-  $2 = t_id;
- } '(' paramlist ')' {
-  ast_node t = create_ast_node(FUNCTION_SIG);
-  t->left_child = $1;
-  t->left_child->right_sibling = $2;
-  t->left_child->right_sibling->right_sibling = $5;
-  $$ = t;
-}
+type_specifier :
+  INTTOKEN {
+    ast_node t = create_ast_node(INT_TYPE);
+    $$ = t;
+  }
+| DOUBLETOKEN {
+    ast_node t = create_ast_node(DBL_TYPE);
+    $$ = t;
+  }
 ;
 
-rettype :
-  VOIDTOKEN { $$ = create_ast_node(RET_VOID); }
-| INTTOKEN { $$ = create_ast_node(RET_INT); }
-| DOUBLETOKEN { $$ = create_ast_node(RET_DOUBLE); }
-;
-
-paramlist : /* empty */ { $$ = NULL; }
-| paramlist ',' param {
-  ast_node t = $1;
-  if (t != NULL) {
-    for (; t->right_sibling != NULL; t = t->right_sibling); // <-- bitchin'
+var_decl_list :
+  var_decl_list ',' var_decl {
+    ast_node t = $1;
+    t = rightmost_sibling(t);
     t->right_sibling = $3;
     $$ = $1;
-  } else
-    $$ = $3; }
+  }
+| var_decl {
+    $$ = $1;
+  }
 ;
 
-param :
-  INTTOKEN IDENT {
+ident : IDENT {
     ast_node t_id = create_ast_node(ID);
     t_id->value.string = add_string(id_table, savedText);
+    $$ = t_id;
+  }
+;
 
-    ast_node t = create_ast_node(INT_PARAM);
-    t->left_child = t_id;
+var_decl :
+  ident {
+    $$ = $1
+  }
+| ident '=' expression {
+    ast_node t = create_ast_node(OP_ASSIGN);
+    t->left_child = $1;
+    t->left_child->right_sibling = $3;
     $$ = t;
   }
-| DOUBLETOKEN IDENT {
-    ast_node t_id = create_ast_node(ID);
-    t_id->value.string = add_string(id_table, savedText);
-
-    ast_node t = create_ast_node(DOUBLE_PARAM);
-    t->left_child = t_id;
-    $$ = t;
-  }
-| INTTOKEN IDENT '[' ']' {
-    ast_node t_id = create_ast_node(ID);
-    t_id->value.string = add_string(id_table, savedText);
-
-    ast_node t = create_ast_node(INT_ARRAY_PARAM);
-    t->left_child = t_id;
-    $$ = t;
-  }
-| DOUBLETOKEN IDENT '[' ']' {
-    ast_node t_id = create_ast_node(ID);
-    t_id->value.string = add_string(id_table, savedText);
-
-    ast_node t = create_ast_node(DOUBLE_ARRAY_PARAM);
-    t->left_child = t_id;
+| ident '[' expression ']' {
+    ast_node t = create_ast_node(ARRAY_SUB);
+    t->left_child = $1;
+    t->left_child->right_sibling = $3;
     $$ = t;
   }
 ;
 
-intdecl : INTTOKEN varlist  {
-  ast_node t = create_ast_node(INT_DECL);
-  t->left_child = $2;
-  $$ = t; }
+func_declaration :
+  type_specifier ident '(' formal_params ')' compound_statement {
+    ast_node t = create_ast_node(FUNC_DECL);
+    t->left_child = $1;
+    t->left_child->right_sibling = $2;
+    t->left_child->right_sibling->right_sibling = $4;
+    rightmost_sibling(t->left_child)->right_sibling = $6;
+    $$ = t;
+  }
+| VOIDTOKEN ident '(' formal_params ')' compound_statement {
+    ast_node t = create_ast_node(FUNC_DECL);
+    t->left_child = create_ast_node(VOID_TYPE);
+    t->left_child->right_sibling = $2;
+    t->left_child->right_sibling->right_sibling = $4;
+    rightmost_sibling(t->left_child)->right_sibling = $6;
+    $$ = t;
+  }
 ;
 
-doubledecl : DOUBLETOKEN varlist  {
-  ast_node t = create_ast_node(DOUBLE_DECL);
-  t->left_child = $2;
-  $$ = t; }
+formal_params :
+  formal_list {
+    $$ = $1;
+  }
+| VOIDTOKEN {
+    $$ = NULL;
+  }
+| /* empty */ {
+    $$ = NULL;
+  }
 ;
 
-varlist : vardecl       { $$ = $1; }
-| varlist ',' vardecl   {
-  ast_node t = $1;
-  while (t->right_sibling != NULL)
-    t = t->right_sibling;
-  t->right_sibling = $3;
-  $$ = $1; }
+formal_list :
+  formal_list ',' formal_param {
+    ast_node t = $1;
+    t = rightmost_sibling(t);
+    t->right_sibling = $3;
+    $$ = $1;
+  }
+| formal_param {
+    $$ = $1;
+  }
 ;
 
-vardecl :
-IDENT {
-  ast_node t1 = create_ast_node(ID);
-  t1->value.string = add_string(id_table, savedText);
-  $1 = t1;
- } '=' expr {
-  ast_node t2 = create_ast_node(OP_ASSIGN);
-  t2->left_child = $1;
-  t2->left_child->right_sibling = $4;
-  $$ = t2; }
-| IDENT {
-  ast_node t = create_ast_node(ID);
-  t->value.string = add_string(id_table, savedText);
-  $$ = t; }
-| arraysub { $$ = $1; }
-
-compoundStmt : '{' stmtList '}' {
-  ast_node t = create_ast_node(SEQ);
-  t->left_child = $2;
-  $$ = t; }
+formal_param :
+  type_specifier ident {
+    ast_node t = create_ast_node(FORMAL_PARAM);
+    t->left_child = $1;
+    t->left_child->right_sibling = $2;
+    $$ = t;
+  }
+| type_specifier ident '[' ']' {
+    ast_node t = create_ast_node(ARRAY_NONSUB);
+    t->left_child = $1;
+    t->left_child->right_sibling = $2;
+    $$ = t;
+  }
 ;
 
-ifStmt : IFTOKEN '(' expr ')' stmt { 
-  ast_node t = create_ast_node(IF_STMT);
-  t->left_child = $3;
-  t->left_child->right_sibling = $5;
-  $$ = t; }
-| IFTOKEN '(' expr ')' stmt ELSETOKEN stmt {
-  ast_node t = create_ast_node(IF_ELSE_STMT);
-  t->left_child = $3;
-  t->left_child->right_sibling = $5;
-  t->left_child->right_sibling->right_sibling = $7;
-  $$ = t; }
-| IFTOKEN '(' error ')' stmt { $$ = NULL; }
-| IFTOKEN '(' error ')' stmt ELSETOKEN stmt { $$ = NULL; }
+compound_statement :
+  '{' local_declarations statement_list '}' {
+    ast_node t = create_ast_node(SEQ);
+    if ($2 != NULL) {
+      t->left_child = $2;
+      rightmost_sibling(t->left_child)->right_sibling = $3;
+    } else
+      t->left_child = $3;
+
+    $$ = t;
+  }
 ;
 
-whileLoop : WHILETOKEN '(' expr ')' stmt {
-  ast_node t = create_ast_node(WHILE_LOOP);
-  t->left_child = $3;
-  t->left_child->right_sibling = $5; }
+local_declarations :
+  local_declarations var_declaration {
+    ast_node t = $1;
+    if (t != NULL) {
+      t = rightmost_sibling(t);
+      t->right_sibling = $2;
+      $$ = $1;
+    } else
+      $$ = $2;
+  }
+| /* empty */ {
+    $$ = NULL;
+  }
 ;
 
-doWhileLoop : DOTOKEN stmt WHILETOKEN '(' expr ')' {
-  ast_node t = create_ast_node(DO_WHILE_LOOP);
-  t->left_child = $2;
-  t->left_child->right_sibling = $5; }
+statement_list : 
+  statement_list statement {
+    ast_node t = $1;
+    if (t != NULL) {
+	t = rightmost_sibling(t);
+	t->right_sibling = $2;
+	$$ = $1;
+    } else
+	$$ = $2;
+  }
+|  /* empty */ {
+    $$ = NULL;
+  }
 ;
 
-forLoop : FORTOKEN '(' expr ';' expr ';' expr ')' stmt {
-  ast_node t = create_ast_node(FOR_LOOP);
-  t->left_child = $3;
-  t->left_child->right_sibling = $5;
-  t->left_child->right_sibling->right_sibling = $7;
-  t->left_child->right_sibling->right_sibling->right_sibling = $9;
-}
+statement : 
+  expression_statement { $$ = $1; }
+ |  compound_statement { $$ = $1; }
+ |  if_statement       { $$ = $1; }
+ |  while_statement    { $$ = $1; } 
+ |  do_while_statement { $$ = $1; }
+ |  for_statement      { $$ = $1; }
+ |  return_statement   { $$ = $1; }
+ |  read_statement     { $$ = $1; }
+ |  print_statement    { $$ = $1; }
+;
+expression_statement : 
+  expression ';'  { $$ = $1; }
+ |  ';'           { $$ = NULL; };
+;
 
-expr :
-IDENT {
-  ast_node t1 = create_ast_node(ID);
-  t1->value.string = add_string(id_table, savedText);
-  $1 = t1;
- } '=' expr {
-  ast_node t2 = create_ast_node(OP_ASSIGN);
-  t2->left_child = $1;
-  t2->left_child->right_sibling = $4;
-  $$ = t2; }
-| expr '+' expr {
-  ast_node t = create_ast_node(OP_PLUS);
-  t->left_child = $1;
-  t->left_child->right_sibling = $3;
-  $$ = t; }
-| '+' expr %prec UPLUS { $$ = $2; }
-| expr '-' expr {
-  ast_node t = create_ast_node(OP_MINUS);
-  t->left_child = $1;
-  t->left_child->right_sibling = $3;
-  $$ = t; }
-| '-' expr %prec UMINUS {
-  ast_node t = create_ast_node(OP_NEG);
-  t->left_child = $2;
-  $$ = t; }
-| expr '*' expr {
-  ast_node t = create_ast_node(OP_TIMES);
-  t->left_child = $1;
-  t->left_child->right_sibling = $3;
-  $$ = t; }
-| '(' expr ')' { $$ = $2; }
+// Note: Resolve the ambiguity in the productions for if_statement in the usual way, by matching each else with the closest previous unmatched then_part.
+if_statement : 
+   IFTOKEN '('expression')' statement {
+	ast_node t = create_ast_node(IF_STMT);
+	t->left_child = $3;
+	t->left_child->right_sibling = $5;
+	$$ = t;
+  }
+ | IFTOKEN '(' expression ')' statement ELSETOKEN statement {
+	ast_node t = create_ast_node(IF_STMT);
+	t->left_child = $3;
+	t->left_child->right_sibling = $5;
+	t->left_child->right_sibling->right_sibling = $7;
+	$$ = t;
+  }
+;
+
+while_statement : 
+  WHILETOKEN '(' expression ')' statement {
+	ast_node t = create_ast_node(WHILE_LOOP);
+	t->left_child = $3;
+	t->left_child->right_sibling = $5;
+	$$ = t;
+  }
+;
+
+do_while_statement : 
+  DOTOKEN statement WHILETOKEN '(' expression ')' ';' {
+	ast_node t = create_ast_node(DO_WHILE_LOOP);
+	t->left_child = $2;
+	t->left_child->right_sibling = $5;
+	$$ = t;
+  }
+;
+
+for_statement : 
+  FORTOKEN '(' for_header_expression ';' for_header_expression ';' for_header_expression ')' statement {
+	ast_node t = create_ast_node(FOR_STMT);
+	t->left_child = $3;
+	t->left_child->right_sibling = $5;
+	t->left_child->right_sibling->right_sibling = $7;
+	t->left_child->right_sibling->right_sibling->right_sibling = $9;
+	$$ = t;
+  }
+;
+
+for_header_expression : expression  {
+	$$ = $1;
+  }
+| /* empty */ {
+	$$ = create_ast_node(EMPTY_EXPR);
+  } 
+;
+
+return_statement : 
+  RETURNTOKEN ';' {
+	ast_node t = create_ast_node(RETURN_STMT);
+	$$ = t;
+  } 
+|  RETURNTOKEN expression ';' {
+	ast_node t = create_ast_node(RETURN_STMT);
+	t->left_child = $2;
+	$$ = t;
+  }
+;
+
+read_statement : 
+  READTOKEN var ';' {
+	ast_node t = create_ast_node(READ_STMT);	
+	t->left_child = $2;
+	$$ = t;
+  }
+;
+
+print_statement : 
+  PRINTTOKEN expression ';' {
+	ast_node t = create_ast_node(PRINT_STMT);	
+	t->left_child = $2;
+	$$ = t;
+  } 
+| PRINTTOKEN STRINGCONST ';' { // check this
+	ast_node t = create_ast_node(PRINT_STMT);	
+	ast_node t_str = create_ast_node(STRING_LITERAL);
+	t_str->value.string = add_string(stringconst_table, savedText);
+	t->left_child = t_str;
+	$$ = t;
+  }
+;
+
+expression : 
+  var '=' expression {
+	ast_node t = create_ast_node(OP_ASSIGN);
+	t->left_child = $1;
+	t->left_child->right_sibling = $3;
+	$$ = t;	
+  }
+| r_value {
+	$$ = $1;
+  }
+;
+var : 
+  ident {
+	$$ = $1;
+  }
+| ident '[' expression ']' {
+	ast_node t = create_ast_node(ARRAY_SUB);
+	t->left_child = $1;
+	t->left_child->right_sibling = $3;
+	$$ = t;
+  }
+;
+r_value : 
+  expression '+' expression {
+	ast_node t = create_ast_node(OP_ADD);	
+	t->left_child = $1;
+	t->left_child->right_sibling = $3;
+	$$ = t;
+  }  
+| expression '-' expression  {
+	ast_node t = create_ast_node(OP_SUB);	
+	t->left_child = $1;
+	t->left_child->right_sibling = $3;
+	$$ = t;
+  }
+| expression '*' expression  {
+	ast_node t = create_ast_node(OP_MULT);	
+	t->left_child = $1;
+	t->left_child->right_sibling = $3;
+	$$ = t;
+  }
+| expression '/'  expression  {
+	ast_node t = create_ast_node(OP_DIV);	
+	t->left_child = $1;
+	t->left_child->right_sibling = $3;
+	$$ = t;
+  }
+| expression '%' expression  {
+	ast_node t = create_ast_node(OP_MOD);	
+	t->left_child = $1;
+	t->left_child->right_sibling = $3;
+	$$ = t;
+  }
+| expression '<' expression  {
+	ast_node t = create_ast_node(OP_LT);	
+	t->left_child = $1;
+	t->left_child->right_sibling = $3;
+	$$ = t;
+  }
+| expression LEQTOKEN expression {
+	ast_node t = create_ast_node(OP_LEQ);	
+	t->left_child = $1;
+	t->left_child->right_sibling = $3;
+	$$ = t;
+  }
+| expression '>' expression  {
+	ast_node t = create_ast_node(OP_GT);	
+	t->left_child = $1;
+	t->left_child->right_sibling = $3;
+	$$ = t;
+  }
+| expression GEQTOKEN expression {
+	ast_node t = create_ast_node(OP_GEQ);	
+	t->left_child = $1;
+	t->left_child->right_sibling = $3;
+	$$ = t;
+  }
+| expression EQTOKEN expression {
+	ast_node t = create_ast_node(OP_EQ);	
+	t->left_child = $1;
+	t->left_child->right_sibling = $3;
+	$$ = t;
+  }
+| expression NEQTOKEN expression {
+	ast_node t = create_ast_node(OP_NEQ);	
+	t->left_child = $1;
+	t->left_child->right_sibling = $3;
+	$$ = t;
+  }
+| expression ANDTOKEN expression {
+	ast_node t = create_ast_node(OP_AND);	
+	t->left_child = $1;
+	t->left_child->right_sibling = $3;
+	$$ = t;
+  }
+| expression ORTOKEN expression {
+	ast_node t = create_ast_node(OP_OR);	
+	t->left_child = $1;
+	t->left_child->right_sibling = $3;
+	$$ = t;
+  }
+| '!' expression {
+	ast_node t = create_ast_node(OP_BANG);	
+	t->left_child = $2;
+	$$ = t;
+  }
+| '-' expression %prec UMINUS {
+	ast_node t = create_ast_node(OP_NEG);	
+	t->left_child = $2;
+	$$ = t;
+  }
+| '+' expression %prec UPLUS {
+    $$ = $2;
+  }
+| var {
+	$$ = $1;
+  }
+| INCREMENTTOKEN var {
+	ast_node t = create_ast_node(OP_INC);	
+	t->left_child = $2;
+	$$ = t;
+  }
+| DECREMENTTOKEN var {
+	ast_node t = create_ast_node(OP_DEC);	
+	t->left_child = $2;
+	$$ = t;
+  }
+| '(' expression ')' {
+	$$ = $2;
+  }
+| call {
+	$$ = $1;
+  }
 | NUMCONST {
-  ast_node t = create_ast_node(INT_LITERAL);
-  t->value.int_value = atoi(savedText);
-  $$ = t; }
+	ast_node t = create_ast_node(INT_LITERAL);
+	t->value.int_value = atoi(savedText);
+	$$ = t;
+  }
 | FNUMCONST {
-  ast_node t = create_ast_node(DOUBLE_LITERAL);
-  t->value.double_value = atof(savedText);
-  $$ = t; }
-| STRINGCONST {
-  ast_node t = create_ast_node(STRING_LITERAL);
-  t->value.string = add_string(stringconst_table, savedText);
-  $$ = t; }
-| IDENT {
-  ast_node t = create_ast_node(ID);
-  t->value.string = add_string(id_table, savedText);
-  $$ = t; }
-| '(' error ')' { $$ = NULL; }
-| INCREMENTTOKEN IDENT {
-  ast_node t = create_ast_node(OP_INCREMENT);
-  t->left_child = $2;
-  $$ = t; }
-| DECREMENTTOKEN IDENT {
-  ast_node t = create_ast_node(OP_DECREMENT);
-  t->left_child = $2;
-  $$ = t; }
-| RETURNTOKEN expr {
-  ast_node t = create_ast_node(RETURN_STMT);
-  t->left_child = $2;
-  $$ = t; }
-| PRINTTOKEN expr {
-  ast_node t = create_ast_node(PRINT_STMT);
-  t->left_child = $2;
-  $$ = t; }
-| READTOKEN {
-  ast_node t = create_ast_node(READ_STMT);
-  $$ = t; }
-| arraysub { $$ = $1; }
-| arraysub '=' expr {
-  ast_node t = create_ast_node(OP_ASSIGN);
-  t->left_child = $1;
-  t->left_child->right_sibling = $3;
-  $$ = t; }
-| expr '<' expr {
-  ast_node t = create_ast_node(OP_LT);
-  t->left_child = $1;
-  t->left_child->right_sibling = $3;
-  $$ = t; }
-| expr LEQTOKEN expr {
-  ast_node t = create_ast_node(OP_LEQ);
-  t->left_child = $1;
-  t->left_child->right_sibling = $3;
-  $$ = t; }
-| expr '>' expr {
-  ast_node t = create_ast_node(OP_GT);
-  t->left_child = $1;
-  t->left_child->right_sibling = $3;
-  $$ = t; }
-| expr GEQTOKEN expr {
-  ast_node t = create_ast_node(OP_GEQ);
-  t->left_child = $1;
-  t->left_child->right_sibling = $3;
-  $$ = t; }
-| expr EQTOKEN expr {
-  ast_node t = create_ast_node(OP_EQ);
-  t->left_child = $1;
-  t->left_child->right_sibling = $3;
-  $$ = t; }
-| expr NEQTOKEN expr {
-  ast_node t = create_ast_node(OP_NEQ);
-  t->left_child = $1;
-  t->left_child->right_sibling = $3;
-  $$ = t; }
-| expr ANDTOKEN expr {
-  ast_node t = create_ast_node(OP_AND);
-  t->left_child = $1;
-  t->left_child->right_sibling = $3;
-  $$ = t; }
-| expr ORTOKEN expr {
-  ast_node t = create_ast_node(OP_OR);
-  t->left_child = $1;
-  t->left_child->right_sibling = $3;
-  $$ = t; }
-| '!' expr {
-  ast_node t = create_ast_node(OP_BANG);
-  t->left_child = $2;
-  $$ = t; }
-| expr '/' expr {
-  ast_node t = create_ast_node(OP_DIVIDE);
-  t->left_child = $1;
-  t->left_child->right_sibling = $3;
-  $$ = t; }
-| expr '%' expr {
-  ast_node t = create_ast_node(OP_MOD);
-  t->left_child = $1;
-  t->left_child->right_sibling = $3;
-  $$ = t; }
+	ast_node t = create_ast_node(DOUBLE_LITERAL);
+	t->value.double_value = atoi(savedText);
+	$$ = t;
+  }
 ;
 
-arraysub :
-IDENT {
-  ast_node t_id = create_ast_node(ID);
-  t_id->value.string = add_string(id_table, savedText);
-  $1 = t_id;
- } '[' expr ']' {
-  ast_node t = create_ast_node(ARRAY_SUBSCRIPTED);
-  t->left_child = $1;
-  t->left_child->right_sibling = $4;
-  $$ = t; }
+call : 
+  ident '(' args ')' {
+	ast_node t = create_ast_node(FUNC_CALL);
+	t->left_child = $1;
+	t->left_child->right_sibling = $3;
+	$$ = t;	
+  }
+;
+
+args : 
+  arg_list {
+	$$ = $1;
+  }
+| /* empty */ {
+	$$ = NULL;
+  }
+;
+
+arg_list : arg_list ',' expression {
+	ast_node t = $1;
+    t = rightmost_sibling(t);
+	t->right_sibling = $3;
+	$$ = $1;
+  }
+|  expression {
+	$$ = $1;
+  }
 ;
 
 %%
 
 int yyerror(char *s) {
   parseError = 1;
-  fprintf(stderr, "%s at line %d\n", s, lineNumber);
+  fprintf(stderr, "%s at line %d: %s\n", s, lineNumber, savedText);
   return 0;
 }
