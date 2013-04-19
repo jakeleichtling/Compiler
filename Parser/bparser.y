@@ -1,3 +1,14 @@
+/*
+ * bparser.y
+ *
+ * Bison file for C57 Parser
+ * -generates parse tree using yyless()
+ * -node type: ast_node
+ * 
+ * Derek Salama & Jake Leichtling
+ * CS57
+ * 4/19/2013
+ */
 %{
 #include <stdlib.h>
 #include <string.h>
@@ -23,6 +34,7 @@ extern Sst stringconst_table;
 char *error_string;
 %}
 
+/* lexer tokens */
 %token INTTOKEN DOUBLETOKEN VOIDTOKEN IDENT FNUMCONST NUMCONST READTOKEN PRINTTOKEN INCREMENTTOKEN DECREMENTTOKEN IFTOKEN ELSETOKEN FORTOKEN DOTOKEN WHILETOKEN STRINGCONST LEQTOKEN GEQTOKEN EQTOKEN NEQTOKEN ANDTOKEN ORTOKEN RETURNTOKEN ILLEGALSTRINGTOKEN OTHER
 
 /* from http://en.wikipedia.org/wiki/Operators_in_C_and_C%2B%2B */
@@ -39,10 +51,13 @@ char *error_string;
 %left UPLUS UMINUS
 
 %start program
+
+/* if-else conflict */
 %expect 1
 
 %%
 
+/* Grammar as follows closely mimicks official C57 grammar as documented on course website */
 program :
   declaration_list {
     ast_node t_root = create_ast_node(ROOT);
@@ -329,13 +344,14 @@ print_statement :
 	t->left_child = $2;
 	$$ = t;
   } 
-| PRINTTOKEN STRINGCONST ';' { // check this
+| PRINTTOKEN STRINGCONST ';' { 
 	ast_node t = create_ast_node(PRINT_STMT);	
 	ast_node t_str = create_ast_node(STRING_LITERAL);
 	t_str->value.string = add_string(stringconst_table, savedText);
 	t->left_child = t_str;
 	$$ = t;
   }
+/* ERROR HANDLING for malformed strings */
 | PRINTTOKEN ILLEGALSTRINGTOKEN {
     error_string = "Malformed string: Newlines not allowed. Use \\n instead?";
     yyerror("syntax error");

@@ -1,3 +1,12 @@
+/* cparser.c
+ * -main ftn for testing parser
+ * -initializes tables and calls yyparse()
+ * -prints parse tree
+ *
+ *  Jake Leichtling & Derek Salama
+ *  CS57
+ *  4/19/2013
+ */
 #include <stdio.h>
 #include "ast.h"
 #include "sst.h"

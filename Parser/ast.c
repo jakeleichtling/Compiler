@@ -6,6 +6,12 @@
  *
  * This file contains functions to create a node and to print out an
  * abstract syntax tree, for debugging.
+ * ----------------------------------------------------------------
+ *
+ *  Modified by Derek Salama and Jake Leichtling
+ *  for use with their parser
+ *  CS57
+ *  4/19/2013
  *
  */
 
@@ -116,6 +122,7 @@ void print_ast(ast_node root, int depth) {
     print_ast(child, depth + 1);
 }
 
+ /* Iterate to last sibling in LL */
 ast_node rightmost_sibling(ast_node t)
 {
   for (; t->right_sibling != NULL; t = t->right_sibling); // <-- bitchin'

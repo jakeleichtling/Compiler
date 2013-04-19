@@ -6,6 +6,12 @@
  *
  * Written by THC for CS 57.  You should modify this file as
  * appropriate.
+ * -------------------------------------------------------------
+ *
+ *  Modified by Derek Salama and Jake Leichtling
+ *  for use with their parser
+ *  CS57
+ *  4/19/2013
  *
  */
 
@@ -57,6 +63,7 @@ ast_node create_ast_node(ast_node_type node_type);
    the root of the subtree and the depth of the subtree root. */
 void print_ast(ast_node root, int depth);
 
+/* Iterate to rightmost sibling in LL */
 ast_node rightmost_sibling(ast_node t);
 
 #endif

@@ -1,3 +1,12 @@
+/* sst.h
+ * -Simple String Table header file
+ * -datastructure used for storing IDs and string literals
+ *  in parser AST tree
+ *
+ *  Jake Leichtling & Derek Salama
+ *  CS57
+ *  4/19/2013
+ */
 #ifndef SST_H_
 #define SST_H_
 
