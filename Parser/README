@@ -1,0 +1,22 @@
+CS57 Project Part 2: Parser
+Derek Salama & Jake Leichtling
+4/19/2013
+-----------------------------
+
+Part 2 of the project uses bison, along with the Lexical Analyzer from Part 1,
+to build an abstract syntax tree from C57 code. The grammar used is defined
+as part of the CS57 Compiler project.
+
+ast.c  & ast.h - syntax tree struct as adopted from THC class lectures
+
+bparser.y - bison parser file
+
+cparser.c - main() function for running bparser and printing tree
+
+flexer.l - lex file for lexical analyzer, slighty modified from Part 1
+
+sst.c & sst.h - "simple string table" for holding IDs and string constants in parse tree
+
+sst_tester.c - main function for testing sst
+
+/testing - directory containing test scripts and files for parser (see TESTING_README for more details)
