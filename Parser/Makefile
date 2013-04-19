@@ -47,7 +47,7 @@ sst_tester:			sst_tester.c sst.o
 clean:					
 								rm -f ./*.output
 								rm -f parser
-								rm -f cparser lex.yy.o lex.yy.c bparser.tab.o bparser.tab.c bparser.tab.h ast.o cparser.o
+								rm -f cparser lex.yy.o lex.yy.c bparser.tab.o bparser.tab.c bparser.tab.h ast.o cparser.o sst.o
 								rm -f sst_tester
 								rm -f ./*.gch
 								rm -f -r ./*.dSYM
