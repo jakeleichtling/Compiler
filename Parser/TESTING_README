@@ -17,6 +17,10 @@ All of the Parser testing can be found within the /testing subdirectory, which c
 
 + bellman-ford.c57.in and dijkstra.c57.in are longer programs that provide practical examples of C57 code. Including these inputs in the testing suite ensures that our Parser can correctly handle programs with many interweaving components. I.e. using actual code could potentially demonstrate errors that are not apparent when testing different dimensions of the Parser in isolation.
 
++ string_newline.c57.in is a small program that demonstrates the Parser's handling of newline-in-string errors. The Parser does not correct the error, but provides information on where the error occurs (line 5) and a potentially helpful hint for correcting the code.
+
++ decl_after_print.c57.in is a small program that demonstrates the Parser's handling of errors in general, in this case a variable declaration following non-declarative instructions (e.g. print). The Parser identifies the line on which the syntax error occured (line 10) based on the actual source code; i.e. newlines in comments are accounted for so that the reported line is accurate.
+
 The bash script /testing/run_all_tests.sh (which must be executed from within /testing) provides a convenient way to run the Parser on these four test files and store the output in corresponding *.out files for manual checking.
 
 Happy testing,

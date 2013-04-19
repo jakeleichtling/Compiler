@@ -22,6 +22,10 @@ cat loops_within_loops.c57.in | ../parser > loops_within_loops.c57.out
 
 cat complicated_expressions.c57.in | ../parser > complicated_expressions.c57.out
 
+cat string_newline.c57.in | ../parser > string_newline.c57.out
+
+cat decl_after_print.c57.in | ../parser > decl_after_print.c57.out
+
 cd ..
 make clean
 cd ./testing
