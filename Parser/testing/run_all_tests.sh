@@ -14,13 +14,13 @@ cd ..
 make
 cd ./testing
 
-cat bellman-ford.cs57.in | ../parser > bellman-ford.cs57.out
+cat bellman-ford.c57.in | ../parser > bellman-ford.c57.out
 
-echo -------------------------------------------------
+cat dijkstra.c57.in | ../parser > dijkstra.c57.out
 
-cat bellman-ford.cs57.out
+cat loops_within_loops.c57.in | ../parser > loops_within_loops.c57.out
 
-echo -------------------------------------------------
+cat complicated_expressions.c57.in | ../parser > complicated_expressions.c57.out
 
 cd ..
 make clean

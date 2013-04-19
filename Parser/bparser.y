@@ -19,9 +19,11 @@ extern int parseError;
 extern char *savedText;
 extern Sst id_table;
 extern Sst stringconst_table;
+
+char *error_string;
 %}
 
-%token INTTOKEN DOUBLETOKEN VOIDTOKEN IDENT FNUMCONST NUMCONST READTOKEN PRINTTOKEN INCREMENTTOKEN DECREMENTTOKEN IFTOKEN ELSETOKEN FORTOKEN DOTOKEN WHILETOKEN STRINGCONST LEQTOKEN GEQTOKEN EQTOKEN NEQTOKEN ANDTOKEN ORTOKEN RETURNTOKEN ILLEGALTOKEN OTHER
+%token INTTOKEN DOUBLETOKEN VOIDTOKEN IDENT FNUMCONST NUMCONST READTOKEN PRINTTOKEN INCREMENTTOKEN DECREMENTTOKEN IFTOKEN ELSETOKEN FORTOKEN DOTOKEN WHILETOKEN STRINGCONST LEQTOKEN GEQTOKEN EQTOKEN NEQTOKEN ANDTOKEN ORTOKEN RETURNTOKEN ILLEGALSTRINGTOKEN OTHER
 
 /* from http://en.wikipedia.org/wiki/Operators_in_C_and_C%2B%2B */
 %nonassoc RETURNTOKEN
@@ -36,6 +38,7 @@ extern Sst stringconst_table;
 %right INCREMENTTOKEN DECREMENTTOKEN '!'
 %left UPLUS UMINUS
 
+%start program
 %expect 1
 
 %%
@@ -333,6 +336,10 @@ print_statement :
 	t->left_child = t_str;
 	$$ = t;
   }
+| PRINTTOKEN ILLEGALSTRINGTOKEN {
+    error_string = "Malformed string: Newlines not allowed. Use \\n instead?";
+    yyerror("syntax error");
+  }
 ;
 
 expression : 
@@ -475,7 +482,7 @@ r_value :
   }
 | FNUMCONST {
 	ast_node t = create_ast_node(DOUBLE_LITERAL);
-	t->value.double_value = atoi(savedText);
+	t->value.double_value = atof(savedText);
 	$$ = t;
   }
 ;
@@ -513,6 +520,13 @@ arg_list : arg_list ',' expression {
 
 int yyerror(char *s) {
   parseError = 1;
-  fprintf(stderr, "%s at line %d: %s\n", s, lineNumber, savedText);
-  return 0;
+  fprintf(stderr, "%s at line %d", s, lineNumber);
+
+  if (error_string) {
+    fprintf(stderr, ": \"%s\"\n", error_string);
+    error_string = NULL;
+  }
+
+  fprintf(stderr, "\n");
+  return 1;
 }

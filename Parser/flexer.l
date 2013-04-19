@@ -23,7 +23,7 @@ letter [a-zA-Z]
 digit [0-9]
 id ({letter}|_)({letter}|{digit}|_)*
 integer {digit}+
-fixedfloat {integer}"."{integer}?|"."{integer}
+float {integer}"."{integer}?|"."{integer}
 
 %x string
 %x comment
@@ -41,7 +41,7 @@ fixedfloat {integer}"."{integer}?|"."{integer}
     savedText = strdup(yytext);
     return NUMCONST;
 }
-{fixedfloat}    {
+{float}    {
     savedText = strdup(yytext);
     return FNUMCONST;
 }
@@ -49,7 +49,7 @@ fixedfloat {integer}"."{integer}?|"."{integer}
 \"              BEGIN(string);
 <string>\n      {
     savedText = strdup(yytext);
-    return ILLEGALTOKEN;
+    return ILLEGALSTRINGTOKEN;
     lineNumber++;
 }
 <string>\\\"    yymore();

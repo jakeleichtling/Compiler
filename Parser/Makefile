@@ -9,7 +9,7 @@
 # 4/19/2013
 
 BISONFlAGS = -d -v
-CFLAGS = -g
+CFLAGS = 
 
 parser:				  lex.yy.o bparser.tab.o ast.o cparser.o sst.o
 								gcc $(CFLAGS) -o parser lex.yy.o bparser.tab.o ast.o cparser.o sst.o -lfl
@@ -50,3 +50,4 @@ clean:
 								rm -f cparser lex.yy.o lex.yy.c bparser.tab.o bparser.tab.c bparser.tab.h ast.o cparser.o
 								rm -f sst_tester
 								rm -f ./*.gch
+								rm -f -r ./*.dSYM
