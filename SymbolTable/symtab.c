@@ -54,9 +54,6 @@ void set_node_addr(symnode node, int addr)
   node->varaddr = addr;
 }
 
-/* Set the address of the variable in this node. */
-void set_node_addr(symnode node, int addr);
-
 /* Does the identifier in this node equal name? */
 int name_is_equal(symnode node, char *name) {
   return !strcmp(node->name, name);
