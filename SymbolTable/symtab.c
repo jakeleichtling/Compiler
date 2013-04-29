@@ -1,7 +1,15 @@
 /* symtab.c
  * Functions for the symbol table.
  * Written by THC for CS 57.
- * You should extend the functions as appropriate.
+ *-------------------------
+ * Modified by Derek Salama & Jake Leichtling
+ * 4/29/2013
+ *
+ * Changes:
+ * -insert now requires a node_type, as we
+ *  are defining node equality based on
+ *  the name and type
+ * -lookup now requires a node_type
  */
 
 #include <stdlib.h>

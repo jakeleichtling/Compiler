@@ -1,0 +1,12 @@
+Project Part 3: Symbol Table
+CS57
+Derek Salama and Jake Leichtling
+4/29/2013
+--------------------------------
+
+Part 3 of the compiler project implements the symbol for our compiler. Our symbol table is mostly comprised of the sample code provided by Professor Cormen. Our modifications revolve around the addition of enumerated types to symnodes. First, we thought that identifier nodes should be distinguished from string constant nodes such that there would be no collision when an identifer node happens to have the same name as a string constant. Furthermore, we added a vartype node for type checking. This vartype only applies to nodes of the identifier type, and is not considered for equality. Besides the enumerated types, we also added an int "addr" to the nodes which records the memory location of that node's value.
+
+All of the source code for this part of the project is contained in symtab.h and symtab.c. See the TESTING_README for information on testing.
+
+Cheers,
+Derek and Jake
