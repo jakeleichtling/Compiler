@@ -29,13 +29,6 @@ static void destroy_symnode(symnode node) {
   free(node);
 }
 
-/* Set the name in this node. */
-void set_node_name(symnode node, char *name) {
-  if (node->name != NULL)
-    free(node->name);
-  node->name = strdup(name);
-}
-
 /* Set the node type of this node. */
 void set_node_nodetype(symnode node, enum nodetype type)
 {
@@ -110,14 +103,14 @@ static int hashPJW(char *s, int size) {
    the symnode for the entry or NULL.  slot is where to look; if slot
    == NOHASHSLOT, then apply the hash function to figure it out. */
 static symnode lookup_symhashtable(symhashtable hashtable, char *name,
-				   int slot) {
+				   int slot, enum nodetype node_type) {
   symnode node;
 
   if (slot == NOHASHSLOT)
     slot = hashPJW(name, hashtable->size);
 
   for (node = hashtable->table[slot];
-       node != NULL && !name_is_equal(node, name);
+       node != NULL && !(name_is_equal(node, name) && node->node_type == node_type);
        node = node->next)
     ;
 
@@ -126,12 +119,13 @@ static symnode lookup_symhashtable(symhashtable hashtable, char *name,
 
 /* Insert a new entry into a symhashtable, but only if it is not
    already present. */
-static symnode insert_into_symhashtable(symhashtable hashtable, char *name) {
+static symnode insert_into_symhashtable(symhashtable hashtable, char *name, enum nodetype node_type) {
   int slot = hashPJW(name, hashtable->size);
-  symnode node = lookup_symhashtable(hashtable, name, slot);
+  symnode node = lookup_symhashtable(hashtable, name, slot, node_type);
 
   if (node == NULL) {
     node = create_symnode(name);
+    node->node_type = node_type;
     node->next = hashtable->table[slot];
     hashtable->table[slot] = node;
   }
@@ -168,16 +162,16 @@ void destroy_symboltable(symboltable symtab) {
 /* Insert an entry into the innermost scope of symbol table.  First
    make sure it's not already in that scope.  Return a pointer to the
    entry. */
-symnode insert_into_symboltable(symboltable symtab, char *name) {
+symnode insert_into_symboltable(symboltable symtab, char *name, enum nodetype node_type) {
   if (symtab->inner_scope == NULL) {
     fprintf(stderr, "Error: inserting into an empty symbol table\n");
     exit(1);
   }
 
-  symnode node = lookup_symhashtable(symtab->inner_scope, name, NOHASHSLOT);
+  symnode node = lookup_symhashtable(symtab->inner_scope, name, NOHASHSLOT, node_type);
 
   if (node == NULL)
-    node = insert_into_symhashtable(symtab->inner_scope, name);
+    node = insert_into_symhashtable(symtab->inner_scope, name, node_type);
 
   return node;
 }
@@ -185,14 +179,14 @@ symnode insert_into_symboltable(symboltable symtab, char *name) {
 /* Lookup an entry in a symbol table.  If found return a pointer to it
    and fill in level.  Otherwise, return NULL and level is
    undefined. */
-symnode lookup_in_symboltable(symboltable symtab, char *name, int *level) {
+symnode lookup_in_symboltable(symboltable symtab, char *name, int *level, enum nodetype node_type) {
   symnode node;
   symhashtable hashtable;
 
   for (node = NULL, hashtable = symtab->inner_scope;
        node == NULL && hashtable != NULL;
        hashtable = hashtable->outer_scope) {
-    node = lookup_symhashtable(hashtable, name, NOHASHSLOT);
+    node = lookup_symhashtable(hashtable, name, NOHASHSLOT, node_type);
     *level = hashtable->level;
   }
 

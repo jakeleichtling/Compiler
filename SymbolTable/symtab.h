@@ -9,15 +9,15 @@
 
 /* Node types */
 enum nodetype {
-  variable,
-  function,
+  identifier,
   stringconst
 };
 
-/* Variable types */
+/* Variable and return types */
 enum vartype {
   inttype,
-  doubletype
+  doubletype,
+  voidtype
 };
 
 /* Node in a linked list within the symbol table. */
@@ -32,12 +32,6 @@ struct symnode {
   int varaddr; // irrelevant for string constants
 };
 
-/* Set the name in this node. */
-void set_node_name(symnode node, char *name);
-
-/* Set the node type of this node. */
-void set_node_nodetype(symnode node, enum nodetype type);
-
 /* Set the variable type of this node. */
 void set_node_vartype(symnode node, enum vartype type);
 
@@ -46,7 +40,6 @@ void set_node_addr(symnode node, int addr);
 
 /* Does the identifier in this node equal name? */
 int name_is_equal(symnode node, char *name);
-
 
 /* Hash table for a given scope in a symbol table. */
 
@@ -74,12 +67,12 @@ void destroy_symboltable(symboltable symtab);
 /* Insert an entry into the innermost scope of symbol table.  First
    make sure it's not already in that scope.  Return a pointer to the
    entry. */
-symnode insert_into_symboltable(symboltable symtab, char *name);
+symnode insert_into_symboltable(symboltable symtab, char *name, enum nodetype node_type);
 
 /* Lookup an entry in a symbol table.  If found return a pointer to it
    and fill in level.  Otherwise, return NULL and level is
    undefined. */
-symnode lookup_in_symboltable(symboltable symtab, char *name, int *level);
+symnode lookup_in_symboltable(symboltable symtab, char *name, int *level, enum nodetype node_type);
 
 /* Enter a new scope. */
 void enter_scope(symboltable symtab);

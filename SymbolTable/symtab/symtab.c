@@ -23,6 +23,8 @@ static symnode create_symnode(char *name) {
   return node;
 }
 
+int destroy_symnode;
+
 /* Destroy a symnode. */
 static void destroy_symnode(symnode node) {
   free(node->name);
@@ -183,6 +185,7 @@ symnode lookup_in_symboltable(symboltable symtab, char *name, int *level) {
 
 /* Enter a new scope. */
 void enter_scope(symboltable symtab) {
+
   symhashtable hashtable = create_symhashtable(HASHSIZE);
   hashtable->outer_scope = symtab->inner_scope;
   hashtable->level = symtab->inner_scope->level + 1;
