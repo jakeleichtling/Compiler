@@ -2,13 +2,13 @@
  * Declarations for the symbol table.
  * Written by THC for CS 57.
  * You should extend the structs and functions as appropriate.
- *-------------------------
+ * -------------------------
  * Modified by Derek Salama & Jake Leichtling
  * 4/29/2013
  *
  * Changes:
  * -Added enum "nodetype" in symnode to distinguish between 
- *  nodes for string constants and identifiers
+ *  nodes for string constants and identifiers for variables and functions
  * -Added enum "vartype" for convenient type checking on
  *  both variables and functions. Please note that this
  *  is irrelevant for string constant nodes and also does

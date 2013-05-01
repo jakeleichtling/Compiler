@@ -1,0 +1,51 @@
+TESTING
+-------
+
+To test the symbol table, run the default "make" and then execute the compiled program symtab_test.
+
+The main function of symtab_test performs the following operations on the symbol table, printing out the state of the table between each operation that is not a node lookup:
+
+---------------------------------------------
+
+    1.) Add int x @ addr 1
+
+    2.) Enter new scope
+
+    3.) Add double x @ addr 2
+
+    4.) Enter new scope
+
+    5.) Look up and print out id \"x\" --> double x @ level 1
+
+    6.) Add stringconst x @ addr 3
+
+    7.) Look up and print out stringconst \"x\" --> stringconst x @ level 2
+
+    8.) Add stringconst x (same name as (6)!)
+
+    9.) Look up and print out stringconst \"x\" --> stringconst x @ level 2 (same node as (7)!)
+
+    10.) Look up and print out id \"x\" --> double x @ level 1
+
+    11.) Add void function x @ addr 4
+
+    12.) Look up and print out id \"x\" --> void function x @ level 2
+
+    13.) Look up and print out stringconst \"x\" --> stringconst x @ level 2 (same node as (7)!)
+
+    14.) Leave the current scope
+
+    15.) Look up and print out stringconst \"x\" --> null
+
+    16.) Look up and print out id \"x\" --> double x @ level 1
+
+    17.) Leave the current scope
+
+    18.) Look up and print out id \"x\" --> int x @ level 0
+
+---------------------------------------------
+
+This testing sequence is intended to ensure that the table functions properly when testing for equality, adding nodes of the same name at different scopes, adding nodes of the same name of different types (identifier vs. string constant) at the same scope, and looking up such nodes. Additionally, the three C57 constructs that are involved in the symbol table (variables, functions, and string constants) are each tested in this sequence.
+
+Happy testing,
+Derek & Jake

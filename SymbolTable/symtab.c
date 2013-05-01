@@ -1,7 +1,7 @@
 /* symtab.c
  * Functions for the symbol table.
  * Written by THC for CS 57.
- *-------------------------
+ * -------------------------
  * Modified by Derek Salama & Jake Leichtling
  * 4/29/2013
  *

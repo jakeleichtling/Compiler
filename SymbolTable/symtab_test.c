@@ -1,6 +1,12 @@
+/* symtab_test.c
+ * Derek Salama & Jake Leichtling
+ * 4/29/2013
+ *
+ * A test driver for our symbol table. See the TESTING_README for more information.
+ */
+
 #include "symtab.h"
 #include <stdio.h>
-
 
 static char *type_strings[] = 
 {
@@ -124,7 +130,7 @@ int main()
     printf("11.) Add void function x @ addr 4\n\n");
     symnode v_ftn_x = insert_into_symboltable(t, "x", identifier);
     set_node_vartype(v_ftn_x, voidtype);
-    set_node_addr(sc_x, 3);
+    set_node_addr(v_ftn_x, 4);
 
     printf("------------------------------------\n");
     print_symboltable(t);
@@ -134,30 +140,33 @@ int main()
     print_node(lookup_in_symboltable(t, "x", &level, identifier));
     printf("@ level: %d\n\n", level);
 
+    printf("13.) Look up and print out stringconst \"x\" --> stringconst x @ level 2 (same node as (7)!)\n");
+    print_node(lookup_in_symboltable(t, "x", &level, stringconst));
+    printf("@ level: %d\n\n", level);
 
-    printf("13.) Leave the current scope\n\n");
+    printf("14.) Leave the current scope\n\n");
     leave_scope(t);
 
     printf("------------------------------------\n");
     print_symboltable(t);
     printf("------------------------------------\n\n");
 
-    printf("14.) Look up and print out stringconst \"x\" --> null\n");
+    printf("15.) Look up and print out stringconst \"x\" --> null\n");
     print_node(lookup_in_symboltable(t, "x", &level, stringconst));
     printf("\n");
 
-    printf("15.) Look up and print out id \"x\" --> double x @ level 1\n");
+    printf("16.) Look up and print out id \"x\" --> double x @ level 1\n");
     print_node(lookup_in_symboltable(t, "x", &level, identifier));
     printf("@ level: %d\n\n", level);
 
-    printf("16.) Leave the current scope\n\n");
+    printf("17.) Leave the current scope\n\n");
     leave_scope(t);
 
     printf("------------------------------------\n");
     print_symboltable(t);
     printf("------------------------------------\n\n");
 
-    printf("17.) Look up and print out id \"x\" --> int x @ level 0\n");
+    printf("18.) Look up and print out id \"x\" --> int x @ level 0\n");
     print_node(lookup_in_symboltable(t, "x", &level, identifier));
     printf("@ level: %d\n\n", level);
 

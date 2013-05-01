@@ -4,7 +4,9 @@ Derek Salama and Jake Leichtling
 4/29/2013
 --------------------------------
 
-Part 3 of the compiler project implements the symbol for our compiler. Our symbol table is mostly comprised of the sample code provided by Professor Cormen. Our modifications revolve around the addition of enumerated types to symnodes. First, we thought that identifier nodes should be distinguished from string constant nodes such that there would be no collision when an identifer node happens to have the same name as a string constant. Furthermore, we added a vartype node for type checking. This vartype only applies to nodes of the identifier type, and is not considered for equality. Besides the enumerated types, we also added an int "addr" to the nodes which records the memory location of that node's value.
+Part 3 of the compiler project implements the symbol table for our compiler. Our symbol table is mostly comprised of the sample code provided by Professor Cormen. Our modifications revolve around the addition of attributes to symnodes (i.e. node type, variable/return type, and address). First, identifier nodes (i.e. functions and variables) should be distinguished from string constant nodes such that there is not a collision between an identifier and a string constant with the same name (e.g. int x and "x"). Furthermore, we added a vartype attribute for type checking, which only applies to nodes of the identifier type and is not considered when checking for equality. We also added an integer "addr" attribute to the nodes which records the memory location of that node's value.
+
+Note: We expect to make a lot of changes to our symbol table code as we implement the later stages of the compiler. At this point in time, we are not completely sure of how the table will be used when generating the proper assembly code. We believe that the importance of the symbol table, such as the node attributes it holds and the ways in which these attributes are used, will become more salient in the future.
 
 All of the source code for this part of the project is contained in symtab.h and symtab.c. See the TESTING_README for information on testing.
 
