@@ -14,7 +14,7 @@
 #include <string.h>
 #include <stdio.h>
 #include "ast.h"
-#include "sst.h"
+#include "symtab.h"
 
 #define YYSTYPE ast_node
 #define YYDEBUG 1
@@ -28,8 +28,8 @@ extern ast_node root;
 extern int parseError;
 
 extern char *savedText;
-extern Sst id_table;
-extern Sst stringconst_table;
+extern symboltable id_table;
+extern symboltable stringconst_table;
 
 char *error_string;
 %}
@@ -124,7 +124,7 @@ var_decl_list :
 
 ident : IDENT {
     ast_node t_id = create_ast_node(ID);
-    t_id->value.string = add_string(id_table, savedText);
+    t_id->value.sym_node = insert_into_symboltable(id_table, savedText);
     $$ = t_id;
   }
 ;
@@ -347,7 +347,7 @@ print_statement :
 | PRINTTOKEN STRINGCONST ';' { 
 	ast_node t = create_ast_node(PRINT_STMT);	
 	ast_node t_str = create_ast_node(STRING_LITERAL);
-	t_str->value.string = add_string(stringconst_table, savedText);
+	t_str->value.sym_node = insert_into_symboltable(stringconst_table, savedText);
 	t->left_child = t_str;
 	$$ = t;
   }

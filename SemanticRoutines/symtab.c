@@ -4,12 +4,6 @@
  * -------------------------
  * Modified by Derek Salama & Jake Leichtling
  * 4/29/2013
- *
- * Changes:
- * -insert now requires a node_type, as we
- *  are defining node equality based on
- *  the name and type
- * -lookup now requires a node_type
  */
 
 #include <stdlib.h>
@@ -35,12 +29,6 @@ static symnode create_symnode(char *name) {
 static void destroy_symnode(symnode node) {
   free(node->name);
   free(node);
-}
-
-/* Set the node type of this node. */
-void set_node_nodetype(symnode node, enum nodetype type)
-{
-  node->node_type = type;
 }
 
 /* Set the variable type of this node. */
@@ -111,14 +99,14 @@ static int hashPJW(char *s, int size) {
    the symnode for the entry or NULL.  slot is where to look; if slot
    == NOHASHSLOT, then apply the hash function to figure it out. */
 static symnode lookup_symhashtable(symhashtable hashtable, char *name,
-				   int slot, enum nodetype node_type) {
+				   int slot) {
   symnode node;
 
   if (slot == NOHASHSLOT)
     slot = hashPJW(name, hashtable->size);
 
   for (node = hashtable->table[slot];
-       node != NULL && !(name_is_equal(node, name) && node->node_type == node_type);
+       node != NULL && !name_is_equal(node, name);
        node = node->next)
     ;
 
@@ -127,13 +115,12 @@ static symnode lookup_symhashtable(symhashtable hashtable, char *name,
 
 /* Insert a new entry into a symhashtable, but only if it is not
    already present. */
-static symnode insert_into_symhashtable(symhashtable hashtable, char *name, enum nodetype node_type) {
+static symnode insert_into_symhashtable(symhashtable hashtable, char *name) {
   int slot = hashPJW(name, hashtable->size);
-  symnode node = lookup_symhashtable(hashtable, name, slot, node_type);
+  symnode node = lookup_symhashtable(hashtable, name, slot);
 
   if (node == NULL) {
     node = create_symnode(name);
-    node->node_type = node_type;
     node->next = hashtable->table[slot];
     hashtable->table[slot] = node;
   }
@@ -170,16 +157,16 @@ void destroy_symboltable(symboltable symtab) {
 /* Insert an entry into the innermost scope of symbol table.  First
    make sure it's not already in that scope.  Return a pointer to the
    entry. */
-symnode insert_into_symboltable(symboltable symtab, char *name, enum nodetype node_type) {
+symnode insert_into_symboltable(symboltable symtab, char *name) {
   if (symtab->inner_scope == NULL) {
     fprintf(stderr, "Error: inserting into an empty symbol table\n");
     exit(1);
   }
 
-  symnode node = lookup_symhashtable(symtab->inner_scope, name, NOHASHSLOT, node_type);
+  symnode node = lookup_symhashtable(symtab->inner_scope, name, NOHASHSLOT);
 
   if (node == NULL)
-    node = insert_into_symhashtable(symtab->inner_scope, name, node_type);
+    node = insert_into_symhashtable(symtab->inner_scope, name);
 
   return node;
 }
@@ -187,14 +174,14 @@ symnode insert_into_symboltable(symboltable symtab, char *name, enum nodetype no
 /* Lookup an entry in a symbol table.  If found return a pointer to it
    and fill in level.  Otherwise, return NULL and level is
    undefined. */
-symnode lookup_in_symboltable(symboltable symtab, char *name, int *level, enum nodetype node_type) {
+symnode lookup_in_symboltable(symboltable symtab, char *name, int *level) {
   symnode node;
   symhashtable hashtable;
 
   for (node = NULL, hashtable = symtab->inner_scope;
        node == NULL && hashtable != NULL;
        hashtable = hashtable->outer_scope) {
-    node = lookup_symhashtable(hashtable, name, NOHASHSLOT, node_type);
+    node = lookup_symhashtable(hashtable, name, NOHASHSLOT);
     *level = hashtable->level;
   }
 

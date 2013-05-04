@@ -18,6 +18,8 @@
 #ifndef AST_H_
 #define AST_H_
 
+#include "symtab.h"
+
 /* You should fill in the various node types.  The following are given
    to you to start with.  You may add or remove node types as you
    wish. */
@@ -49,7 +51,7 @@ struct ast_node_struct {
   ast_node_type node_type;
   ast_node left_child, right_sibling;
   union {
-    char * string;		/* for ID or STRING_LITERAL */
+    symnode sym_node;		/* for ID or STRING_LITERAL */
     int int_value;		/* for INT_LITERAL */
     double double_value;	/* for DOUBLE_LITERAL */
   } value;

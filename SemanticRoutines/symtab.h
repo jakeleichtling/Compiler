@@ -7,23 +7,12 @@
  * 4/29/2013
  *
  * Changes:
- * -Added enum "nodetype" in symnode to distinguish between 
- *  nodes for string constants and identifiers for variables and functions
  * -Added enum "vartype" for convenient type checking on
- *  both variables and functions. Please note that this
- *  is irrelevant for string constant nodes and also does
- *  not effect "shadowing", as equality is only defined by
- *  name and nodetype.
+ *  both variables and functions.
  */
 
 #ifndef SYMTAB_H_
 #define SYMTAB_H_
-
-/* Node types */
-enum nodetype {
-  identifier,
-  stringconst
-};
 
 /* Variable and return types */
 enum vartype {
@@ -39,7 +28,6 @@ struct symnode {
   char *name;	    /* name in this symnode */
   symnode next;	    /* next symnode in list */
   /* Other attributes go here. */
-  enum nodetype node_type;
   enum vartype var_type; // The type of a variable or return type of a function (irrelevant for string constants)
   int varaddr; // irrelevant for string constants
 };
@@ -79,12 +67,12 @@ void destroy_symboltable(symboltable symtab);
 /* Insert an entry into the innermost scope of symbol table.  First
    make sure it's not already in that scope.  Return a pointer to the
    entry. */
-symnode insert_into_symboltable(symboltable symtab, char *name, enum nodetype node_type);
+symnode insert_into_symboltable(symboltable symtab, char *name);
 
 /* Lookup an entry in a symbol table.  If found return a pointer to it
    and fill in level.  Otherwise, return NULL and level is
    undefined. */
-symnode lookup_in_symboltable(symboltable symtab, char *name, int *level, enum nodetype node_type);
+symnode lookup_in_symboltable(symboltable symtab, char *name, int *level);
 
 /* Enter a new scope. */
 void enter_scope(symboltable symtab);

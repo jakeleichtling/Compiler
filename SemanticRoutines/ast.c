@@ -94,7 +94,7 @@ void print_ast(ast_node root, int depth) {
   /* Print attributes specific to node types. */
   switch (root->node_type) {
   case ID:			/* print the id */
-    printf("%s (%p)", root->value.string, root->value.string);
+    printf("%s (%p)", root->value.sym_node->name, root->value.sym_node);
     break;
 
   case INT_LITERAL:		/* print the int literal */
@@ -106,7 +106,7 @@ void print_ast(ast_node root, int depth) {
     break;
 
   case STRING_LITERAL:      /* print the string */
-    printf("%s (%p)", root->value.string, root->value.string);
+    printf("%s (%p)", root->value.sym_node->name, root->value.sym_node);
     break;
 
   default:
