@@ -14,22 +14,31 @@
 #ifndef SYMTAB_H_
 #define SYMTAB_H_
 
-/* Variable and return types */
+/* Variable and return types, used for type checking */
 enum vartype {
   inttype,
   doubletype,
-  voidtype
+  voidtype,
+  no_type
+};
+
+/* The thing that the identifier identifies. Not applicable in the string constant table */
+enum nodetype {
+  func_node,
+  val_node,
+  array_node
 };
 
 /* Node in a linked list within the symbol table. */
-
 typedef struct symnode *symnode;
 struct symnode {
   char *name;	    /* name in this symnode */
   symnode next;	    /* next symnode in list */
   /* Other attributes go here. */
-  enum vartype var_type; // The type of a variable or return type of a function (irrelevant for string constants)
+  enum vartype var_type; // The type of a variable or return type of a function (irrelevant for the string table)
   int varaddr; // irrelevant for string constants
+  enum nodetype node_type; // The thing that the identifier identifies (irrelevant for the string table)
+  int array_size; // only relevant for nodes of type array_node
 };
 
 /* Set the variable type of this node. */

@@ -11,10 +11,10 @@
 BISONFlAGS = -d -v
 CFLAGS = 
 
-djcc:	djcc.o lex.yy.o bparser.tab.o ast.o symtab.o
-	gcc $(CFLAGS) -o djcc djcc.o lex.yy.o bparser.tab.o ast.o symtab.o -lfl
+djcc:	djcc.o lex.yy.o bparser.tab.o ast.o symtab.o quad.o
+	gcc $(CFLAGS) -o djcc djcc.o lex.yy.o bparser.tab.o ast.o symtab.o quad.o -lfl
 
-djcc.o:	djcc.c bparser.tab.h ast.h symtab.h
+djcc.o:	djcc.c bparser.tab.h ast.h symtab.h quad.h
 	gcc $(CFLAGS) -c djcc.c
 
 lex.yy.o:	lex.yy.c bparser.tab.h
@@ -37,6 +37,9 @@ ast.o:	ast.c ast.h
 
 symtab.o:	symtab.c symtab.h
 	gcc $(CFLAGS) -c symtab.c
+
+quad.o:	quad.c quad.h
+	gcc $(CFLAGS) -c quad.c
 
 clean:
 	rm -f djcc

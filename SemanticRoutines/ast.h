@@ -55,6 +55,8 @@ struct ast_node_struct {
     int int_value;		/* for INT_LITERAL */
     double double_value;	/* for DOUBLE_LITERAL */
   } value;
+  int line_num;
+  enum vartype data_type;
 };
 
 /* Create a node with a given token type and return a pointer to the

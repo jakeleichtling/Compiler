@@ -1,6 +1,7 @@
 #include "bparser.tab.h"
 #include "ast.h"
 #include "symtab.h"
+#include "quad.h"
 
 // Should these go here?
 symboltable id_table;

@@ -52,3 +52,11 @@ Parser/sst.h.gch
 Parser/sst_tester
 
 LexicalAnalyzer/clexer
+
+*.output
+
+SemanticRoutines/bparser.tab.c
+
+SemanticRoutines/bparser.tab.h
+
+SemanticRoutines/djcc
