@@ -20,7 +20,7 @@
 /* Create a symnode and return a pointer to it. */
 static symnode create_symnode(char *name) {
   symnode node = malloc(sizeof(struct symnode));
-  node->name = strdup(name);
+  node->name = name;
   node->next = NULL;
   return node;
 }
@@ -163,10 +163,37 @@ symnode insert_into_symboltable(symboltable symtab, char *name) {
     exit(1);
   }
 
-  symnode node = lookup_symhashtable(symtab->inner_scope, name, NOHASHSLOT);
+  char *node_name_str = strdup(name);
+
+  symnode node = lookup_symhashtable(symtab->inner_scope, node_name_str, NOHASHSLOT);
 
   if (node == NULL)
-    node = insert_into_symhashtable(symtab->inner_scope, name);
+    node = insert_into_symhashtable(symtab->inner_scope, node_name_str);
+
+  return node;
+}
+
+/* The same as insert_into_symboltable(), but appends the prefix to the node name */
+symnode insert_into_symboltable_with_prefix(symboltable symtab, char *name, char *prefix)
+{
+  if (symtab->inner_scope == NULL) {
+    fprintf(stderr, "Error: inserting into an empty symbol table\n");
+    exit(1);
+  }
+
+  char *node_name_str;
+  if (strlen(prefix) > 0) {
+    int new_name_str_len = strlen(name) + strlen(prefix) + 1;
+    node_name_str = (char *) calloc(new_name_str_len + 1, sizeof('a'));
+    snprintf(node_name_str, new_name_str_len + 1, "%s$%s", prefix, name);
+  } else {
+    node_name_str = strdup(name);
+  }
+
+  symnode node = lookup_symhashtable(symtab->inner_scope, node_name_str, NOHASHSLOT);
+
+  if (node == NULL)
+    node = insert_into_symhashtable(symtab->inner_scope, node_name_str);
 
   return node;
 }

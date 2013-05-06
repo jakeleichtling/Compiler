@@ -1,0 +1,39 @@
+int f1()
+{
+  int x;
+
+  while (x) {
+    int x;
+    ++x;
+
+    while (x) {
+      int x;
+      ++x;
+    }
+  }
+
+  while (x) {
+    int x;
+    ++x;
+  }
+}
+
+int f2()
+{
+  int x;
+
+  while (x) {
+    int x;
+    ++x;
+
+    while (x) {
+      int x;
+      ++x;
+    }
+  }
+
+  while (x) {
+    int x;
+    ++x;
+  }
+}

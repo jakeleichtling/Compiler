@@ -34,4 +34,7 @@ cat string_newline.c57.in | ../djcc > string_newline.c57.out
 echo "~~~~~~~~~~~~~~~ decl_after_print.c57.in ~~~~~~~~~~~~~~~~~"
 cat decl_after_print.c57.in | ../djcc > decl_after_print.c57.out
 
+echo "~~~~~~~~~~~~~~~~~~~~ nesting.c57.in ~~~~~~~~~~~~~~~~~~~~~"
+cat nesting.c57.in | ../djcc > nesting.c57.out
+
 echo "---------------------------------------------------------"

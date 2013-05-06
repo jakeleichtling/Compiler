@@ -57,6 +57,7 @@ struct ast_node_struct {
   } value;
   int line_num;
   enum vartype data_type;
+  int scope_num; // used for ID name muddling
 };
 
 /* Create a node with a given token type and return a pointer to the

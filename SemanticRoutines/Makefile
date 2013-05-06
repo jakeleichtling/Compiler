@@ -9,10 +9,13 @@
 # 5/29/2013
 
 BISONFlAGS = -d -v
-CFLAGS = 
+CFLAGS = -g
 
 djcc:	djcc.o lex.yy.o bparser.tab.o ast.o symtab.o quad.o
 	gcc $(CFLAGS) -o djcc djcc.o lex.yy.o bparser.tab.o ast.o symtab.o quad.o -lfl
+
+valgrind:	djcc.c lex.yy.c bparser.tab.c bparser.tab.h ast.c ast.h symtab.c symtab.h quad.c quad.h
+	gcc $(CFLAGS) -o djcc djcc.c lex.yy.c bparser.tab.c ast.c symtab.c quad.c -lfl
 
 djcc.o:	djcc.c bparser.tab.h ast.h symtab.h quad.h
 	gcc $(CFLAGS) -c djcc.c

@@ -78,6 +78,9 @@ void destroy_symboltable(symboltable symtab);
    entry. */
 symnode insert_into_symboltable(symboltable symtab, char *name);
 
+/* The same as insert_into_symboltable(), but appends the prefix to the node name */
+symnode insert_into_symboltable_with_prefix(symboltable symtab, char *name, char *prefix);
+
 /* Lookup an entry in a symbol table.  If found return a pointer to it
    and fill in level.  Otherwise, return NULL and level is
    undefined. */
