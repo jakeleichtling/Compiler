@@ -32,6 +32,7 @@ extern symboltable id_table;
 extern symboltable stringconst_table;
 
 char *error_string;
+char *prefix = "";
 %}
 
 /* lexer tokens */
@@ -158,15 +159,19 @@ var_decl :
 ;
 
 func_declaration :
-  type_specifier ident '(' formal_params ')' compound_statement {
+  type_specifier ident '(' formal_params ')' {
+    prefix = strdup($2->value.sym_node->name);
+
     ast_node t = create_ast_node(FUNC_DECL);
     t->line_num = lineNumber;
     t->left_child = $1;
     t->left_child->right_sibling = $2;
     t->left_child->right_sibling->value.sym_node->node_type = func_node;
     t->left_child->right_sibling->right_sibling = $4;
-    rightmost_sibling(t->left_child)->right_sibling = $6;
     $$ = t;
+  } compound_statement {
+    rightmost_sibling($$->left_child)->right_sibling = $7;
+    prefix = "";
   }
 | VOIDTOKEN ident '(' formal_params ')' compound_statement {
     ast_node t = create_ast_node(FUNC_DECL);

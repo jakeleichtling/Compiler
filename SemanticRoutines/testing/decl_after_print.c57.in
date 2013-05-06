@@ -1,0 +1,11 @@
+void main()
+{
+    print "Hello there!";
+
+    /*
+       multiline
+       comment
+    */
+
+    int x;
+}

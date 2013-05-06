@@ -1,0 +1,6 @@
+void main() {
+  int a, b[5], c[a * b[3] / 2 % 7], d;
+  double aa[a], bb, cc[d * b[a / d * b[3]]];
+
+  aa[a * b[a] + d / 44] = 34.4 / bb + (++cc[1]) + -4 + +5.2;
+}

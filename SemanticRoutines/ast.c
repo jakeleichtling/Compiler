@@ -71,6 +71,20 @@ static struct token_lookup token_table[] = {
     { NULL,0 }
 };
 
+// Strings corresponding to vartype and nodetype (in symtab.h) for printing of the syntax tree
+char *var_type_string[] = {
+  "inttype",
+  "doubletype",
+  "voidtype",
+  "no_type"
+};
+
+char *node_type_string[] = {
+  "func_node",
+  "val_node",
+  "array_node"
+};
+
 /* Create a node with a given token type and return a pointer to the
    node. */
 ast_node create_ast_node(ast_node_type node_type) {
@@ -94,7 +108,7 @@ void print_ast(ast_node root, int depth) {
   /* Print attributes specific to node types. */
   switch (root->node_type) {
   case ID:			/* print the id */
-    printf("%s (%p)", root->value.sym_node->name, root->value.sym_node);
+    printf("%s (%p), node type: %s, var type: %s", root->value.sym_node->name, root->value.sym_node, node_type_string[root->value.sym_node->node_type], var_type_string[root->value.sym_node->var_type]);
     break;
 
   case INT_LITERAL:		/* print the int literal */
