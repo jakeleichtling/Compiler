@@ -1,3 +1,8 @@
+int f0()
+{
+  a + b;
+}
+
 int f1()
 {
   int x;
