@@ -12,6 +12,8 @@ enum quad_op {
   print_string_op,
   int_to_float_op,
   assn_op,
+  add_ints,
+  add_floats,
 
   read_op,
   geq_op,
@@ -68,9 +70,6 @@ void set_temp_prefix(char *func_name);
 
 // Get a new temp with the current function name as the prefix
 quad_arg get_new_temp(symboltable symtab, enum vartype var_type);
-
-// Return right-side temps after assignment so that they can be reused
-void return_temps(int num_temps_returned);
 
 // Recursive function for generating intermediate code using quads.
 //  If applicable, returns the quad_arg that holds the result of an operation

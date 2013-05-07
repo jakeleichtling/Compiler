@@ -95,12 +95,6 @@ quad_arg get_new_temp(symboltable symtab, enum vartype var_type)
   return new_quad_arg;
 }
 
-// Return right-side temps after assignment so that they can be reused
-void return_temps(int num_temps_returned)
-{
-  temp_count -= num_temps_returned;
-}
-
 // Recursive function for generating intermediate code using quads.
 //  If applicable, returns the quad_arg that holds the result of an operation
 quad_arg generate_intermediate_code(ast_node node)
@@ -111,34 +105,63 @@ quad_arg generate_intermediate_code(ast_node node)
   quad_arg arg1, arg2, arg3;
   arg1 = generate_quad_arg();
   arg2 = generate_quad_arg();
-  arg3 = generate_quad_arg();    
+  arg3 = generate_quad_arg();
+
+  quad_arg left_arg = NULL;
+  quad_arg right_arg = NULL;
+  quad_arg result_arg = NULL;
+  quad_arg temp1 = NULL;
 
   switch (node->node_type) {
     case ROOT:
       generate_intermediate_code(node->left_child);
       break;
     case ID:
-      return;
+      // Nada
       break;
     case INT_TYPE:
-      return;
+      // Nada
       break;
     case DBL_TYPE:
-      return;
+      // Nada
       break;
     case VOID_TYPE:
-      return;
+      // Nada
       break;
     case ARRAY_SUB:
-      // TODO
+      // TODO, ahhhhh
+      // declaring
+      // assigning
+      // using value
       break;
     case ARRAY_NONSUB:
-      return;
+      // Nada
       break;
     case OP_ASSIGN:
-//      quad_arg left_arg = 
+      // TODO!!!
       break;
     case OP_ADD:
+      left_arg = generate_intermediate_code(node->left_child);
+      right_arg = generate_intermediate_code(node->left_child->right_sibling);
+
+      if (node->left_child->data_type == inttype && node->left_child->right_sibling->data_type == inttype) {
+        result_arg = get_new_temp(id_table, inttype);
+        generate_quad(add_ints, result_arg, left_arg, right_arg);
+      } else {
+        result_arg = get_new_temp(id_table, doubletype);
+
+        if (node->left_child->data_type == doubletype && node->left_child->right_sibling->data_type == doubletype) {
+          generate_quad(add_floats, result_arg, left_arg, right_arg);
+        } else if (node->left_child->data_type == doubletype) {
+          temp1 = get_new_temp(id_table, doubletype);
+          generate_quad(int_to_float_op, temp1, right_arg, NULL);
+          generate_quad(add_floats, result_arg, left_arg, temp1);
+        } else if (node->left_child->right_sibling->data_type == doubletype) {
+          temp1 = get_new_temp(id_table, doubletype);
+          generate_quad(int_to_float_op, temp1, left_arg, NULL);
+          generate_quad(add_floats, result_arg, temp1, right_arg);
+        }
+      }
 
       break;
     case OP_SUB:
@@ -237,22 +260,24 @@ quad_arg generate_intermediate_code(ast_node node)
 
       break;
     case STRING_LITERAL:
-      return;
+      // Nada
       break;
     case INT_LITERAL:
-      return;
+      // Nada
       break;
     case DOUBLE_LITERAL:
-      return;
+      // Nada
       break;
     case FUNC_CALL:
       arg1->arg_type = id_arg;
       generate_quad(call_func_op, arg1, NULL, NULL);
       break;
     case EMPTY_EXPR:
-      return;
+      // Nada
       break;
   }
+
+  return result_arg;
 }
 
 // Add a quad to the array
