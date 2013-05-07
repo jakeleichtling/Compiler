@@ -11,9 +11,45 @@ enum quad_op {
   print_float_op,
   print_string_op,
   int_to_float_op,
-  assn_op,
-  add_ints,
-  add_floats,
+  assn_var_op,
+  assn_to_arraysub_op,
+  assn_from_arraysub_op,
+  add_ints_op,
+  add_floats_op,
+  sub_ints_op,
+  sub_floats_op,
+  mult_ints_op,
+  mult_floats_op,
+  div_ints_op,
+  div_floats_op,
+  mod_op,
+  lt_ints_op,
+  lt_floats_op,
+  leq_ints_op,
+  leq_floats_op,
+  gt_ints_op,
+  gt_floats_op,
+  geq_ints_op,
+  geq_floats_op,
+  eq_ints_op,
+  eq_floats_op,
+  neq_ints_op,
+  neq_floats_op,
+  and_ints_op,
+  and_floats_op,
+  or_ints_op,
+  or_floats_op,
+  int_bang_op,
+  float_bang_op,
+  int_neg_op,
+  float_neg_op,
+  int_inc_op,
+  array_inc_op,
+  int_dec_op,
+  array_dec_op,
+  if_false_op,
+  goto_op,
+
 
   read_op,
   geq_op,
@@ -22,7 +58,6 @@ enum quad_op {
   gt_op,
   mult_op,
   sub_op,
-  goto_op,
   halt_op,
   enter_scope_op,
   leave_scope_op,
@@ -34,7 +69,8 @@ enum quad_arg_type {
   no_arg_type,
   int_arg,
   dbl_arg,
-  id_arg
+  id_arg,
+  str_arg
 };
 
 typedef struct quad_arg *quad_arg;
@@ -62,8 +98,8 @@ quad generate_quad(enum quad_op, quad_arg, quad_arg, quad_arg);
 // Retroactively changes an argument of a previously generated quad
 void patch_quad(quad, int arg_index, quad_arg new_quad_arg);
 
-// Creates a quad argument. Fields must be set manually
-quad_arg generate_quad_arg();
+// Creates a quad argument. Value field must be set manually
+quad_arg generate_quad_arg(enum quad_arg_type quad_arg_type);
 
 // Set the temp prefix to the function name and reset the temp count at 1
 void set_temp_prefix(char *func_name);

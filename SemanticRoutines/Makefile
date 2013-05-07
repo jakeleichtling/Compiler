@@ -44,6 +44,8 @@ symtab.o:	symtab.c symtab.h
 quad.o:	quad.c quad.h
 	gcc $(CFLAGS) -c quad.c
 
+new: clean djcc
+
 clean:
 	rm -f djcc
 	rm -f ./*.output

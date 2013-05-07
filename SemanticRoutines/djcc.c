@@ -11,17 +11,21 @@ quad quad_array[MAX_NUM_QUADS];
 int next_quad_index = 0;
 int quad_array_size = MAX_NUM_QUADS;
 
-symboltable id_table;
+symboltable scoped_id_table; // Used to look up unmangled IDs with scoping
+symboltable flat_id_table; // Used to store IDs with mangled names
 symboltable stringconst_table;
 
 ast_node root = NULL;
 int parseError = 0;
 
+int jldebug = 0;
+
 int main()
 {
   int haveRoot = 0; // 0 means we have a root
 
-  id_table = create_symboltable();
+  scoped_id_table = create_symboltable();
+  flat_id_table = create_symboltable();
   stringconst_table = create_symboltable();
 
   // yydebug = 1;

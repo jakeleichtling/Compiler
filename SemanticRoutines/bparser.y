@@ -20,6 +20,8 @@
 #define YYSTYPE ast_node
 #define YYDEBUG 1
 
+extern int jldebug;
+
 extern int yylex();
 int yyerror(char *s);
 extern char *yytext;
@@ -29,17 +31,11 @@ extern ast_node root;
 extern int parseError;
 
 extern char *savedText;
-extern symboltable id_table;
+extern symboltable scoped_id_table;
+extern symboltable flat_id_table;
 extern symboltable stringconst_table;
 
 char *error_string;
-char *prefix = "";
-int last_scope_num;
-
-char *add_prefix_scope_num(char *prefix, int last_scope_num);
-char *remove_prefix_element(char *prefix);
-
-int entering_func; // Set my function production so that compound statement immediately following does not add to prefix
 %}
 
 /* lexer tokens */
@@ -137,7 +133,13 @@ var_decl_list :
 ident : IDENT {
     ast_node t_id = create_ast_node(ID);
     t_id->line_num = lineNumber;
-    t_id->value.sym_node = insert_into_symboltable_with_prefix(id_table, savedText, prefix);
+
+    if (jldebug) {
+      fprintf(stderr, "@@@ %d %s\n", scoped_id_table->num_nodes, savedText);
+    }
+    symnode scoped_symnode = insert_into_symboltable(scoped_id_table, savedText);
+    t_id->value.sym_node = insert_into_symboltable(flat_id_table, scoped_symnode->mangled_name);
+
     $$ = t_id;
   }
 ;
@@ -166,28 +168,17 @@ var_decl :
 ;
 
 func_declaration :
-  type_specifier ident '(' formal_params ')' {
-    prefix = strdup($2->value.sym_node->name);
-    fprintf(stderr, "%s\n", prefix);
-    last_scope_num = -1;
-
+  type_specifier ident '(' formal_params ')' compound_statement {
     ast_node t = create_ast_node(FUNC_DECL);
     t->line_num = lineNumber;
     t->left_child = $1;
     t->left_child->right_sibling = $2;
     t->left_child->right_sibling->value.sym_node->node_type = func_node;
     t->left_child->right_sibling->right_sibling = $4;
-    $1 = t;
-    entering_func = 1;
-  } compound_statement {
-    rightmost_sibling($1->left_child)->right_sibling = $7;
-
-    prefix = "";
+    rightmost_sibling(t->left_child)->right_sibling = $6;
+    $$ = t;
   }
-| VOIDTOKEN ident '(' formal_params ')' {
-    prefix = strdup($2->value.sym_node->name);
-    last_scope_num = -1;
-
+| VOIDTOKEN ident '(' formal_params ')' compound_statement {
     ast_node t = create_ast_node(FUNC_DECL);
     t->line_num = lineNumber;
     t->left_child = create_ast_node(VOID_TYPE);
@@ -195,12 +186,8 @@ func_declaration :
     t->left_child->right_sibling = $2;
     t->left_child->right_sibling->value.sym_node->node_type = func_node;
     t->left_child->right_sibling->right_sibling = $4;
-    $1 = t;
-    entering_func = 1;
-  } compound_statement {
-    rightmost_sibling($1->left_child)->right_sibling = $7;
-
-    prefix = "";
+    rightmost_sibling(t->left_child)->right_sibling = $6;
+    $$ = t;
   }
 ;
 
@@ -249,21 +236,14 @@ formal_param :
 
 compound_statement :
   '{' {
-    last_scope_num++;
-    if (entering_func) {
-      entering_func = 0;
-    } else {
-      prefix = add_prefix_scope_num(prefix, last_scope_num);
-    }
+    enter_scope(scoped_id_table);
 
     ast_node t = create_ast_node(SEQ);
-    t->scope_num = last_scope_num;
-    $1 = t;
+    t->line_num = lineNumber;
 
-    last_scope_num = -1;
+    $1 = t;
   } local_declarations statement_list '}' {
     ast_node t = $1;
-    t->line_num = lineNumber;
     if ($3 != NULL) {
       t->left_child = $3;
       rightmost_sibling(t->left_child)->right_sibling = $4;
@@ -271,8 +251,7 @@ compound_statement :
       t->left_child = $4;
     }
 
-    prefix = remove_prefix_element(prefix);
-    last_scope_num = t->scope_num;
+    leave_scope(scoped_id_table);
 
     $$ = t;
   }
@@ -1068,47 +1047,4 @@ int type_check(ast_node node)
 
       break;
   }
-}
-
-// Adds the scope number as an element (i.e. scope_num$) to the front of the prefix
-char *add_prefix_scope_num(char *prefix, int last_scope_num)
-{
-  int pref_len = strlen(prefix);
-
-  int digits_counter_num = last_scope_num / 10;
-  int num_digits = 1;
-  while (digits_counter_num != 0) {
-    num_digits++;
-    digits_counter_num /= 10;
-  }
-
-  char *new_pref = (char *) calloc(pref_len + num_digits + 2, sizeof('a'));
-  sprintf(new_pref, "%d$%s", last_scope_num, prefix);
-
-  fprintf(stderr, "num_digits = %d\n", num_digits);
-  fprintf(stderr, "*** %d + %s = %s\n", last_scope_num, prefix, new_pref);
-
-  return new_pref;
-}
-
-// Removes the first element (i.e. .*$.*) from the prefix used for ID name muddling
-char *remove_prefix_element(char *prefix)
-{
-  int pref_len = strlen(prefix);
-
-  int i;
-  for (i = 0; i < pref_len && prefix[i] != '$'; i++); // Find the first occurence of '$'
-
-  fprintf(stderr, "***** %d, %s\n", i, prefix);
-
-  if (i == pref_len)
-    return "";
-
-  // Allocate memory for the new prefix
-  char *new_pref = (char *) calloc(pref_len + 1 - i, sizeof('a'));
-
-  // Copy over the remaining substring (following the first occurence of '$')
-  strncpy(new_pref, prefix + i + 1, pref_len - i);
-
-  return new_pref;
 }

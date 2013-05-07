@@ -39,6 +39,7 @@ struct symnode {
   int varaddr; // irrelevant for string constants
   enum nodetype node_type; // The thing that the identifier identifies (irrelevant for the string table)
   int array_size; // only relevant for nodes of type array_node
+  char *mangled_name; // irrelevant for the string table
 };
 
 /* Set the variable type of this node. */
@@ -65,6 +66,7 @@ struct symhashtable {
 typedef struct symboltable *symboltable;
 struct symboltable {
   symhashtable inner_scope;	/* pointer to symhashtable of innermost scope */
+  int num_nodes; // used for name mangling so that each mangle is unique
 };
 
 /* Create an empty symbol table. */
@@ -77,9 +79,6 @@ void destroy_symboltable(symboltable symtab);
    make sure it's not already in that scope.  Return a pointer to the
    entry. */
 symnode insert_into_symboltable(symboltable symtab, char *name);
-
-/* The same as insert_into_symboltable(), but appends the prefix to the node name */
-symnode insert_into_symboltable_with_prefix(symboltable symtab, char *name, char *prefix);
 
 /* Lookup an entry in a symbol table.  If found return a pointer to it
    and fill in level.  Otherwise, return NULL and level is
