@@ -68,6 +68,9 @@ ast_node create_ast_node(ast_node_type node_type);
    the root of the subtree and the depth of the subtree root. */
 void print_ast(ast_node root, int depth);
 
+/* Print a given node in the abstract syntax tree */
+void print_ast_node(ast_node node);
+
 /* Iterate to rightmost sibling in LL */
 ast_node rightmost_sibling(ast_node t);
 

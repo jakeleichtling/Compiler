@@ -101,9 +101,6 @@ void patch_quad(quad, int arg_index, quad_arg new_quad_arg);
 // Creates a quad argument. Value field must be set manually
 quad_arg generate_quad_arg(enum quad_arg_type quad_arg_type);
 
-// Set the temp prefix to the function name and reset the temp count at 1
-void set_temp_prefix(char *func_name);
-
 // Get a new temp with the current function name as the prefix
 quad_arg get_new_temp(symboltable symtab, enum vartype var_type);
 

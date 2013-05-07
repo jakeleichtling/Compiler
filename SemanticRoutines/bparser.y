@@ -20,8 +20,6 @@
 #define YYSTYPE ast_node
 #define YYDEBUG 1
 
-extern int jldebug;
-
 extern int yylex();
 int yyerror(char *s);
 extern char *yytext;
@@ -134,9 +132,6 @@ ident : IDENT {
     ast_node t_id = create_ast_node(ID);
     t_id->line_num = lineNumber;
 
-    if (jldebug) {
-      fprintf(stderr, "@@@ %d %s\n", scoped_id_table->num_nodes, savedText);
-    }
     symnode scoped_symnode = insert_into_symboltable(scoped_id_table, savedText);
     t_id->value.sym_node = insert_into_symboltable(flat_id_table, scoped_symnode->mangled_name);
 

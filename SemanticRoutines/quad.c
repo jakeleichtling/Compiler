@@ -9,7 +9,8 @@ extern int quad_array_size;
 
 extern symboltable flat_id_table;
 
-char *curr_func_name;
+extern int jldebug;
+
 int temp_count = 0;
 
 /* human readable quad operation names */
@@ -19,7 +20,44 @@ char *quad_op_string[] = {
   "print_float_op",
   "print_string_op",
   "int_to_float_op",
-  "assn_op"
+  "assn_var_op",
+  "assn_to_arraysub_op",
+  "assn_from_arraysub_op",
+  "add_ints_op",
+  "add_floats_op",
+  "sub_ints_op",
+  "sub_floats_op",
+  "mult_ints_op",
+  "mult_floats_op",
+  "div_ints_op",
+  "div_floats_op",
+  "mod_op",
+  "lt_ints_op",
+  "lt_floats_op",
+  "leq_ints_op",
+  "leq_floats_op",
+  "gt_ints_op",
+  "gt_floats_op",
+  "geq_ints_op",
+  "geq_floats_op",
+  "eq_ints_op",
+  "eq_floats_op",
+  "neq_ints_op",
+  "neq_floats_op",
+  "and_ints_op",
+  "and_floats_op",
+  "or_ints_op",
+  "or_floats_op",
+  "int_bang_op",
+  "float_bang_op",
+  "int_neg_op",
+  "float_neg_op",
+  "int_inc_op",
+  "array_inc_op",
+  "int_dec_op",
+  "array_dec_op",
+  "if_false_op",
+  "goto_op"
 };
 
 /* ~~~~~~~~~~~~~~~ Function Prototypes ~~~~~~~~~~~~~~~~~~~ */
@@ -75,14 +113,7 @@ quad_arg generate_quad_arg(enum quad_arg_type quad_arg_type)
   return new_quad_arg;
 }
 
-// Set the temp prefix to the function name and reset the temp count at 1
-void set_temp_prefix(char *func_name)
-{
-  curr_func_name = strdup(func_name);
-  temp_count = 0;
-}
-
-// Get a new temp with the current function name as the prefix
+// Get a new temp with a unique name
 quad_arg get_new_temp(symboltable symtab, enum vartype var_type)
 {
   int digits_counter_num = temp_count / 10;
@@ -92,7 +123,7 @@ quad_arg get_new_temp(symboltable symtab, enum vartype var_type)
     digits_counter_num /= 10;
   }
 
-  int tempname_len = strlen(curr_func_name) + num_digits + 4;
+  int tempname_len = num_digits + 4;
   char *tempname = calloc(tempname_len + 1, sizeof('a'));
   snprintf(tempname, tempname_len + 1, "temp%d", temp_count);
 
@@ -116,6 +147,14 @@ quad_arg generate_intermediate_code(ast_node node)
   if (!node)
     return;
 
+  if (jldebug) {
+    print_ast_node(node);
+    printf("\n");
+  }
+
+
+  ast_node child;
+
   quad_arg left_arg = NULL;
   quad_arg right_arg = NULL;
   quad_arg result_arg = NULL;
@@ -123,10 +162,12 @@ quad_arg generate_intermediate_code(ast_node node)
 
   switch (node->node_type) {
     case ROOT:
-      generate_intermediate_code(node->left_child);
+      for (child = node->left_child; child != NULL; child = child->right_sibling)
+        generate_intermediate_code(child);
       break;
     case ID:
-      // Nada
+      result_arg = generate_quad_arg(id_arg);
+      result_arg->value.var_node = node->value.sym_node;
       break;
     case INT_TYPE:
       // Nada
@@ -148,6 +189,7 @@ quad_arg generate_intermediate_code(ast_node node)
       // Nada
       break;
     case OP_ASSIGN:
+      // TODO: autowidening, and do we have to worry about int assign vs. double assign
       left_arg = generate_intermediate_code(node->left_child->right_sibling);
       result_arg = generate_quad_arg(id_arg);
 
@@ -253,16 +295,22 @@ quad_arg generate_intermediate_code(ast_node node)
       }
       break;
     case FUNC_DECL:
-      // TODO, maybe use to count memory?
+      generate_intermediate_code(node->left_child->right_sibling->right_sibling);
+
       break;
     case VAR_DECL:
-      // TODO, maybe use to count memory?
+      // TODO, gen code for assignment
+
       break;
     case FORMAL_PARAM:
       // TODO, maybe use to count memory?
+
       break;
     case SEQ:
-      // Nada
+      for (child = node->left_child; child != NULL; child = child->right_sibling)
+        generate_intermediate_code(child);
+      break;
+
       break;
     case IF_STMT:
       left_arg = generate_intermediate_code(node->left_child);
@@ -343,24 +391,26 @@ quad_arg generate_binary_op_with_widening(ast_node node, enum quad_op quad_op_in
   quad_arg left_arg = generate_intermediate_code(node->left_child);
   quad_arg right_arg = generate_intermediate_code(node->left_child->right_sibling);
 
-  if (node->left_child->data_type == inttype && node->left_child->right_sibling->data_type == inttype) {
+  printf("@ %d <-> %d\n", node->left_child->data_type, node->left_child->right_sibling->data_type);
+
+  //if (node->left_child->data_type == inttype && node->left_child->right_sibling->data_type == inttype) {
     result_arg = get_new_temp(flat_id_table, inttype);
     generate_quad(quad_op_ints, result_arg, left_arg, right_arg);
-  } else {
-    result_arg = get_new_temp(flat_id_table, doubletype);
+  // } else {
+  //   result_arg = get_new_temp(flat_id_table, doubletype);
 
-    if (node->left_child->data_type == doubletype && node->left_child->right_sibling->data_type == doubletype) {
-      generate_quad(quad_op_floats, result_arg, left_arg, right_arg);
-    } else if (node->left_child->data_type == doubletype) {
-      temp1 = get_new_temp(flat_id_table, doubletype);
-      generate_quad(int_to_float_op, temp1, right_arg, NULL);
-      generate_quad(quad_op_floats, result_arg, left_arg, temp1);
-    } else if (node->left_child->right_sibling->data_type == doubletype) {
-      temp1 = get_new_temp(flat_id_table, doubletype);
-      generate_quad(int_to_float_op, temp1, left_arg, NULL);
-      generate_quad(quad_op_floats, result_arg, temp1, right_arg);
-    }
-  }
+  //   if (node->left_child->data_type == doubletype && node->left_child->right_sibling->data_type == doubletype) {
+  //     generate_quad(quad_op_floats, result_arg, left_arg, right_arg);
+  //   } else if (node->left_child->data_type == doubletype) {
+  //     temp1 = get_new_temp(flat_id_table, doubletype);
+  //     generate_quad(int_to_float_op, temp1, right_arg, NULL);
+  //     generate_quad(quad_op_floats, result_arg, left_arg, temp1);
+  //   } else if (node->left_child->right_sibling->data_type == doubletype) {
+  //     temp1 = get_new_temp(flat_id_table, doubletype);
+  //     generate_quad(int_to_float_op, temp1, left_arg, NULL);
+  //     generate_quad(quad_op_floats, result_arg, temp1, right_arg);
+  //   }
+  // }
 
   return result_arg;
 }
@@ -387,17 +437,28 @@ quad_arg generate_single_operand(ast_node node, enum quad_op quad_op_int, enum q
 // Add a quad to the array
 void add_quad_to_array(quad new_quad)
 {
+  if (jldebug) {
+    printf("\t%d:\t", next_quad_index);
+    print_quad(new_quad);
+  }
+
   if (next_quad_index >= quad_array_size) {
     fprintf(stderr, "The quad array has been filled!\n");
     exit(1);
   }
+
+  quad_array[next_quad_index] = new_quad;
+  next_quad_index++;
 }
 
 // Prints the quad array in human-readable format
 void print_quad_array()
 {
+  printf("~~~~~~~~~~~~~~~~~~ Quad Array ~~~~~~~~~~~~~~~~~~~~~~");
   int i;
   for (i = 0; i < next_quad_index && i < quad_array_size; i++)
+    printf("%d:\t", i);
+    fprintf(stderr, "%d:\t", i);
     print_quad(quad_array[i]);
 }
 
@@ -406,14 +467,21 @@ void print_quad(quad the_quad)
 {
   printf("(%s, ", quad_op_string[the_quad->op]);
   print_quad_arg(the_quad->arg1);
+  printf(", ");
   print_quad_arg(the_quad->arg2);
+  printf(", ");
   print_quad_arg(the_quad->arg3);
-  printf("\n");
+  printf(")\n");
 }
 
 // Prints the quad_arg in human-readable format
 void print_quad_arg(quad_arg the_quad_arg)
 {
+  if (!the_quad_arg) {
+    printf("null");
+    return;
+  }
+
   switch (the_quad_arg->arg_type) {
     case int_arg:
       printf("int: %d", the_quad_arg->value.int_value);

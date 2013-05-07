@@ -102,30 +102,7 @@ void print_ast(ast_node root, int depth) {
   for (i = 0; i < depth; i++)
     printf("  ");
 
-  /* Print the node type. */
-  printf("%s ", token_table[root->node_type].token);
-
-  /* Print attributes specific to node types. */
-  switch (root->node_type) {
-  case ID:			/* print the id */
-    printf("%s (%p), node type: %s, var type: %s", root->value.sym_node->name, root->value.sym_node, node_type_string[root->value.sym_node->node_type], var_type_string[root->value.sym_node->var_type]);
-    break;
-
-  case INT_LITERAL:		/* print the int literal */
-    printf("%d", root->value.int_value);
-    break;
-
-  case DOUBLE_LITERAL:		/* print the double literal */
-    printf("%f", root->value.double_value);
-    break;
-
-  case STRING_LITERAL:      /* print the string */
-    printf("%s (%p)", root->value.sym_node->name, root->value.sym_node);
-    break;
-
-  default:
-    break;
-  }
+  print_ast_node(root);
 
   printf("\n");
 
@@ -134,6 +111,34 @@ void print_ast(ast_node root, int depth) {
   ast_node child;
   for (child = root->left_child; child != NULL; child = child->right_sibling)
     print_ast(child, depth + 1);
+}
+
+void print_ast_node(ast_node node)
+{
+  /* Print the node type. */
+  printf("%s ", token_table[node->node_type].token);
+
+  /* Print attributes specific to node types. */
+  switch (node->node_type) {
+  case ID:      /* print the id */
+    printf("%s (%p), node type: %s, var type: %s", node->value.sym_node->name, node->value.sym_node, node_type_string[node->value.sym_node->node_type], var_type_string[node->value.sym_node->var_type]);
+    break;
+
+  case INT_LITERAL:   /* print the int literal */
+    printf("%d", node->value.int_value);
+    break;
+
+  case DOUBLE_LITERAL:    /* print the double literal */
+    printf("%f", node->value.double_value);
+    break;
+
+  case STRING_LITERAL:      /* print the string */
+    printf("%s (%p)", node->value.sym_node->name, node->value.sym_node);
+    break;
+
+  default:
+    break;
+  }
 }
 
  /* Iterate to last sibling in LL */

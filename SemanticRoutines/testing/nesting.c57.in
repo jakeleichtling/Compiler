@@ -1,13 +1,16 @@
 int f0()
 {
-  a + b;
-
+  int a;
+  int b;
+  int c;
+  c = a + b;
+/*
   if (a) {
 
   } else if (b) {
 
   } else {
-    
+
   }
 }
 
@@ -52,5 +55,5 @@ int f2()
   while (x) {
     int x;
     ++x;
-  }
+  } */
 }
