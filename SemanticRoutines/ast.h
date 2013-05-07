@@ -57,6 +57,7 @@ struct ast_node_struct {
   } value;
   int line_num;
   enum vartype data_type;
+  enum vartype return_type;
   int scope_num; // used for ID name muddling
 };
 

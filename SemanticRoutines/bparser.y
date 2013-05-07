@@ -746,6 +746,10 @@ int fill_id_types(ast_node node)
   }
 }
 
+void type_check_error(int ln) {
+  printf("Type error found at %d\n", ln);
+}
+
 int type_check(ast_node node)
 {
   int error_count = 0;
@@ -757,86 +761,270 @@ int type_check(ast_node node)
 
   switch (node->node_type) {
     case ROOT:
-
       break;
     case ID:
-
       break;
     case INT_TYPE:
-
+      node->data_type = inttype;
       break;
     case DBL_TYPE:
-
+      node->data_type = doubletype;
       break;
     case VOID_TYPE:
-
+      node->data_type = voidtype;
       break;
     case ARRAY_SUB:
-
+    {
+      //TODO: discuss array types
+      enum vartype sub_type = node->left_child->right_sibling->data_type;
+      if (sub_type != inttype) {
+        type_check_error(node->line_num);
+        error_count++;
+      }
       break;
+    }
     case ARRAY_NONSUB:
-
+      //TODO: discuss array types
       break;
     case OP_ASSIGN:
-
+    {
+      enum vartype ltype = node->left_child->data_type;
+      enum vartype rtype = node->left_child->right_sibling->data_type;
+      //widen if assigning int to double
+      int shouldWiden = ((ltype == doubletype) && (rtype == inttype));
+      if (rtype != ltype && !shouldWiden){
+        type_check_error(node->line_num);
+        error_count++;
+      }
+      node->data_type = ltype;
       break;
+    }
     case OP_ADD:
-
+    {
+      enum vartype ltype = node->left_child->data_type;
+      enum vartype rtype = node->left_child->right_sibling->data_type;
+      if ((ltype != inttype && ltype != doubletype) ||
+          (rtype != inttype && rtype != doubletype)) {
+        type_check_error(node->line_num);
+        error_count++;  
+      } else if ((ltype == doubletype) || (rtype == doubletype)) {
+        node->data_type = doubletype;
+      } else {
+        node->data_type = inttype;
+      }
       break;
+    }
     case OP_SUB:
-
+    {
+      enum vartype ltype = node->left_child->data_type;
+      enum vartype rtype = node->left_child->right_sibling->data_type;
+      if ((ltype != inttype && ltype != doubletype) ||
+          (rtype != inttype && rtype != doubletype)) {
+        type_check_error(node->line_num);
+        error_count++;  
+      } else if ((ltype == doubletype) || (rtype == doubletype)) {
+        node->data_type = doubletype;
+      } else {
+        node->data_type = inttype;
+      }
       break;
+    }
     case OP_MULT:
-
+    {
+      enum vartype ltype = node->left_child->data_type;
+      enum vartype rtype = node->left_child->right_sibling->data_type;
+      if ((ltype != inttype && ltype != doubletype) ||
+          (rtype != inttype && rtype != doubletype)) {
+        type_check_error(node->line_num);
+        error_count++;  
+      } else if ((ltype == doubletype) || (rtype == doubletype)) {
+        node->data_type = doubletype;
+      } else {
+        node->data_type = inttype;
+      }
       break;
+    }
     case OP_DIV:
-
+    {
+      enum vartype ltype = node->left_child->data_type;
+      enum vartype rtype = node->left_child->right_sibling->data_type;
+      if ((ltype != inttype && ltype != doubletype) ||
+          (rtype != inttype && rtype != doubletype)) {
+        type_check_error(node->line_num);
+        error_count++;  
+      } else if ((ltype == doubletype) || (rtype == doubletype)) {
+        node->data_type = doubletype;
+      } else {
+        node->data_type = inttype;
+      }
       break;
+    }
     case OP_MOD:
-
+    {
+      enum vartype ltype = node->left_child->data_type;
+      enum vartype rtype = node->left_child->right_sibling->data_type;
+      if (ltype != inttype && rtype != inttype) {
+        type_check_error(node->line_num);
+        error_count++;  
+      }
+      node->data_type = inttype;
       break;
+    }
     case OP_LT:
-
+    {
+      enum vartype ltype = node->left_child->data_type;
+      enum vartype rtype = node->left_child->right_sibling->data_type;
+      if ((ltype != inttype && ltype != doubletype) ||
+          (rtype != inttype && rtype != doubletype)) {
+        type_check_error(node->line_num);
+        error_count++;  
+      }
+      node->data_type = inttype;
       break;
+    }
     case OP_LEQ:
-
+    {
+      enum vartype ltype = node->left_child->data_type;
+      enum vartype rtype = node->left_child->right_sibling->data_type;
+      if ((ltype != inttype && ltype != doubletype) ||
+          (rtype != inttype && rtype != doubletype)) {
+        type_check_error(node->line_num);
+        error_count++;  
+      }
+      node->data_type = inttype;
       break;
+    }
     case OP_GT:
-
+    {
+      enum vartype ltype = node->left_child->data_type;
+      enum vartype rtype = node->left_child->right_sibling->data_type;
+      if ((ltype != inttype && ltype != doubletype) ||
+          (rtype != inttype && rtype != doubletype)) {
+        type_check_error(node->line_num);
+        error_count++;  
+      }
+      node->data_type = inttype;
       break;
+    }
     case OP_GEQ:
-
+    {
+      enum vartype ltype = node->left_child->data_type;
+      enum vartype rtype = node->left_child->right_sibling->data_type;
+      if ((ltype != inttype && ltype != doubletype) ||
+          (rtype != inttype && rtype != doubletype)) {
+        type_check_error(node->line_num);
+        error_count++;  
+      }
+      node->data_type = inttype;
       break;
+    }
     case OP_EQ:
-
+    {
+      enum vartype ltype = node->left_child->data_type;
+      enum vartype rtype = node->left_child->right_sibling->data_type;
+      if ((ltype != inttype && ltype != doubletype) ||
+          (rtype != inttype && rtype != doubletype)) {
+        type_check_error(node->line_num);
+        error_count++;  
+      }
+      node->data_type = inttype;
       break;
+    }
     case OP_NEQ:
-
+    {
+      enum vartype ltype = node->left_child->data_type;
+      enum vartype rtype = node->left_child->right_sibling->data_type;
+      if ((ltype != inttype && ltype != doubletype) ||
+          (rtype != inttype && rtype != doubletype)) {
+        type_check_error(node->line_num);
+        error_count++;  
+      }
+      node->data_type = inttype;
       break;
+    }
     case OP_AND:
-
+    {
+      enum vartype ltype = node->left_child->data_type;
+      enum vartype rtype = node->left_child->right_sibling->data_type;
+      if (ltype != inttype && rtype != inttype) {
+        type_check_error(node->line_num);
+        error_count++;  
+      }
+      node->data_type = inttype;
       break;
+    }
     case OP_OR:
-
+    {
+      enum vartype ltype = node->left_child->data_type;
+      enum vartype rtype = node->left_child->right_sibling->data_type;
+      if (ltype != inttype && rtype != inttype) {
+        type_check_error(node->line_num);
+        error_count++;  
+      }
+      node->data_type = inttype;
       break;
+    }
     case OP_BANG:
-
+    {
+      if (node->left_child->data_type != inttype) {
+        type_check_error(node->line_num);
+        error_count++;  
+      }
+      node->data_type = inttype;
       break;
+    }
     case OP_NEG:
-
+    {
+      enum vartype dtype = node->left_child->data_type;
+      if (dtype != inttype && dtype != doubletype) {
+        type_check_error(node->line_num);
+        error_count++;  
+      }
+      node->data_type = dtype;
       break;
+    }
     case OP_INC:
-
+    {
+      enum vartype dtype = node->left_child->data_type;
+      if (dtype != inttype) {
+        type_check_error(node->line_num);
+        error_count++;  
+      }
+      node->data_type = inttype;
       break;
+    }
     case OP_DEC:
-
+    {
+      enum vartype dtype = node->left_child->data_type;
+      if (dtype != inttype) {
+        type_check_error(node->line_num);
+        error_count++;  
+      }
+      node->data_type = inttype;
       break;
+    }
     case FUNC_DECL:
-
+    {
+      enum vartype rettype = rightmost_sibling(node->left_child)->return_type;
+      //all ftns must have return stmt, even void
+      if(rettype != node->left_child->data_type) {
+        type_check_error(node->line_num);
+        error_count++;  
+      }
       break;
+    }
     case VAR_DECL:
-
+    {
+      enum vartype decltype = node->left_child->data_type;
+      ast_node decls;
+      for(decls = node->left_child->right_sibling; decls != NULL; decls = decls->right_sibling) {
+        if (decls->data_type != decltype) {
+          type_check_error(node->line_num);
+          error_count++;  
+        }
+      }
       break;
+    }
     case FORMAL_PARAM:
 
       break;

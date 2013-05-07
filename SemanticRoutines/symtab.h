@@ -16,10 +16,10 @@
 
 /* Variable and return types, used for type checking */
 enum vartype {
+  no_type,
   inttype,
   doubletype,
-  voidtype,
-  no_type
+  voidtype
 };
 
 /* The thing that the identifier identifies. Not applicable in the string constant table */
