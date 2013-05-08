@@ -84,6 +84,8 @@ quad generate_quad(enum quad_op _op, quad_arg _arg1, quad_arg _arg2, quad_arg _a
   new_quad->arg3 = _arg3;
 
   add_quad_to_array(new_quad);
+
+  return new_quad;
 }
 
 // Retroactively changes an argument of a previously generated quad
@@ -314,7 +316,7 @@ quad_arg generate_intermediate_code(ast_node node)
       break;
     case IF_STMT:
       left_arg = generate_intermediate_code(node->left_child);
-      quad exp_check_quad = generate_quad(if_false_op, NULL, NULL, NULL);
+      quad exp_check_quad = generate_quad(if_false_op, left_arg, NULL, NULL);
       generate_intermediate_code(node->left_child->right_sibling);
       quad jump_quad = generate_quad(goto_op, left_arg, NULL, NULL);
 
@@ -329,11 +331,41 @@ quad_arg generate_intermediate_code(ast_node node)
 
       break;
     case WHILE_LOOP:
+    {
+      // record the quad index of the expression
+      quad_arg expr_quad_index_arg = generate_quad_arg(inttype);
+      expr_quad_index_arg->value.int_value = next_quad_index;
+
+      quad_arg expr_arg = generate_intermediate_code(node->left_child); // generate code for the while loop's expression
+      quad expr_check_quad = generate_quad(if_false_op, expr_arg, NULL, NULL); // generate the quad that checks if the expression is true (destination quad filled in later)
+      generate_intermediate_code(node->left_child->right_sibling); // generate quads for the interior of the while loop
+      generate_quad(goto_op, expr_quad_index_arg, NULL, NULL); // jump back to the beginning of the loop
+
+      // patch expr_check_quad to jump to after the loop if the expr is false
+      quad_arg end_loop_index_arg = generate_quad_arg(inttype);
+      end_loop_index_arg->value.int_value = next_quad_index;
+      patch_quad(expr_check_quad, 2, end_loop_index_arg);
 
       break;
+    }
     case DO_WHILE_LOOP:
+    {
+      // record the quad index of the beginning of the loop body
+      quad_arg start_loop_index_arg = generate_quad_arg(inttype);
+      start_loop_index_arg->value.int_value = next_quad_index;
+
+      generate_intermediate_code(node->left_child); // generate code for the loop body
+      quad_arg expr_arg = generate_intermediate_code(node->left_child->right_sibling); // evaluate expr
+      quad expr_check_quad = generate_quad(if_false_op, expr_arg, NULL, NULL); // check if expr is true (destination filled later)
+      generate_quad(goto_op, start_loop_index_arg, NULL, NULL); // jump back to the beginning of the loop
+
+      // patch expr_check_quad to jump to after loop if expr is false
+      quad_arg end_loop_index_arg = generate_quad_arg(inttype);
+      end_loop_index_arg->value.int_value = next_quad_index;
+      patch_quad(expr_check_quad, 2, end_loop_index_arg);
 
       break;
+    }
     case FOR_STMT:
 
       break;
@@ -341,24 +373,42 @@ quad_arg generate_intermediate_code(ast_node node)
 
       break;
     case READ_STMT:
+    {
+      // create a temp of the proper type
+      enum vartype var_type = node->left_child->data_type;
+      quad_arg temp_arg = get_new_temp(flat_id_table, var_type);
+
+      // read into the temp
+      if (var_type == inttype) {
+        generate_quad(read_int_op, temp_arg, NULL, NULL);
+      } else if (var_type == doubletype) {
+        generate_quad(read_double_op, temp_arg, NULL, NULL);
+      }
+
+      // assign the temp to the var
+      // TODO: wait until assign is finished
 
       break;
+    }
     case PRINT_STMT:
+    {
+      // if the argument is a string literal then we can just print it out
       if (node->left_child->node_type == STRING_LITERAL) {
-        left_arg = generate_quad_arg(str_arg);
-        left_arg->value.var_node = node->left_child->value.sym_node;
-        generate_quad(print_string_op, left_arg, NULL, NULL);
-      } else {
-        left_arg = generate_intermediate_code(node->left_child);
+        quad_arg string_arg = generate_quad_arg(str_arg);
+        string_arg->value.var_node = node->left_child->value.sym_node;
+        generate_quad(print_string_op, string_arg, NULL, NULL);
+      } else { // otherwise, evalutate the expression and then print according to data type
+        quad_arg expr_arg = generate_intermediate_code(node->left_child);
 
         if (node->left_child->data_type == inttype) {
-          generate_quad(print_int_op, left_arg, NULL, NULL);
+          generate_quad(print_int_op, expr_arg, NULL, NULL);
         } else if (node->left_child->data_type == doubletype) {
-          generate_quad(print_float_op, left_arg, NULL, NULL);
+          generate_quad(print_float_op, expr_arg, NULL, NULL);
         }
       }
 
       break;
+    }
     case STRING_LITERAL:
       // Nada
       break;
@@ -454,12 +504,12 @@ void add_quad_to_array(quad new_quad)
 // Prints the quad array in human-readable format
 void print_quad_array()
 {
-  printf("~~~~~~~~~~~~~~~~~~ Quad Array ~~~~~~~~~~~~~~~~~~~~~~");
+  printf("~~~~~~~~~~~~~~~~~~ Quad Array ~~~~~~~~~~~~~~~~~~~~~~\n");
   int i;
-  for (i = 0; i < next_quad_index && i < quad_array_size; i++)
+  for (i = 0; i < next_quad_index && i < quad_array_size; i++) {
     printf("%d:\t", i);
-    fprintf(stderr, "%d:\t", i);
     print_quad(quad_array[i]);
+  }
 }
 
 // Prints the quad in human-readable format

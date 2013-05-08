@@ -41,7 +41,7 @@ int main()
       generate_intermediate_code(root);
       printf("~~~~~~~~~~~~~~~~~~~~~~~\n");
       print_ast(root, 0);
-      //print_quad_array();
+      print_quad_array();
   } else {
       fprintf(stderr, "%s\n", "No root :(\n");
   }

@@ -49,6 +49,8 @@ enum quad_op {
   array_dec_op,
   if_false_op,
   goto_op,
+  read_int_op,
+  read_double_op,
 
 
   read_op,

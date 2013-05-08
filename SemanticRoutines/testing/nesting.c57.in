@@ -4,14 +4,22 @@ int f0()
   int b;
   int c;
   c = a + b;
-/*
+
+  read a[b];
+
+  do {
+    ++b;
+  } while (a>b);
+
   if (a) {
-
+    b = c;
   } else if (b) {
-
-  } else {
-
+    c = a;
+  } else if (c) {
+    a = b;
   }
+  /*
+  
 }
 
 int f1()
