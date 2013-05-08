@@ -33,6 +33,7 @@ extern symboltable scoped_id_table;
 extern symboltable flat_id_table;
 extern symboltable stringconst_table;
 
+extern int type_error_count;
 char *error_string;
 %}
 
@@ -602,6 +603,18 @@ arg_list : arg_list ',' expression {
 
 %%
 
+/* ~~~~~~~~~~~~~~~ Function Prototypes ~~~~~~~~~~~~~~~~~~~ */
+
+// Standard code for checking the types of the operands of a binary operation
+//  and setting the type of the operation
+void standard_binary_op_typecheck_widening(ast_node node);
+
+// Standard code for checking the types of the operands of a binary operation that is of type int
+//  and setting the type of the operation (<, <=, >, >=, == , !=)
+void standard_binary_op_typecheck_int(ast_node node);
+
+/* ~~~~~~~~~~~~~~~ Function Definitions ~~~~~~~~~~~~~~~~~~~ */
+
 int yyerror(char *s) {
   parseError = 1;
   fprintf(stderr, "%s at line %d", s, lineNumber);
@@ -720,12 +733,16 @@ int fill_id_types(ast_node node)
   }
 }
 
-void type_check_error(int ln) {
-  printf("Type error found at %d\n", ln);
+void type_check_error(int ln, char *msg) {
+  printf("Type error found at line %d: %s\n", ln, msg);
+  type_error_count++;
 }
 
 int type_check(ast_node node)
 {
+  // TODO: array types
+  // e.g. can't have int[] a; a = 5;
+
   int error_count = 0;
 
   ast_node child;
@@ -733,196 +750,87 @@ int type_check(ast_node node)
     error_count += type_check(child);
   }
 
+  node->data_type = no_type;
+  node->return_type = no_type;
+
   switch (node->node_type) {
     case ROOT:
       break;
     case ID:
+      node->data_type = node->value.sym_node->var_type;
       break;
     case INT_TYPE:
-      node->data_type = inttype;
       break;
     case DBL_TYPE:
-      node->data_type = doubletype;
       break;
     case VOID_TYPE:
-      node->data_type = voidtype;
       break;
     case ARRAY_SUB:
     {
-      //TODO: discuss array types
       enum vartype sub_type = node->left_child->right_sibling->data_type;
       if (sub_type != inttype) {
-        type_check_error(node->line_num);
-        error_count++;
+        type_check_error(node->line_num, "Array index is not an int");
       }
+
+      node->data_type = node->left_child->value.sym_node->var_type;
+
       break;
     }
     case ARRAY_NONSUB:
-      //TODO: discuss array types
+      node->data_type = node->left_child->value.sym_node->var_type;
       break;
     case OP_ASSIGN:
     {
       enum vartype ltype = node->left_child->data_type;
       enum vartype rtype = node->left_child->right_sibling->data_type;
-      //widen if assigning int to double
-      int shouldWiden = ((ltype == doubletype) && (rtype == inttype));
+      // widen if assigning int to double
+      int shouldWiden = (ltype == doubletype) && (rtype == inttype);
       if (rtype != ltype && !shouldWiden){
-        type_check_error(node->line_num);
-        error_count++;
+        type_check_error(node->line_num, "Cannot assign a double to an int");
       }
       node->data_type = ltype;
       break;
     }
     case OP_ADD:
-    {
-      enum vartype ltype = node->left_child->data_type;
-      enum vartype rtype = node->left_child->right_sibling->data_type;
-      if ((ltype != inttype && ltype != doubletype) ||
-          (rtype != inttype && rtype != doubletype)) {
-        type_check_error(node->line_num);
-        error_count++;  
-      } else if ((ltype == doubletype) || (rtype == doubletype)) {
-        node->data_type = doubletype;
-      } else {
-        node->data_type = inttype;
-      }
+      standard_binary_op_typecheck_widening(node);
       break;
-    }
     case OP_SUB:
-    {
-      enum vartype ltype = node->left_child->data_type;
-      enum vartype rtype = node->left_child->right_sibling->data_type;
-      if ((ltype != inttype && ltype != doubletype) ||
-          (rtype != inttype && rtype != doubletype)) {
-        type_check_error(node->line_num);
-        error_count++;  
-      } else if ((ltype == doubletype) || (rtype == doubletype)) {
-        node->data_type = doubletype;
-      } else {
-        node->data_type = inttype;
-      }
+      standard_binary_op_typecheck_widening(node);
       break;
-    }
     case OP_MULT:
-    {
-      enum vartype ltype = node->left_child->data_type;
-      enum vartype rtype = node->left_child->right_sibling->data_type;
-      if ((ltype != inttype && ltype != doubletype) ||
-          (rtype != inttype && rtype != doubletype)) {
-        type_check_error(node->line_num);
-        error_count++;  
-      } else if ((ltype == doubletype) || (rtype == doubletype)) {
-        node->data_type = doubletype;
-      } else {
-        node->data_type = inttype;
-      }
+      standard_binary_op_typecheck_widening(node);
       break;
-    }
     case OP_DIV:
-    {
-      enum vartype ltype = node->left_child->data_type;
-      enum vartype rtype = node->left_child->right_sibling->data_type;
-      if ((ltype != inttype && ltype != doubletype) ||
-          (rtype != inttype && rtype != doubletype)) {
-        type_check_error(node->line_num);
-        error_count++;  
-      } else if ((ltype == doubletype) || (rtype == doubletype)) {
-        node->data_type = doubletype;
-      } else {
-        node->data_type = inttype;
-      }
+      standard_binary_op_typecheck_widening(node);
       break;
-    }
     case OP_MOD:
     {
       enum vartype ltype = node->left_child->data_type;
       enum vartype rtype = node->left_child->right_sibling->data_type;
-      if (ltype != inttype && rtype != inttype) {
-        type_check_error(node->line_num);
-        error_count++;  
+      if (ltype != inttype || rtype != inttype) {
+        type_check_error(node->line_num, "An operand of mod is not of type int");  
       }
       node->data_type = inttype;
       break;
     }
     case OP_LT:
-    {
-      enum vartype ltype = node->left_child->data_type;
-      enum vartype rtype = node->left_child->right_sibling->data_type;
-      if ((ltype != inttype && ltype != doubletype) ||
-          (rtype != inttype && rtype != doubletype)) {
-        type_check_error(node->line_num);
-        error_count++;  
-      }
-      node->data_type = inttype;
-      break;
-    }
+      standard_binary_op_typecheck_int(node);
     case OP_LEQ:
-    {
-      enum vartype ltype = node->left_child->data_type;
-      enum vartype rtype = node->left_child->right_sibling->data_type;
-      if ((ltype != inttype && ltype != doubletype) ||
-          (rtype != inttype && rtype != doubletype)) {
-        type_check_error(node->line_num);
-        error_count++;  
-      }
-      node->data_type = inttype;
-      break;
-    }
+      standard_binary_op_typecheck_int(node);
     case OP_GT:
-    {
-      enum vartype ltype = node->left_child->data_type;
-      enum vartype rtype = node->left_child->right_sibling->data_type;
-      if ((ltype != inttype && ltype != doubletype) ||
-          (rtype != inttype && rtype != doubletype)) {
-        type_check_error(node->line_num);
-        error_count++;  
-      }
-      node->data_type = inttype;
-      break;
-    }
+      standard_binary_op_typecheck_int(node);
     case OP_GEQ:
-    {
-      enum vartype ltype = node->left_child->data_type;
-      enum vartype rtype = node->left_child->right_sibling->data_type;
-      if ((ltype != inttype && ltype != doubletype) ||
-          (rtype != inttype && rtype != doubletype)) {
-        type_check_error(node->line_num);
-        error_count++;  
-      }
-      node->data_type = inttype;
-      break;
-    }
+      standard_binary_op_typecheck_int(node);
     case OP_EQ:
-    {
-      enum vartype ltype = node->left_child->data_type;
-      enum vartype rtype = node->left_child->right_sibling->data_type;
-      if ((ltype != inttype && ltype != doubletype) ||
-          (rtype != inttype && rtype != doubletype)) {
-        type_check_error(node->line_num);
-        error_count++;  
-      }
-      node->data_type = inttype;
-      break;
-    }
+      standard_binary_op_typecheck_int(node);
     case OP_NEQ:
-    {
-      enum vartype ltype = node->left_child->data_type;
-      enum vartype rtype = node->left_child->right_sibling->data_type;
-      if ((ltype != inttype && ltype != doubletype) ||
-          (rtype != inttype && rtype != doubletype)) {
-        type_check_error(node->line_num);
-        error_count++;  
-      }
-      node->data_type = inttype;
-      break;
-    }
+      standard_binary_op_typecheck_int(node);
     case OP_AND:
     {
       enum vartype ltype = node->left_child->data_type;
       enum vartype rtype = node->left_child->right_sibling->data_type;
-      if (ltype != inttype && rtype != inttype) {
-        type_check_error(node->line_num);
-        error_count++;  
+      if (ltype != inttype || rtype != inttype) {
+        type_check_error(node->line_num, "An operand of && is not an int");  
       }
       node->data_type = inttype;
       break;
@@ -931,9 +839,8 @@ int type_check(ast_node node)
     {
       enum vartype ltype = node->left_child->data_type;
       enum vartype rtype = node->left_child->right_sibling->data_type;
-      if (ltype != inttype && rtype != inttype) {
-        type_check_error(node->line_num);
-        error_count++;  
+      if (ltype != inttype || rtype != inttype) {
+        type_check_error(node->line_num, "An operand of || is not an int");  
       }
       node->data_type = inttype;
       break;
@@ -941,8 +848,7 @@ int type_check(ast_node node)
     case OP_BANG:
     {
       if (node->left_child->data_type != inttype) {
-        type_check_error(node->line_num);
-        error_count++;  
+        type_check_error(node->line_num, "The operand of ! is not an int");  
       }
       node->data_type = inttype;
       break;
@@ -951,8 +857,7 @@ int type_check(ast_node node)
     {
       enum vartype dtype = node->left_child->data_type;
       if (dtype != inttype && dtype != doubletype) {
-        type_check_error(node->line_num);
-        error_count++;  
+        type_check_error(node->line_num, "The operand of - (unary minus) is not an int or double");  
       }
       node->data_type = dtype;
       break;
@@ -961,8 +866,7 @@ int type_check(ast_node node)
     {
       enum vartype dtype = node->left_child->data_type;
       if (dtype != inttype) {
-        type_check_error(node->line_num);
-        error_count++;  
+        type_check_error(node->line_num, "The operand of ++ is not an int");  
       }
       node->data_type = inttype;
       break;
@@ -971,75 +875,104 @@ int type_check(ast_node node)
     {
       enum vartype dtype = node->left_child->data_type;
       if (dtype != inttype) {
-        type_check_error(node->line_num);
-        error_count++;  
+        type_check_error(node->line_num, "The operand of -- is not an int");  
       }
       node->data_type = inttype;
       break;
     }
     case FUNC_DECL:
     {
-      enum vartype rettype = rightmost_sibling(node->left_child)->return_type;
-      //all ftns must have return stmt, even void
-      if(rettype != node->left_child->data_type) {
-        type_check_error(node->line_num);
-        error_count++;  
+      if(node->value.sym_node->var_type != node->left_child->data_type) {
+        type_check_error(node->line_num, "The return types of the function declaration and body do not match");  
       }
+
       break;
     }
     case VAR_DECL:
-    {
-      enum vartype decltype = node->left_child->data_type;
-      ast_node decls;
-      for(decls = node->left_child->right_sibling; decls != NULL; decls = decls->right_sibling) {
-        if (decls->data_type != decltype) {
-          type_check_error(node->line_num);
-          error_count++;  
-        }
-      }
       break;
-    }
     case FORMAL_PARAM:
-
       break;
     case SEQ:
+    {
+      ast_node child;
+      for (child = node->left_child; child != NULL; child = child->right_sibling) {
+        if (node->return_type == no_type) {
+          node->return_type = child->return_type;
+        } else if (child->return_type != no_type && node->return_type != child->return_type) {
+          type_check_error(node->line_num, "The type of this return statement conflicts with that of a previous return statement in this function");
+        }
+      }
 
       break;
+    }
     case IF_STMT:
+      node->return_type = node->left_child->right_sibling->return_type;
 
       break;
     case WHILE_LOOP:
+      node->return_type = node->left_child->right_sibling->return_type;
 
       break;
     case DO_WHILE_LOOP:
+      node->return_type = node->left_child->return_type;
 
       break;
     case FOR_STMT:
+      node->return_type = node->left_child->right_sibling->right_sibling->right_sibling->return_type;
 
       break;
     case RETURN_STMT:
+      node->return_type = node->left_child->data_type;
 
       break;
     case READ_STMT:
-
       break;
     case PRINT_STMT:
-
       break;
     case STRING_LITERAL:
-
       break;
     case INT_LITERAL:
+      node->data_type = inttype;
 
       break;
     case DOUBLE_LITERAL:
+      node->data_type = doubletype;
 
       break;
     case FUNC_CALL:
+      // TODO: check parameters
 
       break;
     case EMPTY_EXPR:
-
       break;
   }
+}
+
+// Standard code for checking the types of the operands of a binary operation with widening
+//  and setting the type of the operation (+, -, *, /)
+void standard_binary_op_typecheck_widening(ast_node node)
+{
+  enum vartype ltype = node->left_child->data_type;
+  enum vartype rtype = node->left_child->right_sibling->data_type;
+  if ((ltype != inttype && ltype != doubletype) ||
+      (rtype != inttype && rtype != doubletype)) {
+    type_check_error(node->line_num, "An operand is not of type int or double");  
+  } else if ((ltype == doubletype) || (rtype == doubletype)) {
+    node->data_type = doubletype;
+  } else {
+    node->data_type = inttype;
+  }
+}
+
+// Standard code for checking the types of the operands of a binary operation that is of type int
+//  and setting the type of the operation (<, <=, >, >=, == , !=)
+void standard_binary_op_typecheck_int(ast_node node)
+{
+  enum vartype ltype = node->left_child->data_type;
+  enum vartype rtype = node->left_child->right_sibling->data_type;
+  if ((ltype != inttype && ltype != doubletype) ||
+      (rtype != inttype && rtype != doubletype)) {
+    type_check_error(node->line_num, "An operand is not of type int or float");  
+  }
+  node->data_type = inttype;
 }

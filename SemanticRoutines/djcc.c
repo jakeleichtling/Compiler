@@ -18,6 +18,8 @@ symboltable stringconst_table;
 ast_node root = NULL;
 int parseError = 0;
 
+int type_error_count = 0;
+
 int jldebug = 1;
 
 int main()
