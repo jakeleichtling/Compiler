@@ -133,7 +133,11 @@ ident : IDENT {
     ast_node t_id = create_ast_node(ID);
     t_id->line_num = lineNumber;
 
+    printf("@@@ %s\n", savedText);
     symnode scoped_symnode = insert_into_symboltable(scoped_id_table, savedText);
+    print_symboltable(scoped_id_table);
+    printf("@@@ %p\n", scoped_symnode);
+    printf("@@@ %s\n", scoped_symnode->mangled_name);
     t_id->value.sym_node = insert_into_symboltable(flat_id_table, scoped_symnode->mangled_name);
 
     $$ = t_id;
@@ -170,6 +174,7 @@ func_declaration :
     t->left_child = $1;
     t->left_child->right_sibling = $2;
     t->left_child->right_sibling->value.sym_node->node_type = func_node;
+    t->left_child->right_sibling->value.sym_node->decl_ast_node = t;
     t->left_child->right_sibling->right_sibling = $4;
     rightmost_sibling(t->left_child)->right_sibling = $6;
     $$ = t;
@@ -738,26 +743,27 @@ void type_check_error(int ln, char *msg) {
   type_error_count++;
 }
 
-int type_check(ast_node node)
+void type_check(ast_node node)
 {
-  // TODO: array types
-  // e.g. can't have int[] a; a = 5;
-
   int error_count = 0;
 
   ast_node child;
   for (child = node->left_child; child != NULL; child = child->right_sibling) {
-    error_count += type_check(child);
+    type_check(child);
   }
 
   node->data_type = no_type;
   node->return_type = no_type;
+  node->is_array_ptr = 0;
 
   switch (node->node_type) {
     case ROOT:
       break;
     case ID:
       node->data_type = node->value.sym_node->var_type;
+      if (node->value.sym_node -> node_type == array_node) {
+        node->is_array_ptr = 1;
+      }
       break;
     case INT_TYPE:
       break;
@@ -770,6 +776,8 @@ int type_check(ast_node node)
       enum vartype sub_type = node->left_child->right_sibling->data_type;
       if (sub_type != inttype) {
         type_check_error(node->line_num, "Array index is not an int");
+      } else if (node->left_child->value.sym_node->node_type != array_node) {
+        type_check_error(node->line_num, "Subscripted variable is not an array");
       }
 
       node->data_type = node->left_child->value.sym_node->var_type;
@@ -777,10 +785,18 @@ int type_check(ast_node node)
       break;
     }
     case ARRAY_NONSUB:
-      node->data_type = node->left_child->value.sym_node->var_type;
+      node->data_type = node->left_child->right_sibling->value.sym_node->var_type;
       break;
     case OP_ASSIGN:
     {
+      if (node->left_child->node_type == ID && node->left_child->value.sym_node->node_type == array_node) {
+        if (node->left_child->right_sibling->is_array_ptr == 0) {
+          type_check_error(node->line_num, "Cannot assign a non-array pointer to an array pointer variable");
+        }
+
+        node->is_array_ptr = 1;
+      }
+
       enum vartype ltype = node->left_child->data_type;
       enum vartype rtype = node->left_child->right_sibling->data_type;
       // widen if assigning int to double
@@ -882,9 +898,14 @@ int type_check(ast_node node)
     }
     case FUNC_DECL:
     {
-      if(node->value.sym_node->var_type != node->left_child->data_type) {
+      enum vartype body_return_type = node->left_child->right_sibling->right_sibling->return_type;
+      enum vartype decl_return_type = node->left_child->right_sibling->value.sym_node->var_type;
+
+      if (!((body_return_type == no_type && decl_return_type == voidtype) || (body_return_type == decl_return_type))) {
         type_check_error(node->line_num, "The return types of the function declaration and body do not match");  
       }
+
+      node->return_type = decl_return_type;
 
       break;
     }
@@ -940,9 +961,21 @@ int type_check(ast_node node)
 
       break;
     case FUNC_CALL:
-      // TODO: check parameters
+    {
+      // get function's sym_node
+      symnode func_sym_node = node->left_child->value.sym_node;
+
+      // set data_type equal to return type of function
+      node->data_type = func_sym_node->var_type;
+
+      // get function declarations ast_node
+      ast_node func_decl_ast_node = (ast_node) func_sym_node->decl_ast_node;
+
+      // check parameter types in parallel
+
 
       break;
+    }
     case EMPTY_EXPR:
       break;
   }

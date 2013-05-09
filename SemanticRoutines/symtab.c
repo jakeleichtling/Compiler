@@ -13,6 +13,20 @@
 
 #define NOHASHSLOT -1
 
+// Strings corresponding to vartype and nodetype (in symtab.h) for printing of the syntax tree
+char *var_type_string[] = {
+  "no_type",
+  "inttype",
+  "doubletype",
+  "voidtype"
+};
+
+char *node_type_string[] = {
+  "func_node",
+  "val_node",
+  "array_node"
+};
+
 /*
  * Functions for symnodes.
  */
@@ -214,4 +228,38 @@ void leave_scope(symboltable symtab) {
   symhashtable hashtable = symtab->inner_scope;
   symtab->inner_scope = hashtable->outer_scope;
   destroy_symhashtable(hashtable);
+}
+
+void print_symnode(symnode node)
+{
+    if (node) {
+      printf("Node: %s, type: %s, vartype: %s, addr: %d, ptr: %p \n", node->name,
+      node_type_string[node->node_type],
+      var_type_string[node->var_type], 
+      node->varaddr,
+            node
+            );
+    } else {
+        printf("Node is null\n");
+    }
+}
+
+void print_symhashtable(symhashtable hashtable)
+{
+  int i;
+  for (i = 0; i < hashtable->size; i++) {
+    symnode node;
+    for (node = hashtable->table[i]; node != NULL; node = node->next) {
+      print_symnode(node);
+    }
+  }
+}
+
+void print_symboltable(symboltable symtab)
+{
+  symhashtable table;
+  for (table = symtab->inner_scope; table != NULL; table = table->outer_scope) {
+    printf("Table at level %d contains:\n", table->level);
+    print_symhashtable(table);
+  }
 }

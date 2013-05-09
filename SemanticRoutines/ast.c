@@ -19,6 +19,9 @@
 #include <stdlib.h>
 #include "ast.h"
 
+extern char *node_type_string[];
+extern char *var_type_string[];
+
 /* Define a table of token types and their associated strings.  You
    should modify this table as appropriate.  The order of entries
    should match the order of enumerated values in ast_node_type. */
@@ -69,20 +72,6 @@ static struct token_lookup token_table[] = {
     { "FUNC_CALL", FUNC_CALL },
     { "EMPTY_EXPR", EMPTY_EXPR },
     { NULL,0 }
-};
-
-// Strings corresponding to vartype and nodetype (in symtab.h) for printing of the syntax tree
-char *var_type_string[] = {
-  "inttype",
-  "doubletype",
-  "voidtype",
-  "no_type"
-};
-
-char *node_type_string[] = {
-  "func_node",
-  "val_node",
-  "array_node"
 };
 
 /* Create a node with a given token type and return a pointer to the
@@ -139,6 +128,8 @@ void print_ast_node(ast_node node)
   default:
     break;
   }
+
+  printf("\tdata type: %s, return type %s", var_type_string[node->data_type], var_type_string[node->return_type]);
 }
 
  /* Iterate to last sibling in LL */

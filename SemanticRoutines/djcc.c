@@ -40,6 +40,7 @@ int main()
 
   if (haveRoot == 0) {
       fill_id_types(root);
+      type_check(root);
       generate_intermediate_code(root);
       printf("~~~~~~~~~~~~~~~~~~~~~~~\n");
       print_ast(root, 0);

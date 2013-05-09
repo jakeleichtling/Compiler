@@ -1,15 +1,20 @@
-int f0()
+int f0(int x, double y[])
 {
   int a;
   int b;
   int c;
-  c = a + b;
 
-  read a[b];
+  f0(5);
+
+  c = a + b;
 
   do {
     ++b;
   } while (a>b);
+
+  {
+    ++b;
+  }
 
   if (a) {
     b = c;

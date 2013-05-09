@@ -21,7 +21,7 @@ static char *vartype_strings[] =
 	"voidtype"
 };
 
-void print_node(symnode node)
+void print_symnode(symnode node)
 {
     if (node) {
     	printf("Node: %s, type: %s, vartype: %s, addr: %d, ptr: %p \n", node->name,
@@ -41,7 +41,7 @@ void print_symhashtable(symhashtable hashtable)
 	for (i = 0; i < hashtable->size; i++) {
 		symnode node;
 		for (node = hashtable->table[i]; node != NULL; node = node->next) {
-			print_node(node);
+			print_symnode(node);
 		}
 	}
 }
@@ -97,7 +97,7 @@ int main()
     printf("------------------------------------\n\n");
 
     printf("5.) Look up and print out id \"x\" --> double x @ level 1\n");
-    print_node(lookup_in_symboltable(t, "x", &level, identifier));
+    print_symnode(lookup_in_symboltable(t, "x", &level, identifier));
     printf("@ level: %d\n\n", level);
 
     printf("6.) Add stringconst x @ addr 3\n\n");
@@ -109,7 +109,7 @@ int main()
     printf("------------------------------------\n\n");
 
     printf("7.) Look up and print out stringconst \"x\" --> stringconst x @ level 2\n");
-    print_node(lookup_in_symboltable(t, "x", &level, stringconst));
+    print_symnode(lookup_in_symboltable(t, "x", &level, stringconst));
     printf("@ level: %d\n\n", level);
 
     printf("8.) Add stringconst x (same name as (6)!)\n\n");
@@ -120,11 +120,11 @@ int main()
     printf("------------------------------------\n\n");
 
     printf("9.) Look up and print out stringconst \"x\" --> stringconst x @ level 2 (same node as (7)!)\n");
-    print_node(lookup_in_symboltable(t, "x", &level, stringconst));
+    print_symnode(lookup_in_symboltable(t, "x", &level, stringconst));
     printf("@ level: %d\n\n", level);
 
     printf("10.) Look up and print out id \"x\" --> double x @ level 1\n");
-    print_node(lookup_in_symboltable(t, "x", &level, identifier));
+    print_symnode(lookup_in_symboltable(t, "x", &level, identifier));
     printf("@ level: %d\n\n", level);
 
     printf("11.) Add void function x @ addr 4\n\n");
@@ -137,11 +137,11 @@ int main()
     printf("------------------------------------\n\n");
 
     printf("12.) Look up and print out id \"x\" --> void function x @ level 2\n");
-    print_node(lookup_in_symboltable(t, "x", &level, identifier));
+    print_symnode(lookup_in_symboltable(t, "x", &level, identifier));
     printf("@ level: %d\n\n", level);
 
     printf("13.) Look up and print out stringconst \"x\" --> stringconst x @ level 2 (same node as (7)!)\n");
-    print_node(lookup_in_symboltable(t, "x", &level, stringconst));
+    print_symnode(lookup_in_symboltable(t, "x", &level, stringconst));
     printf("@ level: %d\n\n", level);
 
     printf("14.) Leave the current scope\n\n");
@@ -152,11 +152,11 @@ int main()
     printf("------------------------------------\n\n");
 
     printf("15.) Look up and print out stringconst \"x\" --> null\n");
-    print_node(lookup_in_symboltable(t, "x", &level, stringconst));
+    print_symnode(lookup_in_symboltable(t, "x", &level, stringconst));
     printf("\n");
 
     printf("16.) Look up and print out id \"x\" --> double x @ level 1\n");
-    print_node(lookup_in_symboltable(t, "x", &level, identifier));
+    print_symnode(lookup_in_symboltable(t, "x", &level, identifier));
     printf("@ level: %d\n\n", level);
 
     printf("17.) Leave the current scope\n\n");
@@ -167,7 +167,7 @@ int main()
     printf("------------------------------------\n\n");
 
     printf("18.) Look up and print out id \"x\" --> int x @ level 0\n");
-    print_node(lookup_in_symboltable(t, "x", &level, identifier));
+    print_symnode(lookup_in_symboltable(t, "x", &level, identifier));
     printf("@ level: %d\n\n", level);
 
 	destroy_symboltable(t);
