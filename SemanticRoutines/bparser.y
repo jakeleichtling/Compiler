@@ -32,8 +32,10 @@ extern char *savedText;
 extern symboltable scoped_id_table;
 extern symboltable flat_id_table;
 extern symboltable stringconst_table;
+extern symboltable id_name_table;
+int scoped_id_table_level;
 
-extern int type_error_count;
+extern int error_count;
 char *error_string;
 %}
 
@@ -133,12 +135,8 @@ ident : IDENT {
     ast_node t_id = create_ast_node(ID);
     t_id->line_num = lineNumber;
 
-    printf("@@@ %s\n", savedText);
-    symnode scoped_symnode = insert_into_symboltable(scoped_id_table, savedText);
-    print_symboltable(scoped_id_table);
-    printf("@@@ %p\n", scoped_symnode);
-    printf("@@@ %s\n", scoped_symnode->mangled_name);
-    t_id->value.sym_node = insert_into_symboltable(flat_id_table, scoped_symnode->mangled_name);
+    // just save the name of the ID for now
+    t_id->value.sym_node = insert_into_symboltable(id_name_table, savedText);
 
     $$ = t_id;
   }
@@ -633,67 +631,6 @@ int yyerror(char *s) {
   return 1;
 }
 
-// Set the type of a function ID from a function declaration
-void set_func_decl_type(ast_node func_decl_node)
-{
-  enum vartype var_type;
-  switch (func_decl_node->left_child->node_type) {
-    case INT_TYPE:
-      var_type = inttype;
-      break;
-    case DBL_TYPE:
-      var_type = doubletype;
-      break;
-    case VOID_TYPE:
-      var_type = voidtype;
-  }
-
-  ast_node id_node = func_decl_node->left_child->right_sibling;
-  id_node->value.sym_node->var_type = var_type;
-}
-
-// Set the type of a formal parameter in a function signature
-void set_formal_param_type(ast_node formal_param_node)
-{
-  enum vartype var_type;
-  switch (formal_param_node->left_child->node_type) {
-    case INT_TYPE:
-      var_type = inttype;
-      break;
-    case DBL_TYPE:
-      var_type = doubletype;
-      break;
-  }
-
-  ast_node id_node = formal_param_node->left_child->right_sibling;
-  id_node->value.sym_node->var_type = var_type;
-}
-
-// Set the types of all variables declared in the same statement
-void set_var_decl_types(ast_node var_decl_node)
-{
-  enum vartype var_type;
-  switch (var_decl_node->left_child->node_type) {
-    case INT_TYPE:
-      var_type = inttype;
-      break;
-    case DBL_TYPE:
-      var_type = doubletype;
-      break;
-  }
-
-  ast_node decl_child_node;
-  for (decl_child_node = var_decl_node->left_child->right_sibling; decl_child_node != NULL; decl_child_node = decl_child_node->right_sibling) {
-    if (decl_child_node->node_type == OP_ASSIGN) {
-      decl_child_node->left_child->value.sym_node->var_type = var_type;
-    } else if (decl_child_node->node_type == ARRAY_SUB) {
-      decl_child_node->left_child->value.sym_node->var_type = var_type;
-    } else {
-      decl_child_node->value.sym_node->var_type = var_type;
-    }
-  }
-}
-
 // Set the type of an array formal parameter (non-subscripted)
 void set_array_formal_param_decl_type(ast_node array_formal_param_decl_node)
 {
@@ -711,36 +648,334 @@ void set_array_formal_param_decl_type(ast_node array_formal_param_decl_node)
   id_node->value.sym_node->var_type = var_type;
 }
 
-// Performs a pre-order traversal of the syntax tree to set the types of identifiers
+void mark_error(int ln, char *msg) {
+  fprintf(stderr, "Type error found at line %d: %s\n", ln, msg);
+  error_count++;
+}
+
+// Recursively call fill_id_types on chlidren and return 1 if any of the recursive calls return nonzero;
+//   otherwise return 0
+int children_fill_id_types(ast_node node)
+{
+  ast_node child;
+  for (child = node->left_child; child != NULL; child = child->right_sibling) {
+    if (fill_id_types(child) != 0) {
+      return 1;
+    }
+  }
+
+  return 0;
+}
+
+// Performs a pre-order traversal of the syntax tree to set the types of identifiers.
+//   Uses a multi-level symbol table to keep track of scoping; then ID names are mangled and saved in a flat symbol table.
 int fill_id_types(ast_node node)
 {
+  print_ast_node(node);
+  printf("\n");
   // Set types if we have a declaration (function or variable) or a parameter
   switch (node->node_type) {
     case FUNC_DECL:
-      set_func_decl_type(node);
-      break;
+    {
+      // Find the return type of the function declaration
+      enum vartype var_type;
+      switch (node->left_child->node_type) {
+        case INT_TYPE:
+          var_type = inttype;
+          break;
+        case DBL_TYPE:
+          var_type = doubletype;
+          break;
+        case VOID_TYPE:
+          var_type = voidtype;
+      }
+
+      // Get the func ID's ast node
+      ast_node id_astnode = node->left_child->right_sibling;
+
+      // Look up the name in the ID name table and make sure it doesn't already exist in the same scope
+      char *basename = id_astnode->value.sym_node->name;
+      symnode prev_scoped_id_symnode = lookup_in_symboltable(scoped_id_table, basename, &scoped_id_table_level);
+      if (prev_scoped_id_symnode != NULL && scoped_id_table_level == scoped_id_table->inner_scope->level) {
+        mark_error(node->line_num, "An ID of this name already exists in the same scope");
+        return 1;
+      }
+
+      // Add the func ID to the scoped ID table, then add it with the mangled name to the flat ID table
+      symnode scoped_id_symnode = insert_into_symboltable(scoped_id_table, basename);
+      symnode flat_id_symnode = insert_into_symboltable(flat_id_table, scoped_id_symnode->mangled_name);
+
+      // Set the node and return type of the sym_node, and point to the symnode from the id astnode
+      flat_id_symnode->node_type = func_node;
+      flat_id_symnode->var_type = var_type;
+      id_astnode->value.sym_node = flat_id_symnode;
+
+      // Enter into the function's scope
+      enter_scope(scoped_id_table);
+
+      // Recurse on the formal parameters and body
+      ast_node child;
+      for (child = id_astnode->right_sibling; child != NULL; child = child->right_sibling) {
+        if (fill_id_types(child) != 0) {
+          return 1;
+        }
+      }
+
+      // Exit the function's scope
+      leave_scope(scoped_id_table);
+
+      return 0;
+    }
     case FORMAL_PARAM:
-      set_formal_param_type(node);
-      break;
+    {
+      // Find the type of the param
+      enum vartype var_type;
+      switch (node->left_child->node_type) {
+        case INT_TYPE:
+          var_type = inttype;
+          break;
+        case DBL_TYPE:
+          var_type = doubletype;
+          break;
+      }
+
+      // Get the param ID's ast node
+      ast_node id_astnode = node->left_child->right_sibling;
+
+      // Look up the name in the ID name table and make sure it doesn't already exist in the same scope
+      char *basename = id_astnode->value.sym_node->name;
+      symnode prev_scoped_id_symnode = lookup_in_symboltable(scoped_id_table, basename, &scoped_id_table_level);
+      if (prev_scoped_id_symnode != NULL && scoped_id_table_level == scoped_id_table->inner_scope->level) {
+        mark_error(node->line_num, "A formal parameter of this name already exists in this function declaration");
+        return 1;
+      }
+
+      // Add the param ID to the scoped ID table, then add it with the mangled name to the flat ID table
+      symnode scoped_id_symnode = insert_into_symboltable(scoped_id_table, basename);
+      symnode flat_id_symnode = insert_into_symboltable(flat_id_table, scoped_id_symnode->mangled_name);
+
+      // Set the node and var_type of the sym_node, and point to the symnode from the id astnode
+      flat_id_symnode->node_type = val_node;
+      flat_id_symnode->var_type = var_type;
+      id_astnode->value.sym_node = flat_id_symnode;
+
+      return 0;
+    }
     case VAR_DECL:
-      set_var_decl_types(node);
-      break;
+    {
+      // Find the type of the variables
+      enum vartype var_type;
+      switch (node->left_child->node_type) {
+        case INT_TYPE:
+          var_type = inttype;
+          break;
+        case DBL_TYPE:
+          var_type = doubletype;
+          break;
+      }
+
+      // Make the symnodes and set the types for all of the declared variables
+      ast_node child;
+      for (child = node->left_child->right_sibling; child != NULL; child = child->right_sibling) {
+        if (child->node_type == ID) {
+          // We already have the ID's ast node
+          ast_node id_astnode = child;
+
+          // Look up the name in the ID name table and make sure it doesn't already exist in the same scope
+          char *basename = id_astnode->value.sym_node->name;
+          symnode prev_scoped_id_symnode = lookup_in_symboltable(scoped_id_table, basename, &scoped_id_table_level);
+          if (prev_scoped_id_symnode != NULL && scoped_id_table_level == scoped_id_table->inner_scope->level) {
+            mark_error(node->line_num, "An ID of this name already exists in the same scope");
+            return 1;
+          }
+
+          // Add the param ID to the scoped ID table, then add it with the mangled name to the flat ID table
+          symnode scoped_id_symnode = insert_into_symboltable(scoped_id_table, basename);
+          symnode flat_id_symnode = insert_into_symboltable(flat_id_table, scoped_id_symnode->mangled_name);
+
+          // Set the node and var_type of the sym_node, and point to the symnode from the id astnode
+          flat_id_symnode->node_type = val_node;
+          flat_id_symnode->var_type = var_type;
+          id_astnode->value.sym_node = flat_id_symnode;
+        } else if (child->node_type == ARRAY_SUB || child->node_type == OP_ASSIGN) {
+          // Get the ID's ast node
+          ast_node id_astnode = child->left_child;
+
+          // Look up the name in the ID name table and make sure it doesn't already exist in the same scope
+          char *basename = id_astnode->value.sym_node->name;
+          symnode prev_scoped_id_symnode = lookup_in_symboltable(scoped_id_table, basename, &scoped_id_table_level);
+          if (prev_scoped_id_symnode != NULL && scoped_id_table_level == scoped_id_table->inner_scope->level) {
+            mark_error(node->line_num, "An ID of this name already exists in the same scope");
+            return 1;
+          }
+
+          // Add the param ID to the scoped ID table, then add it with the mangled name to the flat ID table
+          symnode scoped_id_symnode = insert_into_symboltable(scoped_id_table, basename);
+          symnode flat_id_symnode = insert_into_symboltable(flat_id_table, scoped_id_symnode->mangled_name);
+
+          // Set the node and var_type of the sym_node, and point to the symnode from the id astnode
+          if (child->node_type == ARRAY_SUB) {
+            flat_id_symnode->node_type = array_node;
+          } else {
+            flat_id_symnode->node_type = val_node;
+          }
+          flat_id_symnode->var_type = var_type;
+          id_astnode->value.sym_node = flat_id_symnode;
+
+          // Record size if the subscript is an int literal
+          if (id_astnode->right_sibling->node_type == INT_LITERAL) {
+            flat_id_symnode->array_size = id_astnode->right_sibling->value.int_value;
+          }
+
+          // Recurse on the right child
+          return fill_id_types(id_astnode->right_sibling);
+        }
+      }
+
+      return 0;
+    }
     case ARRAY_NONSUB:
-      set_array_formal_param_decl_type(node);
-      break;
-    default: // just recurse for other types of nodes
-      break;
+    {
+      // Find the type of the param
+      enum vartype var_type;
+      switch (node->left_child->node_type) {
+        case INT_TYPE:
+          var_type = inttype;
+          break;
+        case DBL_TYPE:
+          var_type = doubletype;
+          break;
+      }
+
+      // Get the param ID's ast node
+      ast_node id_astnode = node->left_child->right_sibling;
+
+      // Look up the name in the ID name table and make sure it doesn't already exist in the same scope
+      char *basename = id_astnode->value.sym_node->name;
+      symnode prev_scoped_id_symnode = lookup_in_symboltable(scoped_id_table, basename, &scoped_id_table_level);
+      if (prev_scoped_id_symnode != NULL && scoped_id_table_level == scoped_id_table->inner_scope->level) {
+        mark_error(node->line_num, "A formal parameter of this name already exists in this function declaration");
+        return 1;
+      }
+
+      // Add the param ID to the scoped ID table, then add it with the mangled name to the flat ID table
+      symnode scoped_id_symnode = insert_into_symboltable(scoped_id_table, basename);
+      symnode flat_id_symnode = insert_into_symboltable(flat_id_table, scoped_id_symnode->mangled_name);
+
+      // Set the node and var_type of the sym_node, and point to the symnode from the id astnode
+      flat_id_symnode->node_type = array_node;
+      flat_id_symnode->var_type = var_type;
+      id_astnode->value.sym_node = flat_id_symnode;
+
+      return 0;
+    }
+    case ROOT:
+    {
+      ast_node child;
+      for (child = node->left_child; child != NULL; child = child->right_sibling) {
+        if (fill_id_types(child) != 0) {
+          return 1;
+        }
+      }
+
+      return 0;
+    }
+    case ID:
+    {
+      // We already have the ID's ast_node
+      ast_node id_astnode = node;
+
+      // Look up the name in the ID name table and make sure it is accessible in the current scope
+      char *basename = id_astnode->value.sym_node->name;
+      symnode prev_scoped_id_symnode = lookup_in_symboltable(scoped_id_table, basename, &scoped_id_table_level);
+      if (prev_scoped_id_symnode == NULL) {
+        mark_error(node->line_num, "A variable is referenced but never declared in an accessible scope");
+        return 1;
+      }
+
+      // Find the correct mangled symnode
+      symnode flat_id_symnode = lookup_in_symboltable(flat_id_table, prev_scoped_id_symnode->mangled_name, &scoped_id_table_level);
+
+      // The ast node points to the mangled sym_node of the proper declaration
+      id_astnode->value.sym_node = flat_id_symnode;
+
+      return 0;
+    }
+    case ARRAY_SUB:
+      return children_fill_id_types(node);
+    case OP_ASSIGN:
+      return children_fill_id_types(node);
+    case OP_ADD:
+      return children_fill_id_types(node);
+    case OP_SUB:
+      return children_fill_id_types(node);
+    case OP_MULT:
+      return children_fill_id_types(node);
+    case OP_DIV:
+      return children_fill_id_types(node);
+    case OP_MOD:
+      return children_fill_id_types(node);
+    case OP_LT:
+      return children_fill_id_types(node);
+    case OP_LEQ:
+      return children_fill_id_types(node);
+    case OP_GT:
+      return children_fill_id_types(node);
+    case OP_GEQ:
+      return children_fill_id_types(node);
+    case OP_EQ:
+      return children_fill_id_types(node);
+    case OP_NEQ:
+      return children_fill_id_types(node);
+    case OP_AND:
+      return children_fill_id_types(node);
+    case OP_OR:
+      return children_fill_id_types(node);
+    case OP_BANG:
+      return children_fill_id_types(node);
+    case OP_NEG:
+      return children_fill_id_types(node);
+    case OP_INC:
+      return children_fill_id_types(node);
+    case OP_DEC:
+      return children_fill_id_types(node);
+    case SEQ:
+    {
+      // Enter a new scope for the SEQ
+      enter_scope(scoped_id_table);
+
+      // Recurse on children
+      ast_node child;
+      for (child = node->left_child; child != NULL; child = child->right_sibling) {
+        if (fill_id_types(child) != 0) {
+          return 1;
+        }
+      }
+
+      // Exit the SEQ's scope
+      leave_scope(scoped_id_table);
+
+      return 0;
+    }
+    case IF_STMT:
+      return children_fill_id_types(node);
+    case WHILE_LOOP:
+      return children_fill_id_types(node);
+    case DO_WHILE_LOOP:
+      return children_fill_id_types(node);
+    case FOR_STMT:
+      return children_fill_id_types(node);
+    case RETURN_STMT:
+      return children_fill_id_types(node);
+    case READ_STMT:
+      return children_fill_id_types(node);
+    case PRINT_STMT:
+      return children_fill_id_types(node);
+    case FUNC_CALL:
+      return children_fill_id_types(node);
   }
 
-  ast_node child;
-  for (child = node->left_child; child != NULL; child = child->right_sibling) {
-    fill_id_types(child);
-  }
-}
-
-void type_check_error(int ln, char *msg) {
-  printf("Type error found at line %d: %s\n", ln, msg);
-  type_error_count++;
+  return 0;
 }
 
 void type_check(ast_node node)
@@ -775,9 +1010,9 @@ void type_check(ast_node node)
     {
       enum vartype sub_type = node->left_child->right_sibling->data_type;
       if (sub_type != inttype) {
-        type_check_error(node->line_num, "Array index is not an int");
+        mark_error(node->line_num, "Array index is not an int");
       } else if (node->left_child->value.sym_node->node_type != array_node) {
-        type_check_error(node->line_num, "Subscripted variable is not an array");
+        mark_error(node->line_num, "Subscripted variable is not an array");
       }
 
       node->data_type = node->left_child->value.sym_node->var_type;
@@ -791,7 +1026,7 @@ void type_check(ast_node node)
     {
       if (node->left_child->node_type == ID && node->left_child->value.sym_node->node_type == array_node) {
         if (node->left_child->right_sibling->is_array_ptr == 0) {
-          type_check_error(node->line_num, "Cannot assign a non-array pointer to an array pointer variable");
+          mark_error(node->line_num, "Cannot assign a non-array pointer to an array pointer variable");
         }
 
         node->is_array_ptr = 1;
@@ -799,10 +1034,11 @@ void type_check(ast_node node)
 
       enum vartype ltype = node->left_child->data_type;
       enum vartype rtype = node->left_child->right_sibling->data_type;
+
       // widen if assigning int to double
       int shouldWiden = (ltype == doubletype) && (rtype == inttype);
       if (rtype != ltype && !shouldWiden){
-        type_check_error(node->line_num, "Cannot assign a double to an int");
+        mark_error(node->line_num, "Cannot assign a double to an int");
       }
       node->data_type = ltype;
       break;
@@ -824,7 +1060,7 @@ void type_check(ast_node node)
       enum vartype ltype = node->left_child->data_type;
       enum vartype rtype = node->left_child->right_sibling->data_type;
       if (ltype != inttype || rtype != inttype) {
-        type_check_error(node->line_num, "An operand of mod is not of type int");  
+        mark_error(node->line_num, "An operand of mod is not of type int");  
       }
       node->data_type = inttype;
       break;
@@ -846,7 +1082,7 @@ void type_check(ast_node node)
       enum vartype ltype = node->left_child->data_type;
       enum vartype rtype = node->left_child->right_sibling->data_type;
       if (ltype != inttype || rtype != inttype) {
-        type_check_error(node->line_num, "An operand of && is not an int");  
+        mark_error(node->line_num, "An operand of && is not an int");  
       }
       node->data_type = inttype;
       break;
@@ -856,7 +1092,7 @@ void type_check(ast_node node)
       enum vartype ltype = node->left_child->data_type;
       enum vartype rtype = node->left_child->right_sibling->data_type;
       if (ltype != inttype || rtype != inttype) {
-        type_check_error(node->line_num, "An operand of || is not an int");  
+        mark_error(node->line_num, "An operand of || is not an int");  
       }
       node->data_type = inttype;
       break;
@@ -864,7 +1100,7 @@ void type_check(ast_node node)
     case OP_BANG:
     {
       if (node->left_child->data_type != inttype) {
-        type_check_error(node->line_num, "The operand of ! is not an int");  
+        mark_error(node->line_num, "The operand of ! is not an int");  
       }
       node->data_type = inttype;
       break;
@@ -873,7 +1109,7 @@ void type_check(ast_node node)
     {
       enum vartype dtype = node->left_child->data_type;
       if (dtype != inttype && dtype != doubletype) {
-        type_check_error(node->line_num, "The operand of - (unary minus) is not an int or double");  
+        mark_error(node->line_num, "The operand of - (unary minus) is not an int or double");  
       }
       node->data_type = dtype;
       break;
@@ -882,7 +1118,7 @@ void type_check(ast_node node)
     {
       enum vartype dtype = node->left_child->data_type;
       if (dtype != inttype) {
-        type_check_error(node->line_num, "The operand of ++ is not an int");  
+        mark_error(node->line_num, "The operand of ++ is not an int");  
       }
       node->data_type = inttype;
       break;
@@ -891,7 +1127,7 @@ void type_check(ast_node node)
     {
       enum vartype dtype = node->left_child->data_type;
       if (dtype != inttype) {
-        type_check_error(node->line_num, "The operand of -- is not an int");  
+        mark_error(node->line_num, "The operand of -- is not an int");  
       }
       node->data_type = inttype;
       break;
@@ -902,7 +1138,7 @@ void type_check(ast_node node)
       enum vartype decl_return_type = node->left_child->right_sibling->value.sym_node->var_type;
 
       if (!((body_return_type == no_type && decl_return_type == voidtype) || (body_return_type == decl_return_type))) {
-        type_check_error(node->line_num, "The return types of the function declaration and body do not match");  
+        mark_error(node->line_num, "The return types of the function declaration and body do not match");  
       }
 
       node->return_type = decl_return_type;
@@ -920,7 +1156,7 @@ void type_check(ast_node node)
         if (node->return_type == no_type) {
           node->return_type = child->return_type;
         } else if (child->return_type != no_type && node->return_type != child->return_type) {
-          type_check_error(node->line_num, "The type of this return statement conflicts with that of a previous return statement in this function");
+          mark_error(node->line_num, "The type of this return statement conflicts with that of a previous return statement in this function");
         }
       }
 
@@ -989,7 +1225,7 @@ void standard_binary_op_typecheck_widening(ast_node node)
   enum vartype rtype = node->left_child->right_sibling->data_type;
   if ((ltype != inttype && ltype != doubletype) ||
       (rtype != inttype && rtype != doubletype)) {
-    type_check_error(node->line_num, "An operand is not of type int or double");  
+    mark_error(node->line_num, "An operand is not of type int or double");  
   } else if ((ltype == doubletype) || (rtype == doubletype)) {
     node->data_type = doubletype;
   } else {
@@ -1005,7 +1241,7 @@ void standard_binary_op_typecheck_int(ast_node node)
   enum vartype rtype = node->left_child->right_sibling->data_type;
   if ((ltype != inttype && ltype != doubletype) ||
       (rtype != inttype && rtype != doubletype)) {
-    type_check_error(node->line_num, "An operand is not of type int or float");  
+    mark_error(node->line_num, "An operand is not of type int or float");  
   }
   node->data_type = inttype;
 }

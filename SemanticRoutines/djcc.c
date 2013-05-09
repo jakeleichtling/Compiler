@@ -13,12 +13,13 @@ quad *quad_array;
 
 symboltable scoped_id_table; // Used to look up unmangled IDs with scoping
 symboltable flat_id_table; // Used to store IDs with mangled names
-symboltable stringconst_table;
+symboltable stringconst_table; // Used throughout to save memory with string constants
+symboltable id_name_table; // Used by the parser to save memory with ID names
 
 ast_node root = NULL;
 int parseError = 0;
 
-int type_error_count = 0;
+int error_count = 0;
 
 int jldebug = 1;
 
@@ -31,6 +32,7 @@ int main()
   scoped_id_table = create_symboltable();
   flat_id_table = create_symboltable();
   stringconst_table = create_symboltable();
+  id_name_table = create_symboltable();
 
   // yydebug = 1;
   haveRoot = yyparse();
@@ -39,12 +41,20 @@ int main()
       fprintf(stderr, "WARING: There were parse errors.\nParse tree may be ill-formed.\n");
 
   if (haveRoot == 0) {
+      printf("~~~~~~~~~~~~~~ fill_id_types() ~~~~~~~~~\n");
       fill_id_types(root);
-      type_check(root);
-      generate_intermediate_code(root);
-      printf("~~~~~~~~~~~~~~~~~~~~~~~\n");
+
+      // printf("~~~~~~~~~~~ type_check ~~~~~~~~~~~~\n");
+      // type_check(root);
+
+      // printf("~~~~~~~~~~~~ generate_intermediate_code ~~~~~~~~~~~\n");
+      // generate_intermediate_code(root);
+      
+      printf("~~~~~~~~~~~ print_ast ~~~~~~~~~~~~\n");
       print_ast(root, 0);
-      print_quad_array();
+
+      // printf("~~~~~~~~~~~ print_quad_array ~~~~~~~~~~~~\n");
+      // print_quad_array();
   } else {
       fprintf(stderr, "%s\n", "No root :(\n");
   }
