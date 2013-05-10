@@ -60,3 +60,7 @@ SemanticRoutines/bparser.tab.c
 SemanticRoutines/bparser.tab.h
 
 SemanticRoutines/djcc
+
+*.plist
+
+*.dSYM/*

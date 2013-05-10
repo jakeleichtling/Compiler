@@ -92,4 +92,6 @@ void enter_scope(symboltable symtab);
 /* Leave a scope. */
 void leave_scope(symboltable symtab);
 
+void print_symboltable(symboltable symtab);
+
 #endif

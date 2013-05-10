@@ -11,8 +11,8 @@
 BISONFlAGS = -d -v
 CFLAGS = -g
 
-djcc:	djcc.o lex.yy.o bparser.tab.o ast.o symtab.o quad.o
-	gcc $(CFLAGS) -o djcc djcc.o lex.yy.o bparser.tab.o ast.o symtab.o quad.o -lfl
+djcc:	djcc.o lex.yy.o bparser.tab.o ast.o symtab.o quad.o ast_node_processing.o
+	gcc $(CFLAGS) -o djcc djcc.o lex.yy.o bparser.tab.o ast.o symtab.o quad.o ast_node_processing.o -lfl
 
 valgrind:	djcc.c lex.yy.c bparser.tab.c bparser.tab.h ast.c ast.h symtab.c symtab.h quad.c quad.h
 	gcc $(CFLAGS) -o djcc djcc.c lex.yy.c bparser.tab.c ast.c symtab.c quad.c -lfl
@@ -43,6 +43,9 @@ symtab.o:	symtab.c symtab.h
 
 quad.o:	quad.c quad.h
 	gcc $(CFLAGS) -c quad.c
+
+ast_node_processing.o:	ast_node_processing.c ast_node_processing.h
+	gcc $(CFLAGS) -c ast_node_processing.c
 
 new: clean djcc
 

@@ -1,0 +1,58 @@
+void binary_operations() {
+  int i1, i2;
+  int ai1[10], ai2[20];
+
+  double d1, d2;
+  double ad1[30], ad2[40];
+
+/* + */
+
+  /* binary + (int) */
+  i1 = i1 + i2;
+  ai1[i1] = ai1[i1] + ai2[i2];
+  i1 = i1 + ai2[i2];
+
+  /* binary + (double) */
+  d1 = d1 + d2;
+  ad1[i1] = ad1[i1] + ad2[i2];
+  d1 = d1 + ad2[i2];
+
+  /* binary + (double w/ widening) */
+  d1 = i1 + i2;
+  ad1[i1] = ai1[i1] + ad2[i2];
+  d1 = d1 + ai2[i2];
+
+/* - */
+
+  /* binary - (int) */
+  i1 = i1 - i2;
+  ai1[i1] = ai1[i1] - ai2[i2];
+  i1 = i1 - ai2[i2];
+
+  /* binary - (double) */
+  d1 = d1 - d2;
+  ad1[i1] = ad1[i1] - ad2[i2];
+  d1 = d1 - ad2[i2];
+
+  /* binary - (double w/ widening) */
+  d1 = i1 - i2;
+  ad1[i1] = ai1[i1] - ad2[i2];
+  d1 = d1 - ai2[i2];
+
+/* * */
+
+  /* binary * (int) */
+  i1 = i1 * i2;
+  ai1[i1] = ai1[i1] * ai2[i2];
+  i1 = i1 * ai2[i2];
+
+  /* binary * (double) */
+  d1 = d1 * d2;
+  ad1[i1] = ad1[i1] * ad2[i2];
+  d1 = d1 * ad2[i2];
+
+  /* binary * (double w/ widening) */
+  d1 = i1 * i2;
+  ad1[i1] = ai1[i1] * ad2[i2];
+  d1 = d1 * ai2[i2];
+}

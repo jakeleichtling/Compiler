@@ -9,7 +9,7 @@ extern int quad_array_size;
 
 extern symboltable flat_id_table;
 
-extern int jldebug;
+extern int djdebug;
 
 int temp_count = 0;
 
@@ -149,7 +149,7 @@ quad_arg generate_intermediate_code(ast_node node)
   if (!node)
     return;
 
-  if (jldebug) {
+  if (djdebug) {
     print_ast_node(node);
     printf("\n");
   }
@@ -443,24 +443,24 @@ quad_arg generate_binary_op_with_widening(ast_node node, enum quad_op quad_op_in
 
   printf("@ %d <-> %d\n", node->left_child->data_type, node->left_child->right_sibling->data_type);
 
-  //if (node->left_child->data_type == inttype && node->left_child->right_sibling->data_type == inttype) {
+  if (node->left_child->data_type == inttype && node->left_child->right_sibling->data_type == inttype) {
     result_arg = get_new_temp(flat_id_table, inttype);
     generate_quad(quad_op_ints, result_arg, left_arg, right_arg);
-  // } else {
-  //   result_arg = get_new_temp(flat_id_table, doubletype);
+  } else {
+    result_arg = get_new_temp(flat_id_table, doubletype);
 
-  //   if (node->left_child->data_type == doubletype && node->left_child->right_sibling->data_type == doubletype) {
-  //     generate_quad(quad_op_floats, result_arg, left_arg, right_arg);
-  //   } else if (node->left_child->data_type == doubletype) {
-  //     temp1 = get_new_temp(flat_id_table, doubletype);
-  //     generate_quad(int_to_float_op, temp1, right_arg, NULL);
-  //     generate_quad(quad_op_floats, result_arg, left_arg, temp1);
-  //   } else if (node->left_child->right_sibling->data_type == doubletype) {
-  //     temp1 = get_new_temp(flat_id_table, doubletype);
-  //     generate_quad(int_to_float_op, temp1, left_arg, NULL);
-  //     generate_quad(quad_op_floats, result_arg, temp1, right_arg);
-  //   }
-  // }
+    if (node->left_child->data_type == doubletype && node->left_child->right_sibling->data_type == doubletype) {
+      generate_quad(quad_op_floats, result_arg, left_arg, right_arg);
+    } else if (node->left_child->data_type == doubletype) {
+      temp1 = get_new_temp(flat_id_table, doubletype);
+      generate_quad(int_to_float_op, temp1, right_arg, NULL);
+      generate_quad(quad_op_floats, result_arg, left_arg, temp1);
+    } else if (node->left_child->right_sibling->data_type == doubletype) {
+      temp1 = get_new_temp(flat_id_table, doubletype);
+      generate_quad(int_to_float_op, temp1, left_arg, NULL);
+      generate_quad(quad_op_floats, result_arg, temp1, right_arg);
+    }
+  }
 
   return result_arg;
 }
@@ -487,7 +487,7 @@ quad_arg generate_single_operand(ast_node node, enum quad_op quad_op_int, enum q
 // Add a quad to the array
 void add_quad_to_array(quad new_quad)
 {
-  if (jldebug) {
+  if (djdebug) {
     printf("\t%d:\t", next_quad_index);
     print_quad(new_quad);
   }

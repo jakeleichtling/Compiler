@@ -129,7 +129,7 @@ void print_ast_node(ast_node node)
     break;
   }
 
-  printf("\tdata type: %s, return type %s", var_type_string[node->data_type], var_type_string[node->return_type]);
+  printf("\t--> data type: %s, return type: %s", var_type_string[node->data_type], var_type_string[node->return_type]);
 }
 
  /* Iterate to last sibling in LL */

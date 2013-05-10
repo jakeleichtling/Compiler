@@ -16,25 +16,13 @@ cd ./testing
 
 echo "---------------------------------------------------------"
 
-echo "~~~~~~~~~~~~~~~~~~~ bellman-ford.c57.in ~~~~~~~~~~~~~~~~~"
-cat bellman-ford.c57.in | ../djcc > bellman-ford.c57.out
+# echo "~~~~~~~~~~~~~~~~~~~ bellman-ford.c57.in ~~~~~~~~~~~~~~~~~"
+# cat bellman-ford.c57.in | ../djcc > bellman-ford.c57.out
 
-echo "~~~~~~~~~~~~~~~~~~~ dijkstra.c57.in ~~~~~~~~~~~~~~~~~~~~~"
-cat dijkstra.c57.in | ../djcc > dijkstra.c57.out
+# echo "~~~~~~~~~~~~~~~~~~~ dijkstra.c57.in ~~~~~~~~~~~~~~~~~~~~~"
+# cat dijkstra.c57.in | ../djcc > dijkstra.c57.out
 
-echo "~~~~~~~~~~~~~~ loops_within_loops.c57.in ~~~~~~~~~~~~~~~~"
-cat loops_within_loops.c57.in | ../djcc > loops_within_loops.c57.out
-
-echo "~~~~~~~~~~~~~ complicated_expressions.c57.in ~~~~~~~~~~~~"
-cat complicated_expressions.c57.in | ../djcc > complicated_expressions.c57.out
-
-echo "~~~~~~~~~~~~~~~~ string_newline.c57.in ~~~~~~~~~~~~~~~~~~"
-cat string_newline.c57.in | ../djcc > string_newline.c57.out
-
-echo "~~~~~~~~~~~~~~~ decl_after_print.c57.in ~~~~~~~~~~~~~~~~~"
-cat decl_after_print.c57.in | ../djcc > decl_after_print.c57.out
-
-echo "~~~~~~~~~~~~~~~~~~~~ nesting.c57.in ~~~~~~~~~~~~~~~~~~~~~"
-cat nesting.c57.in | ../djcc > nesting.c57.out
+echo "~~~~~~~~~~~~~~ binary_operations.c57.in ~~~~~~~~~~~~~~~~"
+cat binary_operations.c57.in | ../djcc > binary_operations.c57.out
 
 echo "---------------------------------------------------------"

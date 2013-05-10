@@ -4,6 +4,7 @@
 #include "ast.h"
 #include "symtab.h"
 #include "quad.h"
+#include "ast_node_processing.h"
 
 #define MAX_NUM_QUADS 4096
 
@@ -21,7 +22,7 @@ int parseError = 0;
 
 int error_count = 0;
 
-int jldebug = 1;
+int djdebug = 1;
 
 int main()
 {
@@ -37,24 +38,34 @@ int main()
   // yydebug = 1;
   haveRoot = yyparse();
 
-  if(parseError)
+  if (parseError) {
       fprintf(stderr, "WARING: There were parse errors.\nParse tree may be ill-formed.\n");
-
-  if (haveRoot == 0) {
-      printf("~~~~~~~~~~~~~~ fill_id_types() ~~~~~~~~~\n");
+  } else if (haveRoot == 0) {
+      if (djdebug) {
+        printf("\n~~~~~~~~~~~~~~ fill_id_types ~~~~~~~~~~\n");
+      }
       fill_id_types(root);
 
-      // printf("~~~~~~~~~~~ type_check ~~~~~~~~~~~~\n");
-      // type_check(root);
+      if (djdebug) {
+        printf("\n~~~~~~~~~~~ type_check ~~~~~~~~~~~~\n");
+      }
+      type_check(root);
 
-      // printf("~~~~~~~~~~~~ generate_intermediate_code ~~~~~~~~~~~\n");
-      // generate_intermediate_code(root);
+      if (djdebug) {
+        printf("\n~~~~~~~~~~~~ generate_intermediate_code ~~~~~~~~~~~\n");
+      }
+      generate_intermediate_code(root);
       
-      printf("~~~~~~~~~~~ print_ast ~~~~~~~~~~~~\n");
-      print_ast(root, 0);
+      if (djdebug) {
+        printf("\n~~~~~~~~~~~ print_ast ~~~~~~~~~~~~\n");
+        print_ast(root, 0);
+      }
 
-      // printf("~~~~~~~~~~~ print_quad_array ~~~~~~~~~~~~\n");
-      // print_quad_array();
+      if (djdebug) {
+        printf("\n~~~~~~~~~~~ print_quad_array ~~~~~~~~~~~~\n");
+        print_quad_array();
+      }
+
   } else {
       fprintf(stderr, "%s\n", "No root :(\n");
   }
