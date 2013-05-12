@@ -74,6 +74,12 @@ static struct token_lookup token_table[] = {
     { NULL,0 }
 };
 
+char *mem_addr_type_string[] = {
+  "off_fp",
+  "global",
+  "absolute"
+};
+
 /* Create a node with a given token type and return a pointer to the
    node. */
 ast_node create_ast_node(ast_node_type node_type) {
@@ -110,8 +116,18 @@ void print_ast_node(ast_node node)
   /* Print attributes specific to node types. */
   switch (node->node_type) {
   case ID:      /* print the id */
-    printf("%s (%p), node type: %s, var type: %s", node->value.sym_node->name, node->value.sym_node, node_type_string[node->value.sym_node->node_type], var_type_string[node->value.sym_node->var_type]);
+  {
+    symnode sym_node = node->value.sym_node;
+    printf("%s (%p), node type: %s, var type: %s, address: %d (%s), num vars: %d",
+      sym_node->name,
+      sym_node,
+      node_type_string[sym_node->node_type],
+      var_type_string[sym_node->var_type],
+      sym_node->var_addr,
+      mem_addr_type_string[sym_node->mem_addr_type],
+      sym_node->num_vars);
     break;
+  }
 
   case INT_LITERAL:   /* print the int literal */
     printf("%d", node->value.int_value);

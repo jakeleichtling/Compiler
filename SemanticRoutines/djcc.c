@@ -6,11 +6,7 @@
 #include "quad.h"
 #include "ast_node_processing.h"
 
-#define MAX_NUM_QUADS 4096
-
-int next_quad_index = 0;
-int quad_array_size = MAX_NUM_QUADS;
-quad *quad_array;
+extern quad *quad_array;
 
 symboltable scoped_id_table; // Used to look up unmangled IDs with scoping
 symboltable flat_id_table; // Used to store IDs with mangled names
@@ -28,7 +24,7 @@ int main()
 {
   int haveRoot = 0; // 0 means we have a root
 
-  quad_array = calloc(quad_array_size, sizeof(quad));
+  init_quad_array(-1);
 
   scoped_id_table = create_symboltable();
   flat_id_table = create_symboltable();

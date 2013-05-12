@@ -3,9 +3,11 @@
 #include <string.h>
 #include "quad.h"
 
-extern quad *quad_array;
-extern int next_quad_index;
-extern int quad_array_size;
+#define DEFAULT_QUAD_ARRAY_SIZE 4096
+
+int next_quad_index;
+int quad_array_size;
+quad *quad_array;
 
 extern symboltable flat_id_table;
 
@@ -71,6 +73,9 @@ quad_arg generate_binary_op_with_widening(ast_node node, enum quad_op quad_op_in
 quad_arg generate_single_operand(ast_node node, enum quad_op quad_op_int, enum quad_op quad_op_float);
 
 void add_quad_to_array(quad new_quad);
+
+// Doubles the size of the quad_array and copies over the existing elements
+void expand_quad_array();
 
 /* ~~~~~~~~~~~~~~~ Function Definitions ~~~~~~~~~~~~~~~~~~~ */
 
@@ -493,8 +498,7 @@ void add_quad_to_array(quad new_quad)
   }
 
   if (next_quad_index >= quad_array_size) {
-    fprintf(stderr, "The quad array has been filled!\n");
-    exit(1);
+    expand_quad_array;
   }
 
   quad_array[next_quad_index] = new_quad;
@@ -504,7 +508,6 @@ void add_quad_to_array(quad new_quad)
 // Prints the quad array in human-readable format
 void print_quad_array()
 {
-  printf("~~~~~~~~~~~~~~~~~~ Quad Array ~~~~~~~~~~~~~~~~~~~~~~\n");
   int i;
   for (i = 0; i < next_quad_index && i < quad_array_size; i++) {
     printf("%d:\t", i);
@@ -546,4 +549,38 @@ void print_quad_arg(quad_arg the_quad_arg)
       printf("arg type not specified");
       break;
   }
+}
+
+// Initialize the quad array and store it in quad_array global variable.
+//   Passing a nonpositive size (e.g. -1) uses the default size.
+//   There can only be one quad array at a time since variables are static and the array is global.
+void init_quad_array(int size)
+{
+  if (size > 0) {
+    quad_array_size = size;
+  } else {
+    quad_array_size = DEFAULT_QUAD_ARRAY_SIZE;
+  }
+
+  quad_array = calloc(quad_array_size, sizeof(quad));
+  next_quad_index = 0;
+}
+
+// Doubles the size of the quad_array and copies over the existing elements
+void expand_quad_array()
+{
+  // Allocate memory for the new quad_array
+  quad_array_size *= 2;
+  quad *new_quad_array = calloc(quad_array_size, sizeof(quad));
+
+  // Copy over the existing struct quad pointers
+  int i;
+  for (i = 0; i < next_quad_index; i++) {
+    new_quad_array[i] = quad_array[i];
+  }
+
+  // Free the old quad_array
+  free(quad_array);
+
+  quad_array = new_quad_array;
 }

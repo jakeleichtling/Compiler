@@ -29,6 +29,13 @@ enum nodetype {
   array_node
 };
 
+/* Indicates the type of the memory address */
+enum memaddrtype {
+  off_fp, // relative to FP for local function variables
+  global, // relative to global var pointer
+  absolute // for passing arrays by reference
+};
+
 /* Node in a linked list within the symbol table. */
 typedef struct symnode *symnode;
 struct symnode {
@@ -36,18 +43,15 @@ struct symnode {
   symnode next;	    /* next symnode in list */
   /* Other attributes go here. */
   enum vartype var_type; // The type of a variable or return type of a function (irrelevant for the string table)
-  int varaddr; // irrelevant for string constants
+  int var_addr; // irrelevant for string constants
+  enum memaddrtype mem_addr_type;
   enum nodetype node_type; // The thing that the identifier identifies (irrelevant for the string table)
   int array_size; // only relevant for nodes of type array_node
   char *mangled_name; // irrelevant for the string table
   void *decl_ast_node; // used for function nodes to point to declaration (for parameter type checking on func calls)
+
+  int num_vars; // number of variables for a function
 };
-
-/* Set the variable type of this node. */
-void set_node_vartype(symnode node, enum vartype type);
-
-/* Set the address of the variable in this node. */
-void set_node_addr(symnode node, int addr);
 
 /* Does the identifier in this node equal name? */
 int name_is_equal(symnode node, char *name);

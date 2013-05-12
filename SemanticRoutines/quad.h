@@ -94,6 +94,11 @@ struct quad {
   quad_arg arg3;
 };
 
+// Initialize the quad array and store it in quad_array global variable.
+//   Passing a size of -1 uses the default size.
+//   There can only be one quad array at a time since variables are static and the array is global.
+void init_quad_array(int size);
+
 // Creates a quad and adds it to the quad array
 quad generate_quad(enum quad_op, quad_arg, quad_arg, quad_arg);
 

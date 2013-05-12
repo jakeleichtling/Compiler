@@ -57,18 +57,6 @@ static void destroy_symnode(symnode node) {
   free(node);
 }
 
-/* Set the variable type of this node. */
-void set_node_vartype(symnode node, enum vartype type)
-{
-  node->var_type = type;
-}
-
-/* Set the address of the variable in this node. */
-void set_node_addr(symnode node, int addr)
-{
-  node->varaddr = addr;
-}
-
 /* Does the identifier in this node equal name? */
 int name_is_equal(symnode node, char *name) {
   return !strcmp(node->name, name);
@@ -236,7 +224,7 @@ void print_symnode(symnode node)
       printf("Node: %s, type: %s, vartype: %s, addr: %d, ptr: %p \n", node->name,
       node_type_string[node->node_type],
       var_type_string[node->var_type], 
-      node->varaddr,
+      node->var_addr,
             node
             );
     } else {

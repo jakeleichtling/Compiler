@@ -22,7 +22,10 @@ echo "---------------------------------------------------------"
 # echo "~~~~~~~~~~~~~~~~~~~ dijkstra.c57.in ~~~~~~~~~~~~~~~~~~~~~"
 # cat dijkstra.c57.in | ../djcc > dijkstra.c57.out
 
-echo "~~~~~~~~~~~~~~ binary_operations.c57.in ~~~~~~~~~~~~~~~~"
-cat binary_operations.c57.in | ../djcc > binary_operations.c57.out
+# echo "~~~~~~~~~~~~~~ binary_operations.c57.in ~~~~~~~~~~~~~~~~"
+# cat binary_operations.c57.in | ../djcc > binary_operations.c57.out
+
+echo "~~~~~~~~~~~~~~ temp_test.c57.in ~~~~~~~~~~~~~~~~"
+cat temp_test.c57.in | ../djcc > temp_test.c57.out
 
 echo "---------------------------------------------------------"

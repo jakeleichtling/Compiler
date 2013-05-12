@@ -22,6 +22,12 @@ extern int djdebug;
 // nonzero when a scope has already been entered into for a function
 int entered_func_scope = 0;
 
+// the symnode of the function currently being processed; NULL when outside of a function
+symnode curr_func_symnode;
+
+// the number of global variables
+int num_global_vars = 0;
+
 /* ~~~~~~~~~~~~~~~ Function Definitions ~~~~~~~~~~~~~~~~~~~ */
 
 void mark_error(int ln, char *msg) {
@@ -97,6 +103,8 @@ int fill_id_types(ast_node node)
 
       // Enter into the function's scope
       enter_scope(scoped_id_table);
+      curr_func_symnode = flat_id_symnode;
+      flat_id_symnode->num_vars = 0;
 
       // Recurse on the formal parameters and body
       entered_func_scope = 1; // Tell the SEQ that it doesn't need to enter scope again
@@ -109,6 +117,7 @@ int fill_id_types(ast_node node)
 
       // Exit the function's scope
       leave_scope(scoped_id_table);
+      curr_func_symnode = NULL;
 
       return 0;
     }
@@ -187,6 +196,18 @@ int fill_id_types(ast_node node)
           flat_id_symnode->node_type = val_node;
           flat_id_symnode->var_type = var_type;
           id_astnode->value.sym_node = flat_id_symnode;
+
+          // Set the memory address of this variable and increment the number of variables in the current function or global variables
+          if (curr_func_symnode != NULL) {
+            flat_id_symnode->mem_addr_type = off_fp;
+            curr_func_symnode->num_vars++;
+            flat_id_symnode->var_addr = -8 * curr_func_symnode->num_vars - 4; // the first variable is at -12(fp)
+          } else {
+            flat_id_symnode->mem_addr_type = global;
+            num_global_vars++;
+            flat_id_symnode->var_addr = -8 * num_global_vars; // the first variable is at -8 off the global variable pointer
+          }
+
         } else if (child->node_type == ARRAY_SUB || child->node_type == OP_ASSIGN) {
           // Get the ID's ast node
           ast_node id_astnode = child->left_child;
@@ -224,6 +245,17 @@ int fill_id_types(ast_node node)
           // Recurse on the subscript expression
           if (fill_id_types(id_astnode->right_sibling) != 0) {
             return 1;
+          }
+
+          // Set the memory address of this variable and increment the number of variables in the current function or global variables
+          if (curr_func_symnode != NULL) {
+            flat_id_symnode->mem_addr_type = off_fp;
+            curr_func_symnode->num_vars++;
+            flat_id_symnode->var_addr = -8 * curr_func_symnode->num_vars - 4; // the first variable is at -8(fp)
+          } else {
+            flat_id_symnode->mem_addr_type = global;
+            num_global_vars++;
+            flat_id_symnode->var_addr = -8 * num_global_vars; // the first variable is at the global variable pointer
           }
         }
       }
@@ -389,16 +421,12 @@ void type_check(ast_node node)
 
   node->data_type = no_type;
   node->return_type = no_type;
-  node->is_array_ptr = 0;
 
   switch (node->node_type) {
     case ROOT:
       break;
     case ID:
       node->data_type = node->value.sym_node->var_type;
-      if (node->value.sym_node -> node_type == array_node) {
-        node->is_array_ptr = 1;
-      }
       break;
     case INT_TYPE:
       break;
@@ -425,11 +453,7 @@ void type_check(ast_node node)
     case OP_ASSIGN:
     {
       if (node->left_child->node_type == ID && node->left_child->value.sym_node->node_type == array_node) {
-        if (node->left_child->right_sibling->is_array_ptr == 0) {
-          mark_error(node->line_num, "Cannot assign a non-array pointer to an array pointer variable");
-        }
-
-        node->is_array_ptr = 1;
+          mark_error(node->line_num, "Cannot assign to an array pointer");
       }
 
       enum vartype ltype = node->left_child->data_type;

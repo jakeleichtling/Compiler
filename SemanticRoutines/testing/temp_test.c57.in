@@ -1,0 +1,5 @@
+int x, y;
+
+void temp_test() {
+  int a[5], b[5];
+}
