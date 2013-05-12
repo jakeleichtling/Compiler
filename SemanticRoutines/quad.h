@@ -51,6 +51,10 @@ enum quad_op {
   goto_op,
   read_int_op,
   read_double_op,
+  halt_op,
+  func_decl_op,
+  push_param_op,
+  alloc_array_op, // (alloc_array_op, array id, arg holding integer size of array, -)
 
 
   read_op,
@@ -60,7 +64,6 @@ enum quad_op {
   gt_op,
   mult_op,
   sub_op,
-  halt_op,
   enter_scope_op,
   leave_scope_op,
   new_var_op

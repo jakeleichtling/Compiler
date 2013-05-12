@@ -9,6 +9,14 @@ int next_quad_index;
 int quad_array_size;
 quad *quad_array;
 
+// The number of global temp variables
+int num_global_temps = 0;
+
+symnode curr_func_symnode_quad;
+
+// The number of global variables, imported from ast_node_processing.c
+extern int num_global_vars;
+
 extern symboltable flat_id_table;
 
 extern int djdebug;
@@ -59,7 +67,12 @@ char *quad_op_string[] = {
   "int_dec_op",
   "array_dec_op",
   "if_false_op",
-  "goto_op"
+  "goto_op",
+  "read_int_op",
+  "read_double_op",
+  "halt_op",
+  "func_decl_op",
+  "push_param_op"
 };
 
 /* ~~~~~~~~~~~~~~~ Function Prototypes ~~~~~~~~~~~~~~~~~~~ */
@@ -76,6 +89,9 @@ void add_quad_to_array(quad new_quad);
 
 // Doubles the size of the quad_array and copies over the existing elements
 void expand_quad_array();
+
+// Push the parameters from back to front, using autowidening when necessary
+void push_params_recursively(symnode callee_symnode, ast_node param_node, int i);
 
 /* ~~~~~~~~~~~~~~~ Function Definitions ~~~~~~~~~~~~~~~~~~~ */
 
@@ -139,6 +155,18 @@ quad_arg get_new_temp(symboltable symtab, enum vartype var_type)
   temp_symnode->var_type = var_type;
   temp_symnode->node_type = val_node;
 
+  // Set the memory address of the temp
+  //   and increment the number of temps in the current function or global temps
+  if (curr_func_symnode_quad != NULL) {
+    temp_symnode->mem_addr_type = off_fp;
+    curr_func_symnode_quad->num_temps++;
+    temp_symnode->var_addr = -8 * (curr_func_symnode_quad->num_vars + curr_func_symnode_quad->num_temps) - 4;
+  } else {
+    temp_symnode->mem_addr_type = global;
+    num_global_temps++;
+    temp_symnode->var_addr = -8 * (num_global_vars + num_global_temps);
+  }
+
   // Make the quad_arg for the temp, pointing to the symnode
   quad_arg new_quad_arg = generate_quad_arg(id_arg);
   new_quad_arg->value.var_node = temp_symnode;
@@ -169,13 +197,18 @@ quad_arg generate_intermediate_code(ast_node node)
 
   switch (node->node_type) {
     case ROOT:
-      for (child = node->left_child; child != NULL; child = child->right_sibling)
+      for (child = node->left_child; child != NULL; child = child->right_sibling) {
         generate_intermediate_code(child);
+      }
+
       break;
     case ID:
-      result_arg = generate_quad_arg(id_arg);
-      result_arg->value.var_node = node->value.sym_node;
-      break;
+    {
+      quad_arg id_quad_arg = generate_quad_arg(id_arg);
+      id_quad_arg->value.var_node = node->value.sym_node;
+
+      return id_quad_arg;
+    }
     case INT_TYPE:
       // Nada
       break;
@@ -186,12 +219,20 @@ quad_arg generate_intermediate_code(ast_node node)
       // Nada
       break;
     case ARRAY_SUB:
-      result_arg = get_new_temp(flat_id_table, node->data_type);
-      left_arg = generate_quad_arg(id_arg);
-      left_arg->value.var_node = node->left_child->value.sym_node;
-      right_arg = generate_intermediate_code(node->left_child->right_sibling);
-      generate_quad(assn_from_arraysub_op, result_arg, left_arg, right_arg);
-      break;
+    {
+      // The temp where the value of the array at the index will be stored
+      quad_arg value_arg = get_new_temp(flat_id_table, node->data_type);
+
+      // The quad arg that points to the array
+      quad_arg array_arg = generate_quad_arg(id_arg);
+      array_arg->value.var_node = node->left_child->value.sym_node;
+
+      // The quad arg specifying the index
+      quad_arg index_arg = generate_intermediate_code(node->left_child->right_sibling);
+
+      generate_quad(assn_from_arraysub_op, value_arg, array_arg, index_arg);
+      return value_arg;
+    }
     case ARRAY_NONSUB:
       // Nada
       break;
@@ -302,16 +343,41 @@ quad_arg generate_intermediate_code(ast_node node)
       }
       break;
     case FUNC_DECL:
+    {
+      quad_arg func_id_arg = generate_quad_arg(id_arg);
+      func_id_arg->value.var_node = node->left_child->right_sibling->value.sym_node;
+      generate_quad(func_decl_op, func_id_arg, NULL, NULL);
+
+      curr_func_symnode_quad = node->left_child->right_sibling->value.sym_node;
       generate_intermediate_code(node->left_child->right_sibling->right_sibling);
+      curr_func_symnode_quad = NULL;
 
       break;
+    }
     case VAR_DECL:
-      // TODO, gen code for assignment
+    {
+      ast_node child;
+      for (child = node->left_child; child != NULL; child = child->right_sibling) {
+        if (child->node_type == ARRAY_SUB) {
+          // Get the array ID symnode into an arg
+          quad_arg array_id_arg = generate_quad_arg(id_arg);
+          array_id_arg->value.var_node = child->left_child->value.sym_node;
 
-      break;
+          // Get the size of the array into an arg
+          quad_arg array_size_arg = generate_intermediate_code(child->left_child->right_sibling);
+
+          generate_quad(alloc_array_op, array_id_arg, array_size_arg);
+        } else if (child->node_type == OP_ASSIGN) {
+          // TODO: wait for assignment stuff to be done
+        }
+
+        // Don't do anything for normal variable declarations (e.g. int x)
+      }
+
+      return NULL;
+    }
     case FORMAL_PARAM:
-      // TODO, maybe use to count memory?
-
+      // Nada
       break;
     case SEQ:
       for (child = node->left_child; child != NULL; child = child->right_sibling)
@@ -418,14 +484,21 @@ quad_arg generate_intermediate_code(ast_node node)
       // Nada
       break;
     case INT_LITERAL:
-      // Nada
-      break;
+    {
+      quad_arg int_quad_arg = generate_quad_arg(int_arg);
+      int_quad_arg->value.int_value = node->value.int_value;
+
+      return int_quad_arg;
+    }
     case DOUBLE_LITERAL:
       // Nada
       break;
     case FUNC_CALL:
+      // Push the actual parameters from back to front
+      push_params_recursively(node->left_child->value.sym_node, node->left_child->right_sibling, 0);
+
       left_arg = generate_quad_arg(id_arg);
-      left_arg->value.var_node = node->left_child->right_sibling->value.sym_node;
+      left_arg->value.var_node = node->left_child->value.sym_node;
       generate_quad(call_func_op, left_arg, NULL, NULL);
       break;
     case EMPTY_EXPR:
@@ -583,4 +656,30 @@ void expand_quad_array()
   free(quad_array);
 
   quad_array = new_quad_array;
+}
+
+// Push the parameters from back to front, using autowidening when necessary
+void push_params_recursively(symnode callee_symnode, ast_node param_node, int i)
+{
+  if (param_node == NULL) {
+    return;
+  }
+
+  // Recurse on right sibling
+  push_params_recursively(callee_symnode, param_node->right_sibling, i + 1);
+
+  // Get the result of the param computation
+  quad_arg param_arg = generate_intermediate_code(param_node);
+
+  // Check if autowidening is necessary
+  symnode formal_param = callee_symnode->param_symnode_array[i];
+  if (formal_param->node_type != array_node &&
+      formal_param->var_type == doubletype &&
+      param_node->data_type == inttype) {
+    quad_arg float_temp = get_new_temp(flat_id_table, doubletype);
+    generate_quad(int_to_float_op, float_temp, param_arg, NULL);
+    generate_quad(push_param_op, float_temp, NULL, NULL);
+  } else {
+    generate_quad(push_param_op, param_arg, NULL, NULL);
+  }
 }

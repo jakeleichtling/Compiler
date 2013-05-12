@@ -1,5 +1,19 @@
-int x, y;
+void f0(int xx[], double y, double yy) {
 
-void temp_test() {
-  int a[5], b[5];
+
+
+
 }
+
+void f2() {
+  int x1, xx[2], x2 = 2;
+  return;
+}
+
+void f1() {
+  int xx[5];
+  double y, yy[xx[1]];
+
+  f0(xx, 5, yy[xx[1]]);
+}
+

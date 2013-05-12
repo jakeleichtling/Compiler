@@ -168,7 +168,6 @@ func_declaration :
     t->left_child = $1;
     t->left_child->right_sibling = $2;
     t->left_child->right_sibling->value.sym_node->node_type = func_node;
-    t->left_child->right_sibling->value.sym_node->decl_ast_node = t;
     t->left_child->right_sibling->right_sibling = $4;
     rightmost_sibling(t->left_child)->right_sibling = $6;
     $$ = t;

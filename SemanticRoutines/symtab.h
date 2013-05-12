@@ -48,9 +48,12 @@ struct symnode {
   enum nodetype node_type; // The thing that the identifier identifies (irrelevant for the string table)
   int array_size; // only relevant for nodes of type array_node
   char *mangled_name; // irrelevant for the string table
-  void *decl_ast_node; // used for function nodes to point to declaration (for parameter type checking on func calls)
 
+  // For functions only:
   int num_vars; // number of variables for a function
+  int num_temps; // number of temp variables for a function
+  int num_params; // number of formal parameters
+  symnode *param_symnode_array; // array of pointers to the formal param symnodes for type checking
 };
 
 /* Does the identifier in this node equal name? */

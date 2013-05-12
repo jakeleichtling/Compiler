@@ -1,15 +1,16 @@
 #include <stdio.h>
+#include <stdlib.h>
 #include "ast_node_processing.h"
 
 /* ~~~~~~~~~~~~~~~ Function Prototypes ~~~~~~~~~~~~~~~~~~~ */
 
 // Standard code for checking the types of the operands of a binary operation
 //  and setting the type of the operation
-void standard_binary_op_typecheck_widening(ast_node node);
+int standard_binary_op_typecheck_widening(ast_node node);
 
 // Standard code for checking the types of the operands of a binary operation that is of type int
 //  and setting the type of the operation (<, <=, >, >=, == , !=)
-void standard_binary_op_typecheck_int(ast_node node);
+int standard_binary_op_typecheck_int(ast_node node);
 
 /* ~~~~~~~~~~~~~~~~~~~~~ Variables ~~~~~~~~~~~~~~~~~~~~~~~~ */
 extern symboltable scoped_id_table;
@@ -23,7 +24,7 @@ extern int djdebug;
 int entered_func_scope = 0;
 
 // the symnode of the function currently being processed; NULL when outside of a function
-symnode curr_func_symnode;
+symnode curr_func_symnode_anp;
 
 // the number of global variables
 int num_global_vars = 0;
@@ -103,12 +104,20 @@ int fill_id_types(ast_node node)
 
       // Enter into the function's scope
       enter_scope(scoped_id_table);
-      curr_func_symnode = flat_id_symnode;
+      curr_func_symnode_anp = flat_id_symnode;
       flat_id_symnode->num_vars = 0;
+
+      // Count the number of parameters and allocate space for the param symnode array
+      int num_params = -1; // start at -1 because the function body will be counted
+      ast_node child;
+      for (child = id_astnode->right_sibling; child != NULL; child = child->right_sibling) {
+        num_params++;
+      }
+      flat_id_symnode->param_symnode_array = calloc(num_params, sizeof(symnode));
+      flat_id_symnode->num_params = 0; // will count up when recursing on formal params, which use it for array indexing
 
       // Recurse on the formal parameters and body
       entered_func_scope = 1; // Tell the SEQ that it doesn't need to enter scope again
-      ast_node child;
       for (child = id_astnode->right_sibling; child != NULL; child = child->right_sibling) {
         if (fill_id_types(child) != 0) {
           return 1;
@@ -117,7 +126,7 @@ int fill_id_types(ast_node node)
 
       // Exit the function's scope
       leave_scope(scoped_id_table);
-      curr_func_symnode = NULL;
+      curr_func_symnode_anp = NULL;
 
       return 0;
     }
@@ -153,6 +162,10 @@ int fill_id_types(ast_node node)
       flat_id_symnode->node_type = val_node;
       flat_id_symnode->var_type = var_type;
       id_astnode->value.sym_node = flat_id_symnode;
+
+      // Insert the param symnode into the proper bucket of the current function's param array
+      curr_func_symnode_anp->param_symnode_array[curr_func_symnode_anp->num_params] = flat_id_symnode;
+      curr_func_symnode_anp->num_params++;
 
       return 0;
     }
@@ -198,10 +211,10 @@ int fill_id_types(ast_node node)
           id_astnode->value.sym_node = flat_id_symnode;
 
           // Set the memory address of this variable and increment the number of variables in the current function or global variables
-          if (curr_func_symnode != NULL) {
+          if (curr_func_symnode_anp != NULL) {
             flat_id_symnode->mem_addr_type = off_fp;
-            curr_func_symnode->num_vars++;
-            flat_id_symnode->var_addr = -8 * curr_func_symnode->num_vars - 4; // the first variable is at -12(fp)
+            curr_func_symnode_anp->num_vars++;
+            flat_id_symnode->var_addr = -8 * curr_func_symnode_anp->num_vars - 4; // the first variable is at -12(fp)
           } else {
             flat_id_symnode->mem_addr_type = global;
             num_global_vars++;
@@ -248,10 +261,10 @@ int fill_id_types(ast_node node)
           }
 
           // Set the memory address of this variable and increment the number of variables in the current function or global variables
-          if (curr_func_symnode != NULL) {
+          if (curr_func_symnode_anp != NULL) {
             flat_id_symnode->mem_addr_type = off_fp;
-            curr_func_symnode->num_vars++;
-            flat_id_symnode->var_addr = -8 * curr_func_symnode->num_vars - 4; // the first variable is at -8(fp)
+            curr_func_symnode_anp->num_vars++;
+            flat_id_symnode->var_addr = -8 * curr_func_symnode_anp->num_vars - 4; // the first variable is at -8(fp)
           } else {
             flat_id_symnode->mem_addr_type = global;
             num_global_vars++;
@@ -294,6 +307,10 @@ int fill_id_types(ast_node node)
       flat_id_symnode->node_type = array_node;
       flat_id_symnode->var_type = var_type;
       id_astnode->value.sym_node = flat_id_symnode;
+
+      // Insert the param symnode into the proper bucket of the current function's param array
+      curr_func_symnode_anp->param_symnode_array[curr_func_symnode_anp->num_params] = flat_id_symnode;
+      curr_func_symnode_anp->num_params++;
 
       return 0;
     }
@@ -412,11 +429,15 @@ int fill_id_types(ast_node node)
   return 0;
 }
 
-void type_check(ast_node node)
+// Performs a post-order traversal of the syntax tree to check type compatibilities
+//   throughout the program.
+int type_check(ast_node node)
 {
   ast_node child;
   for (child = node->left_child; child != NULL; child = child->right_sibling) {
-    type_check(child);
+    if (type_check(child) != 0) {
+      return 1;
+    }
   }
 
   node->data_type = no_type;
@@ -439,8 +460,10 @@ void type_check(ast_node node)
       enum vartype sub_type = node->left_child->right_sibling->data_type;
       if (sub_type != inttype) {
         mark_error(node->line_num, "Array index is not an int");
+        return 1;
       } else if (node->left_child->value.sym_node->node_type != array_node) {
         mark_error(node->line_num, "Subscripted variable is not an array");
+        return 1;
       }
 
       node->data_type = node->left_child->value.sym_node->var_type;
@@ -454,6 +477,7 @@ void type_check(ast_node node)
     {
       if (node->left_child->node_type == ID && node->left_child->value.sym_node->node_type == array_node) {
           mark_error(node->line_num, "Cannot assign to an array pointer");
+          return 1;
       }
 
       enum vartype ltype = node->left_child->data_type;
@@ -463,6 +487,7 @@ void type_check(ast_node node)
       int shouldWiden = (ltype == doubletype) && (rtype == inttype);
       if (rtype != ltype && !shouldWiden){
         mark_error(node->line_num, "Cannot assign a double to an int");
+        return 1;
       }
       node->data_type = ltype;
       break;
@@ -485,6 +510,7 @@ void type_check(ast_node node)
       enum vartype rtype = node->left_child->right_sibling->data_type;
       if (ltype != inttype || rtype != inttype) {
         mark_error(node->line_num, "An operand of mod is not of type int");  
+        return 1;
       }
       node->data_type = inttype;
       break;
@@ -507,6 +533,7 @@ void type_check(ast_node node)
       enum vartype rtype = node->left_child->right_sibling->data_type;
       if (ltype != inttype || rtype != inttype) {
         mark_error(node->line_num, "An operand of && is not an int");  
+        return 1;
       }
       node->data_type = inttype;
       break;
@@ -517,6 +544,7 @@ void type_check(ast_node node)
       enum vartype rtype = node->left_child->right_sibling->data_type;
       if (ltype != inttype || rtype != inttype) {
         mark_error(node->line_num, "An operand of || is not an int");  
+        return 1;
       }
       node->data_type = inttype;
       break;
@@ -525,6 +553,7 @@ void type_check(ast_node node)
     {
       if (node->left_child->data_type != inttype) {
         mark_error(node->line_num, "The operand of ! is not an int");  
+        return 1;
       }
       node->data_type = inttype;
       break;
@@ -534,6 +563,7 @@ void type_check(ast_node node)
       enum vartype dtype = node->left_child->data_type;
       if (dtype != inttype && dtype != doubletype) {
         mark_error(node->line_num, "The operand of - (unary minus) is not an int or double");  
+        return 1;
       }
       node->data_type = dtype;
       break;
@@ -543,6 +573,7 @@ void type_check(ast_node node)
       enum vartype dtype = node->left_child->data_type;
       if (dtype != inttype) {
         mark_error(node->line_num, "The operand of ++ is not an int");  
+        return 1;
       }
       node->data_type = inttype;
       break;
@@ -552,6 +583,7 @@ void type_check(ast_node node)
       enum vartype dtype = node->left_child->data_type;
       if (dtype != inttype) {
         mark_error(node->line_num, "The operand of -- is not an int");  
+        return 1;
       }
       node->data_type = inttype;
       break;
@@ -563,6 +595,7 @@ void type_check(ast_node node)
 
       if (!((body_return_type == no_type && decl_return_type == voidtype) || (body_return_type == decl_return_type))) {
         mark_error(node->line_num, "The return types of the function declaration and body do not match");  
+        return 1;
       }
 
       node->return_type = decl_return_type;
@@ -581,6 +614,7 @@ void type_check(ast_node node)
           node->return_type = child->return_type;
         } else if (child->return_type != no_type && node->return_type != child->return_type) {
           mark_error(node->line_num, "The type of this return statement conflicts with that of a previous return statement in this function");
+          return 1;
         }
       }
 
@@ -603,7 +637,11 @@ void type_check(ast_node node)
 
       break;
     case RETURN_STMT:
-      node->return_type = node->left_child->data_type;
+      if (node->left_child != NULL) {
+        node->return_type = node->left_child->data_type;
+      } else {
+        node->return_type = voidtype;
+      }
 
       break;
     case READ_STMT:
@@ -628,11 +666,35 @@ void type_check(ast_node node)
       // set data_type equal to return type of function
       node->data_type = func_sym_node->var_type;
 
-      // get function declarations ast_node
-      ast_node func_decl_ast_node = (ast_node) func_sym_node->decl_ast_node;
+      // check that there are the correct number of actual parameters
+      int i;
+      ast_node actual_param_node;
+      for (actual_param_node = node->left_child->right_sibling, i = 0; actual_param_node != NULL; actual_param_node = actual_param_node->right_sibling, i++);
+      if (i != func_sym_node->num_params) {
+        mark_error(node->line_num, "The number of actual parameters passed does not match the number of formal parameters in the function declaration");
+        return 1;
+      }
 
-      // check parameter types in parallel
+      // check parameter types
+      for (actual_param_node = node->left_child->right_sibling, i = 0; actual_param_node != NULL; actual_param_node = actual_param_node->right_sibling, i++) {
+        // if the function wants an array pointer
+        if (func_sym_node->param_symnode_array[i]->node_type == array_node && (actual_param_node->node_type != ID || actual_param_node->value.sym_node->node_type != array_node)) {
+          mark_error(node->line_num, "A formal parameter is an array pointer, but the corresponding actual parameter passed is not");
+          return 1;
+        }
 
+        enum vartype actual_type = actual_param_node->data_type;
+        enum vartype formal_type = func_sym_node->param_symnode_array[i]->var_type;
+
+        // error if you are expecting an int and get a double
+        if (formal_type == inttype && actual_type == doubletype) {
+          mark_error(node->line_num, "An actual parameter passed is a double, but the corresponding formal parameter expects an int");
+          return 1;
+        } else if (actual_type == voidtype) { // error if a parameter passed is of type void
+          mark_error(node->line_num, "You can't pass a parameter of type void");
+          return 1;
+        }
+      }
 
       break;
     }
@@ -644,17 +706,20 @@ void type_check(ast_node node)
     print_ast_node(node);
     printf("\n");
   }
+
+  return 0;
 }
 
 // Standard code for checking the types of the operands of a binary operation with widening
 //  and setting the type of the operation (+, -, *, /)
-void standard_binary_op_typecheck_widening(ast_node node)
+int standard_binary_op_typecheck_widening(ast_node node)
 {
   enum vartype ltype = node->left_child->data_type;
   enum vartype rtype = node->left_child->right_sibling->data_type;
   if ((ltype != inttype && ltype != doubletype) ||
       (rtype != inttype && rtype != doubletype)) {
     mark_error(node->line_num, "An operand is not of type int or double");  
+    return 1;
   } else if ((ltype == doubletype) || (rtype == doubletype)) {
     node->data_type = doubletype;
   } else {
@@ -664,13 +729,14 @@ void standard_binary_op_typecheck_widening(ast_node node)
 
 // Standard code for checking the types of the operands of a binary operation that is of type int
 //  and setting the type of the operation (<, <=, >, >=, == , !=)
-void standard_binary_op_typecheck_int(ast_node node)
+int standard_binary_op_typecheck_int(ast_node node)
 {
   enum vartype ltype = node->left_child->data_type;
   enum vartype rtype = node->left_child->right_sibling->data_type;
   if ((ltype != inttype && ltype != doubletype) ||
       (rtype != inttype && rtype != doubletype)) {
     mark_error(node->line_num, "An operand is not of type int or float");  
+    return 1;
   }
   node->data_type = inttype;
 }
