@@ -220,8 +220,11 @@ quad_arg generate_intermediate_code(ast_node node)
       break;
     case ARRAY_SUB:
     {
+      // Get the array ID symnode
+      symnode id_symnode = node->left_child->value.sym_node;
+
       // The temp where the value of the array at the index will be stored
-      quad_arg value_arg = get_new_temp(flat_id_table, node->data_type);
+      quad_arg value_arg = get_new_temp(flat_id_table, id_symnode->var_type);
 
       // The quad arg that points to the array
       quad_arg array_arg = generate_quad_arg(id_arg);
@@ -230,26 +233,78 @@ quad_arg generate_intermediate_code(ast_node node)
       // The quad arg specifying the index
       quad_arg index_arg = generate_intermediate_code(node->left_child->right_sibling);
 
-      generate_quad(assn_from_arraysub_op, value_arg, array_arg, index_arg);
+      if (id_symnode->var_type == inttype) {
+        generate_quad(assn_int_from_arraysub_op, value_arg, array_arg, index_arg);
+      } else {
+        generate_quad(assn_float_from_arraysub_op, value_arg, array_arg, index_arg);
+      }
       return value_arg;
     }
     case ARRAY_NONSUB:
       // Nada
       break;
     case OP_ASSIGN:
-      // TODO: autowidening, and do we have to worry about int assign vs. double assign
-      left_arg = generate_intermediate_code(node->left_child->right_sibling);
-      result_arg = generate_quad_arg(id_arg);
+    {
+      // Put the right side of the assignment into an arg
+      quad_arg right_side_arg = generate_intermediate_code(node->left_child->right_sibling);
 
-      if (node->left_child->node_type == ID) {
-        result_arg->value.var_node = node->left_child->value.sym_node;
-        generate_quad(assn_var_op, result_arg, left_arg, NULL);
-      } else if (node->left_child->node_type == ARRAY_SUB) {
-        result_arg->value.var_node = node->left_child->left_child->value.sym_node;
-        quad_arg arraysub_arg = generate_intermediate_code(node->left_child->left_child->right_sibling);
-        generate_quad(assn_to_arraysub_op, result_arg, arraysub_arg, left_arg);
+      if (node->data_type == inttype) { // ints
+        if (node->left_child->node_type == ID) { // normal variables
+          // Get the ID symnode into an arg
+          quad_arg id_quad_arg = generate_quad_arg(id_arg);
+          id_quad_arg->value.var_node = node->left_child->value.sym_node;
+
+          // Assign the right side to the ID
+          generate_quad(assn_int_to_var_op, id_quad_arg, right_side_arg, NULL);
+
+          return right_side_arg;
+        } else { // subscripted arrays
+          // Get the array ID symnode into an arg
+          quad_arg array_id_arg = generate_quad_arg(id_arg);
+          array_id_arg->value.var_node = node->left_child->left_child->value.sym_node;
+
+          // Get the array index into an arg
+          quad_arg index_arg = generate_intermediate_code(node->left_child->left_child->right_sibling);
+
+          // Assign the right side to the array at the index
+          generate_quad(assn_int_to_arraysub_op, array_id_arg, index_arg, right_side_arg);
+
+          return right_side_arg;
+        }
+      } else { // floats, widening is possible
+        // If the right side is an int, widen it to a float
+        quad_arg right_side_float_arg;
+        if (node->left_child->right_sibling->data_type == inttype) {
+          right_side_float_arg = get_new_temp(flat_id_table, doubletype);
+          generate_quad(int_to_float_op, right_side_float_arg, right_side_arg, NULL);
+        } else {
+          right_side_float_arg = right_side_arg;
+        }
+
+        if (node->left_child->node_type == ID) { // normal variables
+          // Get the ID symnode into an arg
+          quad_arg id_quad_arg = generate_quad_arg(id_arg);
+          id_quad_arg->value.var_node = node->left_child->value.sym_node;
+
+          // Assign the right side to the ID
+          generate_quad(assn_float_to_var_op, id_quad_arg, right_side_float_arg, NULL);
+
+          return right_side_float_arg;
+        } else { // subscripted arrays
+          // Get the array ID symnode into an arg
+          quad_arg array_id_arg = generate_quad_arg(id_arg);
+          array_id_arg->value.var_node = node->left_child->left_child->value.sym_node;
+
+          // Get the array index into an arg
+          quad_arg index_arg = generate_intermediate_code(node->left_child->left_child->right_sibling);
+
+          // Assign the right side to the array at the index
+          generate_quad(assn_float_to_arraysub_op, array_id_arg, index_arg, right_side_float_arg);
+
+          return right_side_float_arg;
+        }
       }
-      break;
+    }
     case OP_ADD:
       result_arg = generate_binary_op_with_widening(node, add_ints_op, add_floats_op);
 
@@ -313,35 +368,61 @@ quad_arg generate_intermediate_code(ast_node node)
 
       break;
     case OP_INC:
+    {
       if (node->left_child->node_type == ID) {
-        result_arg = generate_quad_arg(id_arg);
-        result_arg->value.var_node = node->left_child->value.sym_node;
-        generate_quad(int_inc_op, result_arg, NULL, NULL);
-      } else if (node->left_child->node_type == ARRAY_SUB) {
-        left_arg = generate_quad_arg(id_arg);
-        left_arg->value.var_node = node->left_child->left_child->value.sym_node;
-        quad_arg arraysub_arg = generate_intermediate_code(node->left_child->left_child->right_sibling);
-        generate_quad(array_inc_op, left_arg, arraysub_arg, NULL);
+        // Get the ID symnode
+        quad_arg id_quad_arg = generate_quad_arg(id_arg);
+        id_quad_arg->value.var_node = node->left_child->value.sym_node;
 
-        result_arg = get_new_temp(flat_id_table, node->left_child->data_type);
-        generate_quad(assn_from_arraysub_op, result_arg, left_arg, arraysub_arg);
+        generate_quad(var_inc_op, id_quad_arg, NULL, NULL);
+        return id_quad_arg;
+      } else { // Child is an ARRAY_SUB ast node
+        // Get the ID symnode
+        quad_arg id_quad_arg = generate_quad_arg(id_arg);
+        symnode id_symnode = node->left_child->left_child->value.sym_node;
+        id_quad_arg->value.var_node = id_symnode;
+
+        // Put the index expression in an arg
+        quad_arg index_arg = generate_intermediate_code(node->left_child->left_child->right_sibling);
+
+        // Generate the quad to increment the value at that index
+        generate_quad(array_inc_op, id_quad_arg, index_arg, NULL);
+
+        // Put the new value at that index into a temp
+        quad_arg value_temp = get_new_temp(flat_id_table, inttype);
+        generate_quad(assn_int_from_arraysub_op, value_temp, id_quad_arg, index_arg);
+
+        return value_temp;
       }
-      break;
+    }
     case OP_DEC:
+      {
       if (node->left_child->node_type == ID) {
-        result_arg = generate_quad_arg(id_arg);
-        result_arg->value.var_node = node->left_child->value.sym_node;
-        generate_quad(int_dec_op, result_arg, NULL, NULL);
-      } else if (node->left_child->node_type == ARRAY_SUB) {
-        left_arg = generate_quad_arg(id_arg);
-        left_arg->value.var_node = node->left_child->left_child->value.sym_node;
-        quad_arg arraysub_arg = generate_intermediate_code(node->left_child->left_child->right_sibling);
-        generate_quad(array_dec_op, left_arg, arraysub_arg, NULL);
+        // Get the ID symnode
+        quad_arg id_quad_arg = generate_quad_arg(id_arg);
+        id_quad_arg->value.var_node = node->left_child->value.sym_node;
 
-        result_arg = get_new_temp(flat_id_table, node->left_child->data_type);
-        generate_quad(assn_from_arraysub_op, result_arg, left_arg, arraysub_arg);
+        generate_quad(var_dec_op, id_quad_arg, NULL, NULL);
+        return id_quad_arg;
+      } else { // Child is an ARRAY_SUB ast node
+        // Get the ID symnode
+        quad_arg id_quad_arg = generate_quad_arg(id_arg);
+        symnode id_symnode = node->left_child->left_child->value.sym_node;
+        id_quad_arg->value.var_node = id_symnode;
+
+        // Put the index expression in an arg
+        quad_arg index_arg = generate_intermediate_code(node->left_child->left_child->right_sibling);
+
+        // Generate the quad to decrement the value at that index
+        generate_quad(array_dec_op, id_quad_arg, index_arg, NULL);
+
+        // Put the new value at that index into a temp
+        quad_arg value_temp = get_new_temp(flat_id_table, inttype);
+        generate_quad(assn_int_from_arraysub_op, value_temp, id_quad_arg, index_arg);
+
+        return value_temp;
       }
-      break;
+    }
     case FUNC_DECL:
     {
       quad_arg func_id_arg = generate_quad_arg(id_arg);
@@ -366,9 +447,10 @@ quad_arg generate_intermediate_code(ast_node node)
           // Get the size of the array into an arg
           quad_arg array_size_arg = generate_intermediate_code(child->left_child->right_sibling);
 
-          generate_quad(alloc_array_op, array_id_arg, array_size_arg);
+          generate_quad(alloc_array_op, array_id_arg, array_size_arg, NULL);
         } else if (child->node_type == OP_ASSIGN) {
-          // TODO: wait for assignment stuff to be done
+          // Recurse on the assignment node
+          generate_intermediate_code(child);
         }
 
         // Don't do anything for normal variable declarations (e.g. int x)
