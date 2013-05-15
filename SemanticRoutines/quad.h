@@ -57,19 +57,7 @@ enum quad_op {
   halt_op,
   func_decl_op,
   push_param_op,
-  alloc_array_op, // (alloc_array_op, array id, arg holding integer size of array, -)
-
-
-  read_op,
-  geq_op,
-  ifF_op,
-  lab_op,
-  gt_op,
-  mult_op,
-  sub_op,
-  enter_scope_op,
-  leave_scope_op,
-  new_var_op
+  alloc_array_op // (alloc_array_op, array id, arg holding integer size of array, -)
 };
 
 /* types of quad args */

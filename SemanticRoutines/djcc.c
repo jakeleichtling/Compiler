@@ -5,6 +5,7 @@
 #include "symtab.h"
 #include "quad.h"
 #include "ast_node_processing.h"
+#include "tm57_assembly_generation.h"
 
 extern quad *quad_array;
 
@@ -19,6 +20,9 @@ int parseError = 0;
 int error_count = 0;
 
 int djdebug = 1;
+
+// Will be provided at the command line, or defaults
+char *assembly_file_name = "assembly.tm57";
 
 int main()
 {

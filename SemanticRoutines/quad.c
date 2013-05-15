@@ -175,6 +175,7 @@ quad_arg get_new_temp(symboltable symtab, enum vartype var_type)
   return new_quad_arg;
 }
 
+// TODO: Check to make sure all cases are covered!
 // Recursive function for generating intermediate code using quads.
 //  If applicable, returns the quad_arg that holds the result of an operation
 quad_arg generate_intermediate_code(ast_node node)
@@ -186,7 +187,6 @@ quad_arg generate_intermediate_code(ast_node node)
     print_ast_node(node);
     printf("\n");
   }
-
 
   ast_node child;
 
@@ -465,8 +465,6 @@ quad_arg generate_intermediate_code(ast_node node)
       for (child = node->left_child; child != NULL; child = child->right_sibling)
         generate_intermediate_code(child);
       break;
-
-      break;
     case IF_STMT:
       left_arg = generate_intermediate_code(node->left_child);
       quad exp_check_quad = generate_quad(if_false_op, left_arg, NULL, NULL);
@@ -520,10 +518,10 @@ quad_arg generate_intermediate_code(ast_node node)
       break;
     }
     case FOR_STMT:
-
+      // TODO
       break;
     case RETURN_STMT:
-
+      // TODO
       break;
     case READ_STMT:
     {
@@ -567,12 +565,14 @@ quad_arg generate_intermediate_code(ast_node node)
       break;
     case INT_LITERAL:
     {
+      // TODO: change to use parsed int from node and store that into a temp using a quad
       quad_arg int_quad_arg = generate_quad_arg(int_arg);
       int_quad_arg->value.int_value = node->value.int_value;
 
       return int_quad_arg;
     }
     case DOUBLE_LITERAL:
+      // TODO: change to use parsed double from node and store that into a temp using a quad
       // Nada
       break;
     case FUNC_CALL:
