@@ -9,10 +9,28 @@
 //   bucket of backpatch_jump_quads and increment assembly_index to make room.
 void generate_quad_assembly();
 
+// Method to print RO instructions
+// increments assebly line # after print
+void print_ro(ass_op op, int dest_r, int r1, int r2);
+
+// Method to print RM instructions
+// increments assebly line # after print
+void print_rm(ass_op op, int dest_r, int offset, int r);
+
+// Save variable at node w/ value from source register
+void gen_store_int(symnode node, int source_r);
+
+// Load variable at node into destination register
+void gen_load_int(symnode node, int dest_r);
+
 /* ~~~~~~~~~~~~~~~~~~~~~ Variables ~~~~~~~~~~~~~~~~~~~~~~~~ */
 
 // Declared in djcc.c; provided at the command line, or defaults
 extern char *assembly_file_name;
+
+// file stream for assembly printing
+//TODO: open/close
+FILE *fp;
 
 // Specifies the index of the assembly line that corresponds to the beginning of each quad;
 //   indices are parallel to the quad_array
@@ -31,6 +49,13 @@ extern int next_quad_index;
 int assembly_index;
 // The index of the quad currently being considered
 int quad_index;
+
+// pointer to location of global variables on stack
+// TODO: set this!
+int global_ptr;
+
+const int stack_ptr_reg = 6;
+const int frame_ptr_reg = 5;
 
 /* ~~~~~~~~~~~~~~~ Function Definitions ~~~~~~~~~~~~~~~~~~~ */
 
@@ -293,14 +318,115 @@ void generate_quad_assembly()
 }
 
 // Generate assembly for standard int binary ops
+void gen_standard_binary_op(ass_op op, symnode dest, symnode larg, symnode rarg) {
+    //load larg into r0
+    gen_load_int(larg, 0);
+
+    //load rarg into r1
+    gen_load_int(rarg, 1);
+
+    //execute, store in r0
+    print_ro(op, 0, 0, 1);
+
+    //store in destination
+    gen_store_int(dest, 0);
+}
+
+void gen_load_int(symnode node, int dest_r) {
+    switch(node->mem_addr_type) {
+        case off_fp:
+            print_rm(LD, dest_r, node->var_addr, frame_ptr_reg);
+            break;
+
+        case global:
+            print_rm(LD, dest_r, node->var_addr, global_ptr);
+            break;
+
+        case absolute:
+            //put 0 in reg0
+            print_rm(LDC, 0, 0, 0);
+
+            //load offset(0) 
+            print_rm(LD, dest_r, node->var_addr, 0);
+            break;
+    }
+}
+
+void gen_store_int(symnode node, int source_r) {
+    switch(node->mem_addr_type) {
+        case off_fp:
+            print_rm(ST, source_r, node->var_addr, frame_ptr_reg);
+            break;
+
+        case global:
+            print_rm(ST, source_r, node->var_addr, global_ptr);
+            break;
+
+        case absolute:
+            //put 0 in reg0
+            print_rm(LDC, 0, 0, 0);
+
+            print_rm(ST, source_r, node->var_addr, 0);
+            break;
+    }
+}
+
 
 
 // Generate assembly for standard double binary ops
 
+// Define enum and corresponding strings
+char* ass_op_str[] = {
+    "HALT",
+    "IN",
+    "OUT",
+    "ADD",
+    "SUB",
+    "MUL",
+    "DIV",
+    "ADDF",
+    "SUBF",
+    "MULF",
+    "DIVF",
+    "CVTIF",
+    "CVTFI",
+    "LD",
+    "LDA",
+    "LDC",
+    "ST",
+    "JLT",
+    "JLE",
+    "JGE",
+    "JGT",
+    "JEQ",
+    "JNE",
+    "LDF",
+    "STF",
+    "JFLT",
+    "JFLE",
+    "JFGE",
+    "JFGT",
+    "JFEQ",
+    "JFNE",
+    "INF",
+    "OUTF",
+    "LDFC",
+    "LDB",
+    "STB",
+    "INB",
+    "OUTB"
+};
+
 // Method to print RO
+void print_ro(ass_op op, int dest_r, int r1, int r2) {
+    char* opp_str = ass_op_str[op];
+    fprintf(fp, "%d:   %s   %d,%d,%d\n", assembly_index++, opp_str, dest_r, r1, r2);
+}
 
 // Method to print RM
-
-// Define enum and corresponding strings
+void print_rm(ass_op op, int dest_r, int offset, int r) {
+    char* opp_str = ass_op_str[op];
+    fprintf(fp, "%d:   %s   %d,%d(%d)\n", assembly_index++, opp_str, dest_r, offset, r);
+}
 
 // Make sure you clear the assembly file before writing into it (don't want to just append)
