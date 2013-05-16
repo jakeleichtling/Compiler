@@ -180,8 +180,9 @@ quad_arg get_new_temp(symboltable symtab, enum vartype var_type)
 //  If applicable, returns the quad_arg that holds the result of an operation
 quad_arg generate_intermediate_code(ast_node node)
 {
-  if (!node)
-    return;
+  if (!node) {
+    return NULL;
+  }
 
   if (djdebug) {
     print_ast_node(node);
@@ -190,18 +191,15 @@ quad_arg generate_intermediate_code(ast_node node)
 
   ast_node child;
 
-  quad_arg left_arg = NULL;
-  quad_arg right_arg = NULL;
-  quad_arg result_arg = NULL;
-  quad_arg temp1 = NULL;
-
   switch (node->node_type) {
     case ROOT:
+    {
       for (child = node->left_child; child != NULL; child = child->right_sibling) {
         generate_intermediate_code(child);
       }
 
-      break;
+      return NULL;
+    }
     case ID:
     {
       quad_arg id_quad_arg = generate_quad_arg(id_arg);
@@ -210,14 +208,11 @@ quad_arg generate_intermediate_code(ast_node node)
       return id_quad_arg;
     }
     case INT_TYPE:
-      // Nada
-      break;
+      return NULL;
     case DBL_TYPE:
-      // Nada
-      break;
+      return NULL;
     case VOID_TYPE:
-      // Nada
-      break;
+      return NULL;
     case ARRAY_SUB:
     {
       // Get the array ID symnode
@@ -238,11 +233,11 @@ quad_arg generate_intermediate_code(ast_node node)
       } else {
         generate_quad(assn_float_from_arraysub_op, value_arg, array_arg, index_arg);
       }
+
       return value_arg;
     }
     case ARRAY_NONSUB:
-      // Nada
-      break;
+      return NULL;
     case OP_ASSIGN:
     {
       // Put the right side of the assignment into an arg
@@ -306,67 +301,37 @@ quad_arg generate_intermediate_code(ast_node node)
       }
     }
     case OP_ADD:
-      result_arg = generate_binary_op_with_widening(node, add_ints_op, add_floats_op);
-
-      break;
+      return generate_binary_op_with_widening(node, add_ints_op, add_floats_op);
     case OP_SUB:
-      result_arg = generate_binary_op_with_widening(node, sub_ints_op, sub_floats_op);
-
-      break;
+      return generate_binary_op_with_widening(node, sub_ints_op, sub_floats_op);
     case OP_MULT:
-      result_arg = generate_binary_op_with_widening(node, mult_ints_op, mult_floats_op);
-
-      break;
+      return generate_binary_op_with_widening(node, mult_ints_op, mult_floats_op);
     case OP_DIV:
-      result_arg = generate_binary_op_with_widening(node, div_ints_op, div_floats_op);
-
-      break;
+      return generate_binary_op_with_widening(node, div_ints_op, div_floats_op);
     case OP_MOD:
       // We can use the standard binary operation code with widening because the type check
       //  ensures both operands are ints.
-      result_arg = generate_binary_op_with_widening(node, mod_op, -1);
-
-      break;
+      return generate_binary_op_with_widening(node, mod_op, -1);
     case OP_LT:
-      result_arg = generate_binary_op_with_widening(node, lt_ints_op, lt_floats_op);
-
-      break;
+      return generate_binary_op_with_widening(node, lt_ints_op, lt_floats_op);
     case OP_LEQ:
-      result_arg = generate_binary_op_with_widening(node, leq_ints_op, leq_floats_op);
-
-      break;
+      return generate_binary_op_with_widening(node, leq_ints_op, leq_floats_op);
     case OP_GT:
-      result_arg = generate_binary_op_with_widening(node, gt_ints_op, gt_floats_op);
- 
-      break;
+      return generate_binary_op_with_widening(node, gt_ints_op, gt_floats_op);
     case OP_GEQ:
-      result_arg = generate_binary_op_with_widening(node, geq_ints_op, geq_floats_op);
-
-      break;
+      return generate_binary_op_with_widening(node, geq_ints_op, geq_floats_op);
     case OP_EQ:
-      result_arg = generate_binary_op_with_widening(node, eq_ints_op, eq_floats_op);
-
-      break;
+      return generate_binary_op_with_widening(node, eq_ints_op, eq_floats_op);
     case OP_NEQ:
-      result_arg = generate_binary_op_with_widening(node, neq_ints_op, neq_floats_op);
-
-      break;
+      return generate_binary_op_with_widening(node, neq_ints_op, neq_floats_op);
     case OP_AND:
-      result_arg = generate_binary_op_with_widening(node, and_ints_op, and_floats_op);
-
-      break;
+      return generate_binary_op_with_widening(node, and_ints_op, and_floats_op);
     case OP_OR:
-      result_arg = generate_binary_op_with_widening(node, or_ints_op, or_floats_op);
-
-      break;
+      return generate_binary_op_with_widening(node, or_ints_op, or_floats_op);
     case OP_BANG:
-      result_arg = generate_single_operand(node, int_bang_op, float_bang_op);
-
-      break;
+      return generate_single_operand(node, int_bang_op, float_bang_op);
     case OP_NEG:
-      result_arg = generate_single_operand(node, int_neg_op, float_neg_op);
-
-      break;
+      return generate_single_operand(node, int_neg_op, float_neg_op);
     case OP_INC:
     {
       if (node->left_child->node_type == ID) {
@@ -433,7 +398,7 @@ quad_arg generate_intermediate_code(ast_node node)
       generate_intermediate_code(node->left_child->right_sibling->right_sibling);
       curr_func_symnode_quad = NULL;
 
-      break;
+      return NULL;
     }
     case VAR_DECL:
     {
@@ -459,28 +424,44 @@ quad_arg generate_intermediate_code(ast_node node)
       return NULL;
     }
     case FORMAL_PARAM:
-      // Nada
-      break;
+      return NULL;
     case SEQ:
-      for (child = node->left_child; child != NULL; child = child->right_sibling)
+    {
+      for (child = node->left_child; child != NULL; child = child->right_sibling) {
         generate_intermediate_code(child);
-      break;
-    case IF_STMT:
-      left_arg = generate_intermediate_code(node->left_child);
-      quad exp_check_quad = generate_quad(if_false_op, left_arg, NULL, NULL);
-      generate_intermediate_code(node->left_child->right_sibling);
-      quad jump_quad = generate_quad(goto_op, left_arg, NULL, NULL);
+      }
 
+      return NULL;
+    }
+    case IF_STMT:
+    {
+      // Generate the if condition
+      quad_arg if_cond_arg = generate_intermediate_code(node->left_child);
+
+      // Save the quad that checks the if condition to be patched
+      quad exp_check_quad = generate_quad(if_false_op, if_cond_arg, NULL, NULL);
+
+      // Generate the if body, including a jump quad to the end of the else stmt
+      generate_intermediate_code(node->left_child->right_sibling);
+      quad jump_quad = generate_quad(goto_op, NULL, NULL, NULL);
+
+      // Patch the exp_check_qud to jump to the beginning of the else body
       quad_arg start_else_stmt_arg = generate_quad_arg(inttype);
       start_else_stmt_arg->value.int_value = next_quad_index;
       patch_quad(exp_check_quad, 2, start_else_stmt_arg);
 
-      generate_intermediate_code(node->left_child->right_sibling->right_sibling);
+      // If we have an else statement, generate the code for its body
+      if (node->left_child->right_sibling->right_sibling != NULL) {
+        generate_intermediate_code(node->left_child->right_sibling->right_sibling);
+      }
+
+      // Patch the jump quad at the end of the if body with the index following the if-else-stmt
       quad_arg end_else_stmt_arg = generate_quad_arg(inttype);
       end_else_stmt_arg->value.int_value = next_quad_index;
       patch_quad(jump_quad, 1, end_else_stmt_arg);
 
-      break;
+      return NULL;
+    }
     case WHILE_LOOP:
     {
       // record the quad index of the expression
@@ -497,7 +478,7 @@ quad_arg generate_intermediate_code(ast_node node)
       end_loop_index_arg->value.int_value = next_quad_index;
       patch_quad(expr_check_quad, 2, end_loop_index_arg);
 
-      break;
+      return NULL;
     }
     case DO_WHILE_LOOP:
     {
@@ -515,14 +496,49 @@ quad_arg generate_intermediate_code(ast_node node)
       end_loop_index_arg->value.int_value = next_quad_index;
       patch_quad(expr_check_quad, 2, end_loop_index_arg);
 
-      break;
+      return NULL;
     }
     case FOR_STMT:
-      // TODO
-      break;
+    {
+      // for (x, y, z) body
+
+      // Generate the initialization quads x
+      generate_intermediate_code(node->left_child);
+
+      // Generate the code for evaluating expression y, but first save the index of the first quad of evaluation
+      quad_arg expr_eval_index_arg = generate_quad_arg(inttype);
+      expr_eval_index_arg->value.int_value = next_quad_index;
+      quad_arg expr_arg = generate_intermediate_code(node->left_child->right_sibling);
+
+      // Check if expression y is true (destination filled later)
+      quad expr_check_quad = generate_quad(if_false_op, expr_arg, NULL, NULL);
+
+      // Generate code for the body of the loop, the iteration code z, and jumping back to the evaluation of y
+      generate_intermediate_code(node->left_child->right_sibling->right_sibling->right_sibling);
+      generate_intermediate_code(node->left_child->right_sibling->right_sibling);
+      generate_quad(goto_op, expr_eval_index_arg, NULL, NULL);
+
+      // Patch the expression check quad now that we know the index of the quad after the loop
+      quad_arg end_loop_index_arg = generate_quad_arg(inttype);
+      end_loop_index_arg->value.int_value = next_quad_index;
+      patch_quad(expr_check_quad, 2, end_loop_index_arg);
+
+      return NULL;
+    }
     case RETURN_STMT:
-      // TODO
-      break;
+    {
+      // If the node has no children, then we are returning nothing
+      if (node->left_child == NULL) {
+        generate_quad(return_op, NULL, NULL, NULL);
+      }
+
+      // Generate code for the return expression
+      quad_arg return_exp_arg = generate_intermediate_code(node->left_child);
+
+      generate_quad(return_op, return_exp_arg, NULL, NULL);
+
+      return NULL;
+    }
     case READ_STMT:
     {
       // create a temp of the proper type
@@ -539,7 +555,7 @@ quad_arg generate_intermediate_code(ast_node node)
       // assign the temp to the var
       // TODO: wait until assign is finished
 
-      break;
+      return NULL;
     }
     case PRINT_STMT:
     {
@@ -558,37 +574,55 @@ quad_arg generate_intermediate_code(ast_node node)
         }
       }
 
-      break;
+      return NULL;
     }
     case STRING_LITERAL:
-      // Nada
-      break;
+      return NULL;
     case INT_LITERAL:
     {
-      // TODO: change to use parsed int from node and store that into a temp using a quad
-      quad_arg int_quad_arg = generate_quad_arg(int_arg);
-      int_quad_arg->value.int_value = node->value.int_value;
+      quad_arg int_lit_arg = generate_quad_arg(int_arg);
+      int_lit_arg->value.int_value = node->value.int_value;
+      quad_arg int_temp_arg = get_new_temp(flat_id_table, inttype);
 
-      return int_quad_arg;
+      generate_quad(assign_int_literal, int_temp_arg, int_lit_arg, NULL);
+
+      return int_temp_arg;
     }
     case DOUBLE_LITERAL:
-      // TODO: change to use parsed double from node and store that into a temp using a quad
-      // Nada
-      break;
+    {
+      quad_arg dbl_lit_arg = generate_quad_arg(dbl_arg);
+      dbl_lit_arg->value.double_value = node->value.double_value;
+      quad_arg dbl_temp_arg = get_new_temp(flat_id_table, doubletype);
+
+      generate_quad(assign_double_literal, dbl_temp_arg, dbl_lit_arg, NULL);
+
+      return dbl_temp_arg;
+    }
     case FUNC_CALL:
+    {
       // Push the actual parameters from back to front
       push_params_recursively(node->left_child->value.sym_node, node->left_child->right_sibling, 0);
 
-      left_arg = generate_quad_arg(id_arg);
-      left_arg->value.var_node = node->left_child->value.sym_node;
-      generate_quad(call_func_op, left_arg, NULL, NULL);
-      break;
-    case EMPTY_EXPR:
-      // Nada
-      break;
-  }
+      // Put the func symnode in func_id_arg
+      quad_arg func_id_arg = generate_quad_arg(id_arg);
+      func_id_arg->value.var_node = node->left_child->value.sym_node;
 
-  return result_arg;
+      // Make a temp to hold the return value if the function has a return type
+      enum vartype func_ret_type = node->left_child->value.sym_node->var_type;
+      if (func_ret_type != voidtype) {
+        quad_arg return_val_temp_arg = get_new_temp(flat_id_table, func_ret_type);
+        generate_quad(call_func_op, func_id_arg, return_val_temp_arg, NULL);
+        return return_val_temp_arg;
+      } else {
+        generate_quad(call_func_op, func_id_arg, NULL, NULL);
+        return NULL;
+      }
+    }
+    case EMPTY_EXPR:
+      return NULL;
+    default: // just to make -Wall happy
+      return NULL;
+  }
 }
 
 // Generates code for the standard binary operation with widening
@@ -653,7 +687,7 @@ void add_quad_to_array(quad new_quad)
   }
 
   if (next_quad_index >= quad_array_size) {
-    expand_quad_array;
+    expand_quad_array();
   }
 
   quad_array[next_quad_index] = new_quad;

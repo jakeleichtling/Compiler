@@ -24,6 +24,8 @@ int djdebug = 1;
 // Will be provided at the command line, or defaults
 char *assembly_file_name = "assembly.tm57";
 
+int yyparse();
+
 int main()
 {
   int haveRoot = 0; // 0 means we have a root

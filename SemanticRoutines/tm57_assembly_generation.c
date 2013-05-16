@@ -2,6 +2,15 @@
 #include <stdio.h>
 #include "tm57_assembly_generation.h"
 
+/* ~~~~~~~~~~~~~~~ Function Prototypes ~~~~~~~~~~~~~~~~~~~ */
+
+// Generate the assembly instructions corresponding to the quad currently
+//   being considered. If this quad is a jump, then set the corresponding
+//   bucket of backpatch_jump_quads and increment assembly_index to make room.
+void generate_quad_assembly();
+
+/* ~~~~~~~~~~~~~~~~~~~~~ Variables ~~~~~~~~~~~~~~~~~~~~~~~~ */
+
 // Declared in djcc.c; provided at the command line, or defaults
 extern char *assembly_file_name;
 
@@ -22,6 +31,8 @@ extern int next_quad_index;
 int assembly_index;
 // The index of the quad currently being considered
 int quad_index;
+
+/* ~~~~~~~~~~~~~~~ Function Definitions ~~~~~~~~~~~~~~~~~~~ */
 
 // Iterate through the quad_array and generates assembly for each quad,
 //   filling out the quad_assembly_lines array accordingly
@@ -44,8 +55,237 @@ void generate_program_assembly()
 
 // Generate the assembly instructions corresponding to the quad currently
 //   being considered. If this quad is a jump, then set the corresponding
-//   bucket of backpatch_jump_quads and increment assembly_index to make room.
+//   bucket of backpatch_jump_quads and increment assembly_index to appropriate room.
 void generate_quad_assembly()
 {
   quad curr_quad = quad_array[quad_index];
+
+  switch (curr_quad->op)
+  {
+    case call_func_op:
+    {
+
+    }
+    case print_int_op:
+    {
+
+    }
+    case print_float_op:
+    {
+
+    }
+    case print_string_op:
+    {
+
+    }
+    case int_to_float_op:
+    {
+
+    }
+    case assn_int_to_var_op:
+    {
+
+    }
+    case assn_int_to_arraysub_op:
+    {
+
+    }
+    case assn_int_from_arraysub_op:
+    {
+
+    }
+    case assn_float_to_var_op:
+    {
+
+    }
+    case assn_float_to_arraysub_op:
+    {
+
+    }
+    case assn_float_from_arraysub_op:
+    {
+
+    }
+    case add_ints_op:
+    {
+
+    }
+    case add_floats_op:
+    {
+
+    }
+    case sub_ints_op:
+    {
+
+    }
+    case sub_floats_op:
+    {
+
+    }
+    case mult_ints_op:
+    {
+
+    }
+    case mult_floats_op:
+    {
+
+    }
+    case div_ints_op:
+    {
+
+    }
+    case div_floats_op:
+    {
+
+    }
+    case mod_op:
+    {
+
+    }
+    case lt_ints_op:
+    {
+
+    }
+    case lt_floats_op:
+    {
+
+    }
+    case leq_ints_op:
+    {
+
+    }
+    case leq_floats_op:
+    {
+
+    }
+    case gt_ints_op:
+    {
+
+    }
+    case gt_floats_op:
+    {
+
+    }
+    case geq_ints_op:
+    {
+
+    }
+    case geq_floats_op:
+    {
+
+    }
+    case eq_ints_op:
+    {
+
+    }
+    case eq_floats_op:
+    {
+
+    }
+    case neq_ints_op:
+    {
+
+    }
+    case neq_floats_op:
+    {
+
+    }
+    case and_ints_op:
+    {
+
+    }
+    case and_floats_op:
+    {
+
+    }
+    case or_ints_op:
+    {
+
+    }
+    case or_floats_op:
+    {
+
+    }
+    case int_bang_op:
+    {
+
+    }
+    case float_bang_op:
+    {
+
+    }
+    case int_neg_op:
+    {
+
+    }
+    case float_neg_op:
+    {
+
+    }
+    case var_inc_op:
+    {
+
+    }
+    case array_inc_op:
+    {
+
+    }
+    case var_dec_op:
+    {
+
+    }
+    case array_dec_op:
+    {
+
+    }
+    case if_false_op:
+    {
+
+    }
+    case goto_op:
+    {
+
+    }
+    case read_int_op:
+    {
+
+    }
+    case read_double_op:
+    {
+
+    }
+    case halt_op:
+    {
+
+    }
+    case func_decl_op:
+    {
+
+    }
+    case push_param_op:
+    {
+
+    }
+    case alloc_array_op:
+    {
+
+    }
+    case return_op:
+    {
+
+    }
+    case assign_int_literal:
+    {
+
+    }
+    case assign_double_literal:
+    {
+
+    }
+  }
 }
+
+// Generate assembly for standard int binary ops
+
+
+// Generate assembly for standard double binary ops

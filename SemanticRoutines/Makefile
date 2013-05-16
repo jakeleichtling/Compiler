@@ -9,7 +9,7 @@
 # 5/29/2013
 
 BISONFlAGS = -d -v
-CFLAGS = -g
+CFLAGS = -g -Wall
 
 djcc:	djcc.o lex.yy.o bparser.tab.o ast.o symtab.o quad.o ast_node_processing.o tm57_assembly_generation.o
 	gcc $(CFLAGS) -o djcc djcc.o lex.yy.o bparser.tab.o ast.o symtab.o quad.o ast_node_processing.o tm57_assembly_generation.o -lfl
@@ -21,7 +21,7 @@ djcc.o:	djcc.c bparser.tab.h ast.h symtab.h quad.h
 	gcc $(CFLAGS) -c djcc.c
 
 lex.yy.o:	lex.yy.c bparser.tab.h
-	gcc $(CFLAGS) -c lex.yy.c
+	gcc -g -c lex.yy.c
 
 lex.yy.c:	flexer.l bparser.tab.h
 	flex flexer.l

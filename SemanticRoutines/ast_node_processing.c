@@ -71,15 +71,15 @@ int fill_id_types(ast_node node)
     {
       // Find the return type of the function declaration
       enum vartype var_type;
-      switch (node->left_child->node_type) {
-        case INT_TYPE:
-          var_type = inttype;
-          break;
-        case DBL_TYPE:
-          var_type = doubletype;
-          break;
-        case VOID_TYPE:
-          var_type = voidtype;
+      enum nodetype ret_node_type = node->left_child->node_type;
+      if (ret_node_type == INT_TYPE) {
+        var_type = inttype;
+      } else if (ret_node_type == DBL_TYPE) {
+        var_type = doubletype;
+      } else if (ret_node_type == VOID_TYPE) {
+        var_type = voidtype;
+      } else {
+        return 1; // error
       }
 
       // Get the func ID's ast node
@@ -134,13 +134,13 @@ int fill_id_types(ast_node node)
     {
       // Find the type of the param
       enum vartype var_type;
-      switch (node->left_child->node_type) {
-        case INT_TYPE:
-          var_type = inttype;
-          break;
-        case DBL_TYPE:
-          var_type = doubletype;
-          break;
+      enum nodetype ret_node_type = node->left_child->node_type;
+      if (ret_node_type == INT_TYPE) {
+        var_type = inttype;
+      } else if (ret_node_type == DBL_TYPE) {
+        var_type = doubletype;
+      } else {
+        return 1; // error
       }
 
       // Get the param ID's ast node
@@ -173,13 +173,13 @@ int fill_id_types(ast_node node)
     {
       // Find the type of the variables
       enum vartype var_type;
-      switch (node->left_child->node_type) {
-        case INT_TYPE:
-          var_type = inttype;
-          break;
-        case DBL_TYPE:
-          var_type = doubletype;
-          break;
+      enum nodetype var_node_type = node->left_child->node_type;
+      if (var_node_type == INT_TYPE) {
+        var_type = inttype;
+      } else if (var_node_type == DBL_TYPE) {
+        var_type = doubletype;
+      } else {
+        return 1; // error
       }
 
       // Make the symnodes and set the types for all of the declared variables
@@ -279,13 +279,13 @@ int fill_id_types(ast_node node)
     {
       // Find the type of the param
       enum vartype var_type;
-      switch (node->left_child->node_type) {
-        case INT_TYPE:
-          var_type = inttype;
-          break;
-        case DBL_TYPE:
-          var_type = doubletype;
-          break;
+      enum nodetype ret_node_type = node->left_child->node_type;
+      if (ret_node_type == INT_TYPE) {
+        var_type = inttype;
+      } else if (ret_node_type == DBL_TYPE) {
+        var_type = doubletype;
+      } else {
+        return 1; // error
       }
 
       // Get the param ID's ast node
@@ -424,9 +424,23 @@ int fill_id_types(ast_node node)
       return children_fill_id_types(node);
     case FUNC_CALL:
       return children_fill_id_types(node);
+    case STRING_LITERAL:
+      return 0;
+    case INT_LITERAL:
+      return 0;
+    case DOUBLE_LITERAL:
+      return 0;
+    case EMPTY_EXPR:
+      return 0;
+    case INT_TYPE:
+      return 0;
+    case DBL_TYPE:
+      return 0;
+    case VOID_TYPE:
+      return 0;
+    default: // just to make -Wall happy
+      return 0;
   }
-
-  return 0;
 }
 
 // Performs a post-order traversal of the syntax tree to check type compatibilities
@@ -593,7 +607,9 @@ int type_check(ast_node node)
       enum vartype body_return_type = node->left_child->right_sibling->right_sibling->return_type;
       enum vartype decl_return_type = node->left_child->right_sibling->value.sym_node->var_type;
 
-      if (!((body_return_type == no_type && decl_return_type == voidtype) || (body_return_type == decl_return_type))) {
+      if (!((body_return_type == no_type && decl_return_type == voidtype) ||
+            (body_return_type == decl_return_type) ||
+            (body_return_type == inttype && decl_return_type == doubletype))) {
         mark_error(node->line_num, "The return types of the function declaration and body do not match");  
         return 1;
       }
@@ -612,6 +628,8 @@ int type_check(ast_node node)
       for (child = node->left_child; child != NULL; child = child->right_sibling) {
         if (node->return_type == no_type) {
           node->return_type = child->return_type;
+        } else if (node->return_type == inttype && child->return_type == doubletype) { // Widen to doubletype
+          node->return_type = doubletype;
         } else if (child->return_type != no_type && node->return_type != child->return_type) {
           mark_error(node->line_num, "The type of this return statement conflicts with that of a previous return statement in this function");
           return 1;
@@ -725,6 +743,8 @@ int standard_binary_op_typecheck_widening(ast_node node)
   } else {
     node->data_type = inttype;
   }
+
+  return 0;
 }
 
 // Standard code for checking the types of the operands of a binary operation that is of type int
@@ -739,4 +759,6 @@ int standard_binary_op_typecheck_int(ast_node node)
     return 1;
   }
   node->data_type = inttype;
+
+  return 0;
 }
