@@ -40,6 +40,13 @@ void generate_program_assembly()
 {
   quad_assembly_index = calloc(next_quad_index, sizeof(int));
   backpatch_jump_quads = calloc(next_quad_index, sizeof(int));
+
+  // Initialize backpatch_jump_quads buckets to -1
+  int i;
+  for (i = 0; i < next_quad_index; i++) {
+    backpatch_jump_quads[i] = -1;
+  }
+
   assembly_index = 0;
 
   for (quad_index = 0; quad_index < next_quad_index; quad_index++) {
@@ -289,3 +296,11 @@ void generate_quad_assembly()
 
 
 // Generate assembly for standard double binary ops
+
+// Method to print RO
+
+// Method to print RM
+
+// Define enum and corresponding strings
+
+// Make sure you clear the assembly file before writing into it (don't want to just append)

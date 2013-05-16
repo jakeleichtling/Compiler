@@ -85,7 +85,6 @@ struct quad_arg {
 typedef struct quad *quad;
 struct quad {
   enum quad_op op;
-  ast_node var_node;
   quad_arg arg1;
   quad_arg arg2;
   quad_arg arg3;

@@ -30,9 +30,12 @@ char *quad_op_string[] = {
   "print_float_op",
   "print_string_op",
   "int_to_float_op",
-  "assn_var_op",
-  "assn_to_arraysub_op",
-  "assn_from_arraysub_op",
+  "assn_int_to_var_op",
+  "assn_int_to_arraysub_op",
+  "assn_int_from_arraysub_op",
+  "assn_float_to_var_op",
+  "assn_float_to_arraysub_op",
+  "assn_float_from_arraysub_op",
   "add_ints_op",
   "add_floats_op",
   "sub_ints_op",
@@ -62,9 +65,9 @@ char *quad_op_string[] = {
   "float_bang_op",
   "int_neg_op",
   "float_neg_op",
-  "int_inc_op",
+  "var_inc_op",
   "array_inc_op",
-  "int_dec_op",
+  "var_dec_op",
   "array_dec_op",
   "if_false_op",
   "goto_op",
@@ -72,7 +75,11 @@ char *quad_op_string[] = {
   "read_double_op",
   "halt_op",
   "func_decl_op",
-  "push_param_op"
+  "push_param_op",
+  "alloc_array_op",
+  "return_op",
+  "assign_int_literal",
+  "assign_double_literal"
 };
 
 /* ~~~~~~~~~~~~~~~ Function Prototypes ~~~~~~~~~~~~~~~~~~~ */
@@ -175,7 +182,6 @@ quad_arg get_new_temp(symboltable symtab, enum vartype var_type)
   return new_quad_arg;
 }
 
-// TODO: Check to make sure all cases are covered!
 // Recursive function for generating intermediate code using quads.
 //  If applicable, returns the quad_arg that holds the result of an operation
 quad_arg generate_intermediate_code(ast_node node)
@@ -541,19 +547,17 @@ quad_arg generate_intermediate_code(ast_node node)
     }
     case READ_STMT:
     {
-      // create a temp of the proper type
-      enum vartype var_type = node->left_child->data_type;
-      quad_arg temp_arg = get_new_temp(flat_id_table, var_type);
+      // create an argument holding the variable to be written to
+      symnode var_symnode = node->left_child->value.sym_node;
+      quad_arg var_arg = generate_quad_arg(id_arg);
+      var_arg->value.var_node = var_symnode;
 
       // read into the temp
-      if (var_type == inttype) {
-        generate_quad(read_int_op, temp_arg, NULL, NULL);
-      } else if (var_type == doubletype) {
-        generate_quad(read_double_op, temp_arg, NULL, NULL);
+      if (var_symnode->var_type == inttype) {
+        generate_quad(read_int_op, var_arg, NULL, NULL);
+      } else if (var_symnode->var_type) {
+        generate_quad(read_double_op, var_arg, NULL, NULL);
       }
-
-      // assign the temp to the var
-      // TODO: wait until assign is finished
 
       return NULL;
     }

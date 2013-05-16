@@ -663,8 +663,10 @@ int type_check(ast_node node)
 
       break;
     case READ_STMT:
+      // TODO: check to make sure it is an int or double var (including subscripted array)
       break;
     case PRINT_STMT:
+      // TODO: check to make sure it isn't an array (could be a subscripted array)
       break;
     case STRING_LITERAL:
       break;

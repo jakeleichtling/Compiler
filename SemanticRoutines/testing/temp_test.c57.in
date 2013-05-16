@@ -1,19 +1,7 @@
-void f0(int xx[], double y, double yy) {
+int x = 1 + 2;
+double y[5];
 
-
-
-
+void f0() {
+  read x;
+  read y;
 }
-
-void f2() {
-  int x1, xx[2], x2 = 2;
-  return;
-}
-
-void f1() {
-  int xx[5];
-  double y, yy[xx[1]];
-
-  f0(xx, 5, yy[xx[1]]);
-}
-
