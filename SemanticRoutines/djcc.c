@@ -68,6 +68,16 @@ int main()
         print_quad_array();
       }
 
+      if (djdebug) {
+        printf("\n~~~~~~~~~~~ print_symboltable(flat_id_table); ~~~~~~~~~~~~\n");
+        print_symboltable(flat_id_table);
+      }
+
+      if (djdebug) {
+        printf("\n~~~~~~~~~~~ generate_quad_assembly ~~~~~~~~~~~~\n");
+      }
+      generate_program_assembly();
+
   } else {
       fprintf(stderr, "%s\n", "No root :(\n");
   }

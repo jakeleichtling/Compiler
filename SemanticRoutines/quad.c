@@ -36,13 +36,13 @@ char *quad_op_string[] = {
   "assn_float_to_var_op",
   "assn_float_to_arraysub_op",
   "assn_float_from_arraysub_op",
-  "add_ints_op",
+  "add_ints_op", //
   "add_floats_op",
-  "sub_ints_op",
+  "sub_ints_op", //
   "sub_floats_op",
-  "mult_ints_op",
+  "mult_ints_op", //
   "mult_floats_op",
-  "div_ints_op",
+  "div_ints_op", //
   "div_floats_op",
   "mod_op",
   "lt_ints_op",
