@@ -176,8 +176,8 @@ void generate_quad_assembly()
 		}
     case assn_int_to_var_op:
     {
-			// Load the int literal value into r0
-      print_rm(LDC, 0, curr_quad->arg2->value.int_value, 0);
+			// Load the int variable's value into r0
+      gen_load_int(curr_quad->arg2->value.var_node, 0);
 
       // Store r0 into the int variable
       gen_store_int(curr_quad->arg1->value.var_node, 0);
@@ -211,7 +211,7 @@ void generate_quad_assembly()
       // Calculate r0 <- r0 + r1 to get the address of the destination bucket in the array
       print_ro(ADD, 0, 0, 1);
 
-      // Load the int value into r1
+      // Load the int variable's value into r1
       gen_load_int(curr_quad->arg3->value.var_node, 1);
 
       // Store r1 into the array bucket (address in r0)
@@ -256,8 +256,8 @@ void generate_quad_assembly()
     }
     case assn_float_to_var_op:
     {
-      // Load the double literal value into fr0
-      print_rm(LDFC, 0, curr_quad->arg2->value.double_value, 0);
+      // Load the double variable's value into fr0
+      gen_load_float(curr_quad->arg2->value.var_node, 0);
 
       // Store fr0 into the double variable
       gen_store_float(curr_quad->arg1->value.var_node, 0);
@@ -380,110 +380,386 @@ void generate_quad_assembly()
 			return;
 		}
 
-    // Derek
     case lt_ints_op:
     {
-			// TODO
+      // Load the left int argument into r0
+      gen_load_int(curr_quad->arg2->value.var_node, 0);
+
+      // Load the right int argument into r1
+      gen_load_int(curr_quad->arg3->value.var_node, 1);
+
+      // r0 <- r0 - r1
+      print_ro(SUB, 0, 0, 1);
+
+      // If r0 < 0, jump to L1 (2 instructions)
+      print_rm(JLT, 0, 2, 7);
+
+      // Put 0 in r0 and jump to L2 (1 instruction)
+      print_rm(LDC, 0, 0, 0);
+      print_rm(LDA, 7, 1, 7);
+
+      // L1: Put 1 in r0
+      print_rm(LDC, 0, 1, 0);
+
+      // L2: Store r0 into the int variable
+      gen_store_int(curr_quad->arg1->value.var_node, 0);
+
 			return;
 		}
     case lt_floats_op:
     {
-			// TODO
-			return;
-		}
+      // Load the left float argument into fr0
+      gen_load_float(curr_quad->arg2->value.var_node, 0);
+
+      // Load the right float argument into fr1
+      gen_load_float(curr_quad->arg3->value.var_node, 1);
+
+      // fr0 <- fr0 - fr1
+      print_ro(SUBF, 0, 0, 1);
+
+      // If fr0 < 0, jump to L1 (2 instructions)
+      print_rm(JFLT, 0, 2, 7);
+
+      // Put 0.0 in fr0 and jump to L2 (1 instruction)
+      print_rm(LDFC, 0, 0.0, 0);
+      print_rm(LDA, 7, 1, 7);
+
+      // L1: Put 1.0 in fr0
+      print_rm(LDC, 0, 1.0, 0);
+
+      // L2: Store fr0 into the double variable
+      gen_store_float(curr_quad->arg1->value.var_node, 0);
+
+      return;
+    }
     case leq_ints_op:
     {
-			// TODO
-			return;
-		}
+      // Load the left int argument into r0
+      gen_load_int(curr_quad->arg2->value.var_node, 0);
+
+      // Load the right int argument into r1
+      gen_load_int(curr_quad->arg3->value.var_node, 1);
+
+      // r0 <- r0 - r1
+      print_ro(SUB, 0, 0, 1);
+
+      // If r0 <= 0, jump to L1 (2 instructions)
+      print_rm(JLE, 0, 2, 7);
+
+      // Put 0 in r0 and jump to L2 (1 instruction)
+      print_rm(LDC, 0, 0, 0);
+      print_rm(LDA, 7, 1, 7);
+
+      // L1: Put 1 in r0
+      print_rm(LDC, 0, 1, 0);
+
+      // L2: Store r0 into the int variable
+      gen_store_int(curr_quad->arg1->value.var_node, 0);
+
+      return;
+    }
     case leq_floats_op:
     {
-			// TODO
-			return;
-		}
+      // Load the left float argument into fr0
+      gen_load_float(curr_quad->arg2->value.var_node, 0);
+
+      // Load the right float argument into fr1
+      gen_load_float(curr_quad->arg3->value.var_node, 1);
+
+      // fr0 <- fr0 - fr1
+      print_ro(SUBF, 0, 0, 1);
+
+      // If fr0 <= 0, jump to L1 (2 instructions)
+      print_rm(JFLE, 0, 2, 7);
+
+      // Put 0.0 in fr0 and jump to L2 (1 instruction)
+      print_rm(LDFC, 0, 0.0, 0);
+      print_rm(LDA, 7, 1, 7);
+
+      // L1: Put 1.0 in fr0
+      print_rm(LDC, 0, 1.0, 0);
+
+      // L2: Store fr0 into the double variable
+      gen_store_float(curr_quad->arg1->value.var_node, 0);
+
+      return;
+    }
     case gt_ints_op:
     {
-			// TODO
-			return;
-		}
+      // Load the left int argument into r0
+      gen_load_int(curr_quad->arg2->value.var_node, 0);
+
+      // Load the right int argument into r1
+      gen_load_int(curr_quad->arg3->value.var_node, 1);
+
+      // r0 <- r0 - r1
+      print_ro(SUB, 0, 0, 1);
+
+      // If r0 > 0, jump to L1 (2 instructions)
+      print_rm(JGT, 0, 2, 7);
+
+      // Put 0 in r0 and jump to L2 (1 instruction)
+      print_rm(LDC, 0, 0, 0);
+      print_rm(LDA, 7, 1, 7);
+
+      // L1: Put 1 in r0
+      print_rm(LDC, 0, 1, 0);
+
+      // L2: Store r0 into the int variable
+      gen_store_int(curr_quad->arg1->value.var_node, 0);
+
+      return;
+    }
     case gt_floats_op:
     {
-			// TODO
-			return;
-		}
+      // Load the left float argument into fr0
+      gen_load_float(curr_quad->arg2->value.var_node, 0);
+
+      // Load the right float argument into fr1
+      gen_load_float(curr_quad->arg3->value.var_node, 1);
+
+      // fr0 <- fr0 - fr1
+      print_ro(SUBF, 0, 0, 1);
+
+      // If fr0 > 0, jump to L1 (2 instructions)
+      print_rm(JFGT, 0, 2, 7);
+
+      // Put 0.0 in fr0 and jump to L2 (1 instruction)
+      print_rm(LDFC, 0, 0.0, 0);
+      print_rm(LDA, 7, 1, 7);
+
+      // L1: Put 1.0 in fr0
+      print_rm(LDC, 0, 1.0, 0);
+
+      // L2: Store fr0 into the double variable
+      gen_store_float(curr_quad->arg1->value.var_node, 0);
+
+      return;
+    }
     case geq_ints_op:
     {
-			// TODO
-			return;
-		}
+      // Load the left int argument into r0
+      gen_load_int(curr_quad->arg2->value.var_node, 0);
+
+      // Load the right int argument into r1
+      gen_load_int(curr_quad->arg3->value.var_node, 1);
+
+      // r0 <- r0 - r1
+      print_ro(SUB, 0, 0, 1);
+
+      // If r0 >= 0, jump to L1 (2 instructions)
+      print_rm(JGE, 0, 2, 7);
+
+      // Put 0 in r0 and jump to L2 (1 instruction)
+      print_rm(LDC, 0, 0, 0);
+      print_rm(LDA, 7, 1, 7);
+
+      // L1: Put 1 in r0
+      print_rm(LDC, 0, 1, 0);
+
+      // L2: Store r0 into the int variable
+      gen_store_int(curr_quad->arg1->value.var_node, 0);
+
+      return;
+    }
     case geq_floats_op:
     {
-			// TODO
-			return;
-		}
+      // Load the left float argument into fr0
+      gen_load_float(curr_quad->arg2->value.var_node, 0);
+
+      // Load the right float argument into fr1
+      gen_load_float(curr_quad->arg3->value.var_node, 1);
+
+      // fr0 <- fr0 - fr1
+      print_ro(SUBF, 0, 0, 1);
+
+      // If fr0 >= 0, jump to L1 (2 instructions)
+      print_rm(JFGE, 0, 2, 7);
+
+      // Put 0.0 in fr0 and jump to L2 (1 instruction)
+      print_rm(LDFC, 0, 0.0, 0);
+      print_rm(LDA, 7, 1, 7);
+
+      // L1: Put 1.0 in fr0
+      print_rm(LDC, 0, 1.0, 0);
+
+      // L2: Store fr0 into the double variable
+      gen_store_float(curr_quad->arg1->value.var_node, 0);
+
+      return;
+    }
     case eq_ints_op:
     {
-			// TODO
-			return;
-		}
+      // Load the left int argument into r0
+      gen_load_int(curr_quad->arg2->value.var_node, 0);
+
+      // Load the right int argument into r1
+      gen_load_int(curr_quad->arg3->value.var_node, 1);
+
+      // r0 <- r0 - r1
+      print_ro(SUB, 0, 0, 1);
+
+      // If r0 == 0, jump to L1 (2 instructions)
+      print_rm(JEQ, 0, 2, 7);
+
+      // Put 0 in r0 and jump to L2 (1 instruction)
+      print_rm(LDC, 0, 0, 0);
+      print_rm(LDA, 7, 1, 7);
+
+      // L1: Put 1 in r0
+      print_rm(LDC, 0, 1, 0);
+
+      // L2: Store r0 into the int variable
+      gen_store_int(curr_quad->arg1->value.var_node, 0);
+
+      return;
+    }
     case eq_floats_op:
     {
-			// TODO
-			return;
-		}
+      // Load the left float argument into fr0
+      gen_load_float(curr_quad->arg2->value.var_node, 0);
+
+      // Load the right float argument into fr1
+      gen_load_float(curr_quad->arg3->value.var_node, 1);
+
+      // fr0 <- fr0 - fr1
+      print_ro(SUBF, 0, 0, 1);
+
+      // If fr0 == 0, jump to L1 (2 instructions)
+      print_rm(JFEQ, 0, 2, 7);
+
+      // Put 0.0 in fr0 and jump to L2 (1 instruction)
+      print_rm(LDFC, 0, 0.0, 0);
+      print_rm(LDA, 7, 1, 7);
+
+      // L1: Put 1.0 in fr0
+      print_rm(LDC, 0, 1.0, 0);
+
+      // L2: Store fr0 into the double variable
+      gen_store_float(curr_quad->arg1->value.var_node, 0);
+
+      return;
+    }
     case neq_ints_op:
     {
-			// TODO
-			return;
-		}
+      // Load the left int argument into r0
+      gen_load_int(curr_quad->arg2->value.var_node, 0);
+
+      // Load the right int argument into r1
+      gen_load_int(curr_quad->arg3->value.var_node, 1);
+
+      // r0 <- r0 - r1
+      print_ro(SUB, 0, 0, 1);
+
+      // If r0 != 0, jump to L1 (2 instructions)
+      print_rm(JNE, 0, 2, 7);
+
+      // Put 0 in r0 and jump to L2 (1 instruction)
+      print_rm(LDC, 0, 0, 0);
+      print_rm(LDA, 7, 1, 7);
+
+      // L1: Put 1 in r0
+      print_rm(LDC, 0, 1, 0);
+
+      // L2: Store r0 into the int variable
+      gen_store_int(curr_quad->arg1->value.var_node, 0);
+
+      return;
+    }
     case neq_floats_op:
     {
-			// TODO
-			return;
-		}
-    case and_ints_op:
+      // Load the left float argument into fr0
+      gen_load_float(curr_quad->arg2->value.var_node, 0);
+
+      // Load the right float argument into fr1
+      gen_load_float(curr_quad->arg3->value.var_node, 1);
+
+      // fr0 <- fr0 - fr1
+      print_ro(SUBF, 0, 0, 1);
+
+      // If fr0 != 0, jump to L1 (2 instructions)
+      print_rm(JFNE, 0, 2, 7);
+
+      // Put 0.0 in fr0 and jump to L2 (1 instruction)
+      print_rm(LDFC, 0, 0.0, 0);
+      print_rm(LDA, 7, 1, 7);
+
+      // L1: Put 1.0 in fr0
+      print_rm(LDC, 0, 1.0, 0);
+
+      // L2: Store fr0 into the double variable
+      gen_store_float(curr_quad->arg1->value.var_node, 0);
+
+      return;
+    }
+    case bang_op:
     {
-			// TODO
-			return;
-		}
-    case and_floats_op:
-    {
-			// TODO
-			return;
-		}
-    case or_ints_op:
-    {
-			// TODO
-			return;
-		}
-    case or_floats_op:
-    {
-			// TODO
-			return;
-		}
-    case int_bang_op:
-    {
-			// TODO
-			return;
-		}
-    case float_bang_op:
-    {
-			// TODO
+			// Load the expression into r0
+      gen_load_int(curr_quad->arg2->value.var_node, 0);
+
+      // If r0 == 0, jump to L1 (2 instructions)
+      print_rm(JEQ, 0, 2, 7);
+
+      // r0 <- 0 (false)
+      print_rm(LDC, 0, 0, 0);
+
+      // Jump to L2 (1 instruction)
+      print_rm(LDA, 7, 1, 7);
+
+      // L1: r0 <- 1 (true)
+      print_rm(LDC, 0, 1, 0);
+
+      // L2: Store r0 in the result variable
+      gen_store_int(curr_quad->arg1->value.var_node, 0);
+
 			return;
 		}
     case int_neg_op:
     {
-			// TODO
+			// r0 <- int variable's value (arg2)
+      gen_load_int(curr_quad->arg2->value.var_node, 0);
+
+      // r1 <- -1
+      print_rm(LDC, 1, -1, 0);
+
+      // r0 <- r0 * r1 = int variable's value * -1
+      print_ro(MUL, 0, 0, 1);
+
+      // result variable (arg1) <- r0
+      gen_store_int(curr_quad->arg1->value.var_node, 0);
+
 			return;
 		}
     case float_neg_op:
     {
-			// TODO
-			return;
+      // fr0 <- double variable's value (arg2)
+      gen_load_float(curr_quad->arg2->value.var_node, 0);
+
+      // fr1 <- -1.0
+      print_rm(LDFC, 1, -1.0, 0);
+
+      // fr0 <- fr0 * fr1 = double variable's value * -1.0
+      print_ro(MULF, 0, 0, 1);
+
+      // result variable (arg1) <- fr0
+      gen_store_float(curr_quad->arg1->value.var_node, 0);
+
+      return;
 		}
     case var_inc_op:
     {
-			// TODO
+			// r1 <- 1
+      print_rm(LDC, 1, 1, 0);
+
+      // r0 <- int variable's value
+      gen_load_int(curr_quad->arg1->value.var_node, 0);
+
+      // r0 <- r0 + r1 = int variable's value + 1
+      print_ro(ADD, 0, 0, 1);
+
+      // Store r0 into the int variable
+      gen_store_int(curr_quad->arg1->value.var_node, 0);
+
 			return;
 		}
     case array_inc_op:
@@ -503,12 +779,34 @@ void generate_quad_assembly()
 		}
     case if_false_op:
     {
-			// TODO
-			return;
+      // Register the quad for backpatching in backpatch_jump_quads
+      backpatch_jump_quads[quad_index] = assembly_index;
+
+      // Increment assembly_index to make room:
+      //   2 instructions for loading the expression and then conditionally jumping
+      assembly_index += 2;
+
+      return;
 		}
+    case if_true_op:
+    {
+      // Register the quad for backpatching in backpatch_jump_quads
+      backpatch_jump_quads[quad_index] = assembly_index;
+
+      // Increment assembly_index to make room:
+      //   2 instructions for loading the expression and then conditionally jumping
+      assembly_index += 2;
+
+      return;
+    }
     case goto_op:
     {
-			// TODO
+			// Register the quad for backpatching in backpatch_jump_quads
+      backpatch_jump_quads[quad_index] = assembly_index;
+
+      // Increment assembly_index to make room
+      assembly_index++;
+
 			return;
 		}
     case read_int_op:
@@ -548,12 +846,22 @@ void generate_quad_assembly()
 		}
     case assign_int_literal:
     {
-			// TODO
-			return;
+      // Load the int literal value into r0
+      print_rm(LDC, 0, curr_quad->arg2->value.int_value, 0);
+
+      // Store r0 into the int variable
+      gen_store_int(curr_quad->arg1->value.var_node, 0);
+
+      return;
 		}
     case assign_double_literal:
     {
-			// TODO
+			// Load the double literal value into fr0
+      print_rm(LDFC, 0, curr_quad->arg2->value.double_value, 0);
+
+      // Store fr0 into the double variable
+      gen_store_float(curr_quad->arg1->value.var_node, 0);
+
 			return;
 		}
   }

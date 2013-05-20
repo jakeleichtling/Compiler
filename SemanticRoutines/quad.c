@@ -57,19 +57,15 @@ char *quad_op_string[] = {
   "eq_floats_op",
   "neq_ints_op",
   "neq_floats_op",
-  "and_ints_op",
-  "and_floats_op",
-  "or_ints_op",
-  "or_floats_op",
-  "int_bang_op",
-  "float_bang_op",
   "int_neg_op",
   "float_neg_op",
+  "bang_op",
   "var_inc_op",
   "array_inc_op",
   "var_dec_op",
   "array_dec_op",
   "if_false_op",
+  "if_true_op",
   "goto_op",
   "read_int_op",
   "read_double_op",
@@ -331,11 +327,92 @@ quad_arg generate_intermediate_code(ast_node node)
     case OP_NEQ:
       return generate_binary_op_with_widening(node, neq_ints_op, neq_floats_op);
     case OP_AND:
-      return generate_binary_op_with_widening(node, and_ints_op, and_floats_op);
+      {
+        quad_arg result_arg = get_new_temp(flat_id_table, inttype);
+
+        // Evaluate the left expression
+        quad_arg left_exp_arg = generate_intermediate_code(node->left_child);
+
+        // If it is false, jump to L1
+        quad left_fail_jump_quad = generate_quad(if_false_op, left_exp_arg, NULL, NULL);
+
+        // Evaluate the right expression
+        quad_arg right_exp_arg = generate_intermediate_code(node->left_child->right_sibling);
+
+        // If it is false, jump to L1
+        quad right_fail_jump_quad = generate_quad(if_false_op, right_exp_arg, NULL, NULL);
+
+        // Save 1 in the result argument and jump to the quad following the and operation
+        quad_arg true_int_literal_arg = generate_quad_arg(int_arg);
+        true_int_literal_arg->value.int_value = 1;
+        generate_quad(assign_int_literal, result_arg, true_int_literal_arg, NULL);
+        quad after_true_jump_quad = generate_quad(goto_op, NULL, NULL, NULL);
+
+        // L1: Save 0 in the result argument
+        quad_arg L1_arg = generate_quad_arg(int_arg);
+        L1_arg->value.int_value = next_quad_index;
+        quad_arg false_int_literal_arg = generate_quad_arg(int_arg);
+        false_int_literal_arg->value.int_value = 0;
+        generate_quad(assign_int_literal, result_arg, false_int_literal_arg, NULL);
+
+        // Backpatch
+        patch_quad(left_fail_jump_quad, 2, L1_arg);
+        patch_quad(right_fail_jump_quad, 2, L1_arg);
+
+        quad_arg after_and_arg = generate_quad_arg(int_arg);
+        after_and_arg->value.int_value = next_quad_index;
+        patch_quad(after_true_jump_quad, 1, after_and_arg);
+
+        return result_arg;
+      }
     case OP_OR:
-      return generate_binary_op_with_widening(node, or_ints_op, or_floats_op);
+    {
+        quad_arg result_arg = get_new_temp(flat_id_table, inttype);
+
+        // Evaluate the left expression
+        quad_arg left_exp_arg = generate_intermediate_code(node->left_child);
+
+        // If it is true, jump to L1
+        quad left_succ_jump_quad = generate_quad(if_true_op, left_exp_arg, NULL, NULL);
+
+        // Evaluate the right expression
+        quad_arg right_exp_arg = generate_intermediate_code(node->left_child->right_sibling);
+
+        // If it is true, jump to L1
+        quad right_succ_jump_quad = generate_quad(if_true_op, right_exp_arg, NULL, NULL);
+
+        // Save 0 in the result argument and jump to the quad following the or operation
+        quad_arg false_int_literal_arg = generate_quad_arg(int_arg);
+        false_int_literal_arg->value.int_value = 0;
+        generate_quad(assign_int_literal, result_arg, false_int_literal_arg, NULL);
+        quad after_false_jump_quad = generate_quad(goto_op, NULL, NULL, NULL);
+
+        // L1: Save 1 in the result argument
+        quad_arg L1_arg = generate_quad_arg(int_arg);
+        L1_arg->value.int_value = next_quad_index;
+        quad_arg true_int_literal_arg = generate_quad_arg(int_arg);
+        true_int_literal_arg->value.int_value = 1;
+        generate_quad(assign_int_literal, result_arg, true_int_literal_arg, NULL);
+
+        // Backpatch
+        patch_quad(left_succ_jump_quad, 2, L1_arg);
+        patch_quad(right_succ_jump_quad, 2, L1_arg);
+
+        quad_arg after_or_arg = generate_quad_arg(int_arg);
+        after_or_arg->value.int_value = next_quad_index;
+        patch_quad(after_false_jump_quad, 1, after_or_arg);
+
+        return result_arg;
+    }
     case OP_BANG:
-      return generate_single_operand(node, int_bang_op, float_bang_op);
+    {
+      quad_arg result_arg = get_new_temp(flat_id_table, inttype);
+      quad_arg exp_arg = generate_intermediate_code(node->left_child);
+
+      generate_quad(bang_op, result_arg, exp_arg, NULL);
+
+      return result_arg;
+    }
     case OP_NEG:
       return generate_single_operand(node, int_neg_op, float_neg_op);
     case OP_INC:

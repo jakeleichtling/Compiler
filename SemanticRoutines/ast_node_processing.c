@@ -163,9 +163,11 @@ int fill_id_types(ast_node node)
       flat_id_symnode->var_type = var_type;
       id_astnode->value.sym_node = flat_id_symnode;
 
-      // Insert the param symnode into the proper bucket of the current function's param array
+      // Insert the param symnode into the proper bucket of the current function's param array, and set the param's address
       curr_func_symnode_anp->param_symnode_array[curr_func_symnode_anp->num_params] = flat_id_symnode;
       curr_func_symnode_anp->num_params++;
+      flat_id_symnode->mem_addr_type = off_fp;
+      flat_id_symnode->var_addr = (1 + curr_func_symnode_anp->num_params) * 8;
 
       return 0;
     }
@@ -214,7 +216,7 @@ int fill_id_types(ast_node node)
           if (curr_func_symnode_anp != NULL) {
             flat_id_symnode->mem_addr_type = off_fp;
             curr_func_symnode_anp->num_vars++;
-            flat_id_symnode->var_addr = -8 * curr_func_symnode_anp->num_vars - 4; // the first variable is at -12(fp)
+            flat_id_symnode->var_addr = -8 * curr_func_symnode_anp->num_vars; // the first variable is at -8(fp)
           } else {
             flat_id_symnode->mem_addr_type = global;
             num_global_vars++;
@@ -264,11 +266,11 @@ int fill_id_types(ast_node node)
           if (curr_func_symnode_anp != NULL) {
             flat_id_symnode->mem_addr_type = off_fp;
             curr_func_symnode_anp->num_vars++;
-            flat_id_symnode->var_addr = -8 * curr_func_symnode_anp->num_vars - 4; // the first variable is at -8(fp)
+            flat_id_symnode->var_addr = -8 * curr_func_symnode_anp->num_vars; // the first variable is at -8(fp)
           } else {
             flat_id_symnode->mem_addr_type = global;
             num_global_vars++;
-            flat_id_symnode->var_addr = -8 * num_global_vars; // the first variable is at the global variable pointer
+            flat_id_symnode->var_addr = -8 * num_global_vars; // the first variable is at -8 off the global variable pointer
           }
         }
       }
@@ -308,9 +310,11 @@ int fill_id_types(ast_node node)
       flat_id_symnode->var_type = var_type;
       id_astnode->value.sym_node = flat_id_symnode;
 
-      // Insert the param symnode into the proper bucket of the current function's param array
+      // Insert the param symnode into the proper bucket of the current function's param array, and set the param's address
       curr_func_symnode_anp->param_symnode_array[curr_func_symnode_anp->num_params] = flat_id_symnode;
       curr_func_symnode_anp->num_params++;
+      flat_id_symnode->mem_addr_type = off_fp;
+      flat_id_symnode->var_addr = (1 + curr_func_symnode_anp->num_params) * 8;
 
       return 0;
     }
