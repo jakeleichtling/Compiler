@@ -13,6 +13,9 @@ void generate_quad_assembly();
 // Generate assembly for standard int binary ops: add_ints_op, sub_ints_op, mult_ints_op, div_ints_op
 void gen_standard_int_binary_op(ass_op op, quad_arg dest_arg, quad_arg l_arg, quad_arg r_arg);
 
+// Generate assembly for standard float binary ops
+void gen_standard_float_binary_op(ass_op op, quad_arg dest_arg, quad_arg l_arg, quad_arg r_arg);
+
 // Method to print RO instructions
 // increments assebly line # after print
 void print_ro(ass_op op, int dest_r, int r1, int r2);
@@ -33,13 +36,16 @@ void gen_load_int(symnode node, int dest_r);
 // Load variable at node into destination register
 void gen_load_float(symnode node, int dest_r);
 
+// Outputs the quad as a comment in the assembly file for debugging
+void print_quad_comment();
+void print_quad_arg_comment();
+
 /* ~~~~~~~~~~~~~~~~~~~~~ Variables ~~~~~~~~~~~~~~~~~~~~~~~~ */
 
 // Declared in djcc.c; provided at the command line, or defaults
 extern char *assembly_file_name;
 
 // file stream for assembly printing
-//TODO: open/close
 FILE *file;
 
 // Specifies the index of the assembly line that corresponds to the beginning of each quad;
@@ -63,6 +69,12 @@ int quad_index;
 // pointer to location of global variables on stack
 // TODO: set this!
 int global_ptr_reg;
+
+// The strings corresponding to quad ops, defined in quad.c
+extern char *quad_op_string[];
+
+// Is debugging mode on?
+extern int djdebug;
 
 const int stack_ptr_reg = 6;
 const int frame_ptr_reg = 5;
@@ -96,6 +108,11 @@ void generate_program_assembly()
     //   bucket of quad_assembly_index
     quad_assembly_index[quad_index] = assembly_index;
 
+    // Print the quad as a comment if debugging
+    if (djdebug) {
+      print_quad_comment();
+    }
+
     generate_quad_assembly();
   }
 
@@ -121,13 +138,23 @@ void generate_quad_assembly()
 		}
     case print_int_op:
     {
-			// TODO
+      // Load int value of variable into r0
+      gen_load_int(curr_quad->arg1->value.var_node, 0);
+
+      // Print out the int value in r0
+      print_ro(OUT, 0, 0, 0);
+
 			return;
 		}
     case print_float_op:
     {
-			// TODO
-			return;
+      // Load float value of variable into r0
+      gen_load_float(curr_quad->arg1->value.var_node, 0);
+
+      // Print out the float value in fr0
+      print_ro(OUTF, 0, 0, 0);
+
+      return;
 		}
     case print_string_op:
     {
@@ -136,39 +163,177 @@ void generate_quad_assembly()
 		}
     case int_to_float_op:
     {
-			// TODO
+			// Load the int value into r1
+      gen_load_int(curr_quad->arg2->value.var_node, 1);
+
+      // Convert the int value to a float value in fr0
+      print_ro(CVTIF, 0, 1, 0);
+
+      // Save the float value in fr0 into the float variable
+      gen_load_float(curr_quad->arg1->value.var_node, 0);
+
 			return;
 		}
     case assn_int_to_var_op:
     {
-			// TODO
+			// Load the int literal value into r0
+      print_rm(LDC, 0, curr_quad->arg2->value.int_value, 0);
+
+      // Store r0 into the int variable
+      gen_store_int(curr_quad->arg1->value.var_node, 0);
+
 			return;
 		}
     case assn_int_to_arraysub_op:
     {
-			// TODO
+			// Get the offset into the array, assuming buckets of 8 bytes, and put it in r0
+      gen_load_int(curr_quad->arg2->value.var_node, 0);
+
+      // Get the absolute address of the array and put it in r1
+      symnode array_id_node = curr_quad->arg1->value.var_node;
+      switch(array_id_node->mem_addr_type) {
+          case off_fp:
+              print_rm(LDA, 1, array_id_node->var_addr, frame_ptr_reg);
+              break;
+
+          case global:
+              print_rm(LDA, 1, array_id_node->var_addr, global_ptr_reg);
+              break;
+
+          case absolute:
+              //put 0 in reg3
+              print_rm(LDC, 3, 0, 0);
+
+              print_rm(LDA, 1, array_id_node->var_addr, 3);
+              break;
+      }
+
+      // Calculate r0 <- r0 + r1 to get the address of the destination bucket in the array
+      print_ro(ADD, 0, 0, 1);
+
+      // Load the int value into r1
+      gen_load_int(curr_quad->arg3->value.var_node, 1);
+
+      // Store r1 into the array bucket (address in r0)
+      print_rm(ST, 1, 0, 0);
+
 			return;
 		}
     case assn_int_from_arraysub_op:
     {
-			// TODO
-			return;
-		}
+      // Get the offset into the array, assuming buckets of 8 bytes, and put it in r0
+      gen_load_int(curr_quad->arg3->value.var_node, 0);
+
+      // Get the absolute address of the array and put it in r1
+      symnode array_id_node = curr_quad->arg2->value.var_node;
+      switch(array_id_node->mem_addr_type) {
+          case off_fp:
+              print_rm(LDA, 1, array_id_node->var_addr, frame_ptr_reg);
+              break;
+
+          case global:
+              print_rm(LDA, 1, array_id_node->var_addr, global_ptr_reg);
+              break;
+
+          case absolute:
+              //put 0 in reg3
+              print_rm(LDC, 3, 0, 0);
+
+              print_rm(LDA, 1, array_id_node->var_addr, 3);
+              break;
+      }
+
+      // Calculate r0 <- r0 + r1 to get the address of the destination bucket in the array
+      print_ro(ADD, 0, 0, 1);
+
+      // Load the int value from the array bucket (address in r0) into r1
+      print_rm(LD, 1, 0, 0);
+
+      // Store the int value into the int variable
+      gen_store_int(curr_quad->arg1->value.var_node, 1);
+
+      return;
+    }
     case assn_float_to_var_op:
     {
-			// TODO
-			return;
-		}
+      // Load the double literal value into fr0
+      print_rm(LDFC, 0, curr_quad->arg2->value.double_value, 0);
+
+      // Store fr0 into the double variable
+      gen_store_float(curr_quad->arg1->value.var_node, 0);
+
+      return;
+    }
     case assn_float_to_arraysub_op:
     {
-			// TODO
-			return;
-		}
+      // Get the offset into the array, assuming buckets of 8 bytes, and put it in r0
+      gen_load_int(curr_quad->arg2->value.var_node, 0);
+
+      // Get the absolute address of the array and put it in r1
+      symnode array_id_node = curr_quad->arg1->value.var_node;
+      switch(array_id_node->mem_addr_type) {
+          case off_fp:
+              print_rm(LDA, 1, array_id_node->var_addr, frame_ptr_reg);
+              break;
+
+          case global:
+              print_rm(LDA, 1, array_id_node->var_addr, global_ptr_reg);
+              break;
+
+          case absolute:
+              //put 0 in reg3
+              print_rm(LDC, 3, 0, 0);
+
+              print_rm(LDA, 1, array_id_node->var_addr, 3);
+              break;
+      }
+
+      // Calculate r0 <- r0 + r1 to get the address of the destination bucket in the array
+      print_ro(ADD, 0, 0, 1);
+
+      // Load the double value into fr1
+      gen_load_float(curr_quad->arg3->value.var_node, 1);
+
+      // Store fr1 into the array bucket (address in r0)
+      print_rm(STF, 1, 0, 0);
+
+      return;
+    }
     case assn_float_from_arraysub_op:
     {
-			// TODO
-			return;
-		}
+      // Get the offset into the array, assuming buckets of 8 bytes, and put it in r0
+      gen_load_int(curr_quad->arg3->value.var_node, 0);
+
+      // Get the absolute address of the array and put it in r1
+      symnode array_id_node = curr_quad->arg2->value.var_node;
+      switch(array_id_node->mem_addr_type) {
+          case off_fp:
+              print_rm(LDA, 1, array_id_node->var_addr, frame_ptr_reg);
+              break;
+
+          case global:
+              print_rm(LDA, 1, array_id_node->var_addr, global_ptr_reg);
+              break;
+
+          case absolute:
+              //put 0 in reg3
+              print_rm(LDC, 3, 0, 0);
+
+              print_rm(LDA, 1, array_id_node->var_addr, 3);
+              break;
+      }
+
+      // Calculate r0 <- r0 + r1 to get the address of the destination bucket in the array
+      print_ro(ADD, 0, 0, 1);
+
+      // Load the double value from the array bucket (address in r0) into fr1
+      print_rm(LDF, 1, 0, 0);
+
+      // Store the double value into the double variable
+      gen_store_float(curr_quad->arg1->value.var_node, 1);
+
+      return;
+    }
     case add_ints_op:
     {
       gen_standard_int_binary_op(ADD, curr_quad->arg1, curr_quad->arg2, curr_quad->arg3);
@@ -176,7 +341,7 @@ void generate_quad_assembly()
     }
     case add_floats_op:
     {
-			// TODO
+			gen_standard_float_binary_op(ADDF, curr_quad->arg1, curr_quad->arg2, curr_quad->arg3);
 			return;
 		}
     case sub_ints_op:
@@ -186,7 +351,7 @@ void generate_quad_assembly()
 		}
     case sub_floats_op:
     {
-			// TODO
+			gen_standard_float_binary_op(SUBF, curr_quad->arg1, curr_quad->arg2, curr_quad->arg3);
 			return;
 		}
     case mult_ints_op:
@@ -196,7 +361,7 @@ void generate_quad_assembly()
 		}
     case mult_floats_op:
     {
-			// TODO
+			gen_standard_float_binary_op(MULF, curr_quad->arg1, curr_quad->arg2, curr_quad->arg3);
 			return;
 		}
     case div_ints_op:
@@ -206,14 +371,16 @@ void generate_quad_assembly()
 		}
     case div_floats_op:
     {
-			// TODO
+			gen_standard_float_binary_op(DIVF, curr_quad->arg1, curr_quad->arg2, curr_quad->arg3);
 			return;
 		}
     case mod_op:
     {
-			// TODO
+      gen_standard_int_binary_op(MOD, curr_quad->arg1, curr_quad->arg2, curr_quad->arg3);
 			return;
 		}
+
+    // Derek
     case lt_ints_op:
     {
 			// TODO
@@ -411,7 +578,7 @@ void gen_standard_int_binary_op(ass_op op, quad_arg dest_arg, quad_arg l_arg, qu
     gen_store_int(dest_symnode, 0);
 }
 
-// Generate assembly for standard int binary ops
+// Generate assembly for standard float binary ops
 void gen_standard_float_binary_op(ass_op op, quad_arg dest_arg, quad_arg l_arg, quad_arg r_arg) {
     symnode l_symnode = l_arg->value.var_node;
     symnode r_symnode = r_arg->value.var_node;
@@ -521,6 +688,7 @@ char* ass_op_str[] = {
     "SUBF",
     "MULF",
     "DIVF",
+    "MOD",
     "CVTIF",
     "CVTFI",
     "LD",
@@ -562,4 +730,42 @@ void print_rm(ass_op op, int dest_r, int offset, int r) {
     char* op_str = ass_op_str[op];
     fprintf(file, "%d:\t%s\t%d,%d(%d)\n", assembly_index, op_str, dest_r, offset, r);
     assembly_index++;
+}
+
+
+// Outputs the quad as a comment in the assembly file for debugging
+void print_quad_comment()
+{
+    quad curr_quad = quad_array[quad_index];
+
+    fprintf(file, "\n*\t%d:\t(%s, ", quad_index, quad_op_string[curr_quad->op]);
+    print_quad_arg_comment(curr_quad->arg1);
+    fprintf(file, ", ");
+    print_quad_arg_comment(curr_quad->arg2);
+    fprintf(file, ", ");
+    print_quad_arg_comment(curr_quad->arg3);
+    fprintf(file, ")\n");
+}
+
+void print_quad_arg_comment(quad_arg the_quad_arg)
+{
+  if (!the_quad_arg) {
+    fprintf(file, "null");
+    return;
+  }
+
+  switch (the_quad_arg->arg_type) {
+    case int_arg:
+      fprintf(file, "int: %d", the_quad_arg->value.int_value);
+      break;
+    case dbl_arg:
+      fprintf(file, "double: %f", the_quad_arg->value.double_value);
+      break;
+    case id_arg:
+      fprintf(file, "ID: %s", the_quad_arg->value.var_node->name);
+      break;
+    default:
+      fprintf(file, "arg type not specified");
+      break;
+  }
 }

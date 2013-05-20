@@ -2,3 +2,9 @@ int x = 1 + 2;
 int y = 3 - 4;
 int z = 5 * 6;
 int a = 7 / 8;
+
+double d = 1;
+
+void f0() {
+  print a;
+}

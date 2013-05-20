@@ -1,16 +1,63 @@
-0:	LD	0,-40(0)
-1:	LD	1,-48(0)
+
+*	0:	(assign_int_literal, ID: temp0, int: 1, null)
+
+*	1:	(assign_int_literal, ID: temp1, int: 2, null)
+
+*	2:	(add_ints_op, ID: temp2, ID: temp0, ID: temp1)
+0:	LD	0,-48(0)
+1:	LD	1,-56(0)
 2:	ADD	0,0,1
-3:	ST	0,-56(0)
-4:	LD	0,-64(0)
-5:	LD	1,-72(0)
+3:	ST	0,-64(0)
+
+*	3:	(assn_int_to_var_op, ID: 0$x, ID: temp2, null)
+
+*	4:	(assign_int_literal, ID: temp3, int: 3, null)
+
+*	5:	(assign_int_literal, ID: temp4, int: 4, null)
+
+*	6:	(sub_ints_op, ID: temp5, ID: temp3, ID: temp4)
+4:	LD	0,-72(0)
+5:	LD	1,-80(0)
 6:	SUB	0,0,1
-7:	ST	0,-80(0)
-8:	LD	0,-88(0)
-9:	LD	1,-96(0)
+7:	ST	0,-88(0)
+
+*	7:	(assn_int_to_var_op, ID: 1$y, ID: temp5, null)
+
+*	8:	(assign_int_literal, ID: temp6, int: 5, null)
+
+*	9:	(assign_int_literal, ID: temp7, int: 6, null)
+
+*	10:	(mult_ints_op, ID: temp8, ID: temp6, ID: temp7)
+8:	LD	0,-96(0)
+9:	LD	1,-104(0)
 10:	MUL	0,0,1
-11:	ST	0,-104(0)
-12:	LD	0,-112(0)
-13:	LD	1,-120(0)
+11:	ST	0,-112(0)
+
+*	11:	(assn_int_to_var_op, ID: 2$z, ID: temp8, null)
+
+*	12:	(assign_int_literal, ID: temp9, int: 7, null)
+
+*	13:	(assign_int_literal, ID: temp10, int: 8, null)
+
+*	14:	(div_ints_op, ID: temp11, ID: temp9, ID: temp10)
+12:	LD	0,-120(0)
+13:	LD	1,-128(0)
 14:	DIV	0,0,1
-15:	ST	0,-128(0)
+15:	ST	0,-136(0)
+
+*	15:	(assn_int_to_var_op, ID: 3$a, ID: temp11, null)
+
+*	16:	(assign_int_literal, ID: temp12, int: 1, null)
+
+*	17:	(int_to_float_op, ID: temp13, ID: temp12, null)
+16:	LD	1,-144(0)
+17:	CVTIF	0,1,0
+18:	LDF	0,-152(0)
+
+*	18:	(assn_float_to_var_op, ID: 4$d, ID: temp13, null)
+
+*	19:	(func_decl_op, ID: 5$f0, null, null)
+
+*	20:	(print_int_op, ID: 3$a, null, null)
+19:	LD	0,-32(0)
+20:	OUT	0,0,0

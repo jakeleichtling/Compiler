@@ -64,3 +64,5 @@ SemanticRoutines/djcc
 *.plist
 
 *.dSYM/*
+
+SemanticRoutines/assembly.tm57
