@@ -72,6 +72,7 @@ char *quad_op_string[] = {
   "halt_op",
   "func_decl_op",
   "push_param_op",
+  "pop_params_op",
   "alloc_array_op",
   "return_op",
   "assign_int_literal",
@@ -613,12 +614,13 @@ quad_arg generate_intermediate_code(ast_node node)
       // If the node has no children, then we are returning nothing
       if (node->left_child == NULL) {
         generate_quad(return_op, NULL, NULL, NULL);
-      }
+      } else {
 
-      // Generate code for the return expression
-      quad_arg return_exp_arg = generate_intermediate_code(node->left_child);
+        // Generate code for the return expression
+        quad_arg return_exp_arg = generate_intermediate_code(node->left_child);
 
-      generate_quad(return_op, return_exp_arg, NULL, NULL);
+        generate_quad(return_op, return_exp_arg, NULL, NULL);
+     }
 
       return NULL;
     }
@@ -690,14 +692,20 @@ quad_arg generate_intermediate_code(ast_node node)
 
       // Make a temp to hold the return value if the function has a return type
       enum vartype func_ret_type = node->left_child->value.sym_node->var_type;
+      quad_arg return_val_temp_arg = NULL;
       if (func_ret_type != voidtype) {
-        quad_arg return_val_temp_arg = get_new_temp(flat_id_table, func_ret_type);
+        return_val_temp_arg = get_new_temp(flat_id_table, func_ret_type);
         generate_quad(call_func_op, func_id_arg, return_val_temp_arg, NULL);
-        return return_val_temp_arg;
       } else {
         generate_quad(call_func_op, func_id_arg, NULL, NULL);
-        return NULL;
       }
+
+      //pop params
+      quad_arg num_params_arg = generate_quad_arg(int_arg);
+      num_params_arg->value.int_value = node->left_child->value.sym_node->num_params;
+      generate_quad(pop_params_op, num_params_arg, NULL, NULL);
+
+      return return_val_temp_arg;
     }
     case EMPTY_EXPR:
       return NULL;

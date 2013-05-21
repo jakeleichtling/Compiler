@@ -53,6 +53,7 @@ enum quad_op {
   halt_op,
   func_decl_op,
   push_param_op,
+  pop_params_op,
   alloc_array_op, // (alloc_array_op, array id, arg holding integer size of array, -)
   return_op,
   assign_int_literal,

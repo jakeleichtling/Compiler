@@ -608,8 +608,15 @@ int type_check(ast_node node)
     }
     case FUNC_DECL:
     {
-      enum vartype body_return_type = node->left_child->right_sibling->right_sibling->return_type;
       enum vartype decl_return_type = node->left_child->right_sibling->value.sym_node->var_type;
+
+      //Get symnode of body -> rightmost child
+      ast_node seq_node;
+      for (seq_node = node->left_child; 
+              seq_node->right_sibling != NULL; 
+              seq_node = seq_node->right_sibling); // <-- bitchin'
+
+      enum vartype body_return_type = seq_node->return_type;
 
       if (!((body_return_type == no_type && decl_return_type == voidtype) ||
             (body_return_type == decl_return_type) ||

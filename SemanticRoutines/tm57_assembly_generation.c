@@ -76,6 +76,7 @@ extern char *quad_op_string[];
 // Is debugging mode on?
 extern int djdebug;
 
+const int program_ctr_reg = 7;
 const int stack_ptr_reg = 6;
 const int frame_ptr_reg = 5;
 
@@ -842,7 +843,7 @@ void generate_quad_assembly()
 		}
     case halt_op:
     {
-			// TODO
+      print_ro(HALT, 0, 0, 0);
 			return;
 		}
     case func_decl_op:
@@ -855,6 +856,17 @@ void generate_quad_assembly()
 			// TODO
 			return;
 		}
+    case pop_params_op:
+    {
+      int pop_size = curr_quad->arg1->value.int_value * 8;
+
+      // load 8 * num params into r0
+      print_rm(LDC, 0, pop_size, 0);
+
+      // add size of param array to sp
+      print_ro(ADD, stack_ptr_reg, stack_ptr_reg, 0);
+      return;
+    }
     case alloc_array_op:
     {
 			// TODO
@@ -862,7 +874,44 @@ void generate_quad_assembly()
 		}
     case return_op:
     {
-			// TODO
+      //Save value of return expression into r4 if it exists
+      if (curr_quad->arg1 != NULL) {
+        symnode retexp = curr_quad->arg1->value.var_node;
+        switch(retexp->var_type) {
+          case voidtype:
+            //do nothing
+            break;
+          case no_type:
+            //do nothing
+            break;
+          case inttype:
+            //load int into r4
+            gen_load_int(retexp, 4);
+            break;
+          case doubletype:
+            //load double into r4
+            gen_load_float(retexp, 4);
+            break;
+        }
+      }
+
+      // cleanup 1) sp = fp pops all locals and temps
+      print_rm(LDA, stack_ptr_reg, 0, frame_ptr_reg);
+
+      // cleanup 2) increment sp by 8 to pop ret addr and control link
+      // load 8 into r0
+      print_rm(LDC, 0, 8, 0);
+      // sp <-- sp + (8)
+      print_ro(ADD, stack_ptr_reg, stack_ptr_reg, 0);
+
+      // save ret addr in r3 (4(fp))
+      print_rm(LD, 3, 4, frame_ptr_reg);
+
+      // set fp to value at control link (0(fp)) 
+      print_rm(LD, frame_ptr_reg, 0, frame_ptr_reg) ;
+
+      //return control (set pc to r3)
+      print_rm(LDA, program_ctr_reg, 0, 3);
 			return;
 		}
     case assign_int_literal:
