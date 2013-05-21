@@ -769,8 +769,19 @@ void generate_quad_assembly()
 		}
     case var_dec_op:
     {
-			// TODO
-			return;
+      // r1 <- -1
+      print_rm(LDC, 1, -1, 0);
+
+      // r0 <- int variable's value
+      gen_load_int(curr_quad->arg1->value.var_node, 0);
+
+      // r0 <- r0 + r1 = int variable's value + -1
+      print_ro(ADD, 0, 0, 1);
+
+      // Store r0 into the int variable
+      gen_store_int(curr_quad->arg1->value.var_node, 0);
+
+      return;
 		}
     case array_dec_op:
     {
@@ -811,13 +822,23 @@ void generate_quad_assembly()
 		}
     case read_int_op:
     {
-			// TODO
+      // r0 <- int from stdin
+			print_ro(IN, 0, 0, 0);
+
+      // int variable <- r0
+      gen_store_int(curr_quad->arg1->value.var_node, 0);
+
 			return;
 		}
     case read_double_op:
     {
-			// TODO
-			return;
+      // fr0 <- double from stdin
+      print_ro(INF, 0, 0, 0);
+
+      // double variable <- fr0
+      gen_store_float(curr_quad->arg1->value.var_node, 0);
+
+      return;
 		}
     case halt_op:
     {
