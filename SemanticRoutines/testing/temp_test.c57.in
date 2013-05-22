@@ -3,5 +3,5 @@ void f(int x) {
 }
 
 void main(void) {
-  f(2);
+  f(17);
 }
