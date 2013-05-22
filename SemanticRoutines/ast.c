@@ -148,7 +148,7 @@ void print_ast_node(ast_node node)
   printf("\t--> data type: %s, return type: %s", var_type_string[node->data_type], var_type_string[node->return_type]);
 }
 
- /* Iterate to last sibling in LL */
+/* Iterate to last sibling in LL */
 ast_node rightmost_sibling(ast_node t)
 {
   for (; t->right_sibling != NULL; t = t->right_sibling); // <-- bitchin'

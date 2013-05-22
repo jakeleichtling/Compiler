@@ -1,11 +1,7 @@
-int a = 7 / 8;
-
-int f1(int c) {
-	return 3;
+void f(int x) {
+  print x;
 }
 
-int f0() {
-  print a;
-  f1(a);
-  return 3;
+void main(void) {
+  f(2);
 }

@@ -1,5 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include "ast_node_processing.h"
 
 /* ~~~~~~~~~~~~~~~ Function Prototypes ~~~~~~~~~~~~~~~~~~~ */
@@ -11,6 +12,9 @@ int standard_binary_op_typecheck_widening(ast_node node);
 // Standard code for checking the types of the operands of a binary operation that is of type int
 //  and setting the type of the operation (<, <=, >, >=, == , !=)
 int standard_binary_op_typecheck_int(ast_node node);
+
+// Returns true if the given AST node is an ID and is an array node
+int is_array_node(ast_node node);
 
 /* ~~~~~~~~~~~~~~~~~~~~~ Variables ~~~~~~~~~~~~~~~~~~~~~~~~ */
 extern symboltable scoped_id_table;
@@ -28,6 +32,9 @@ symnode curr_func_symnode_anp;
 
 // the number of global variables
 int num_global_vars = 0;
+
+// The symnode of the main function (declared in symtab.h)
+extern symnode main_func_symnode;
 
 /* ~~~~~~~~~~~~~~~ Function Definitions ~~~~~~~~~~~~~~~~~~~ */
 
@@ -101,6 +108,16 @@ int fill_id_types(ast_node node)
       flat_id_symnode->node_type = func_node;
       flat_id_symnode->var_type = var_type;
       id_astnode->value.sym_node = flat_id_symnode;
+
+      // If the name of the function is "main", then save its flat_id_symnode in main_func_symnode
+      if (strcmp(basename, "main") == 0) {
+        // We have an error if the declared return type is not void
+        if (flat_id_symnode->var_type != voidtype) {
+          mark_error(node->line_num, "The main function must have a void return type");
+        }
+
+        main_func_symnode = flat_id_symnode;
+      }
 
       // Enter into the function's scope
       enter_scope(scoped_id_table);
@@ -218,7 +235,7 @@ int fill_id_types(ast_node node)
             curr_func_symnode_anp->num_vars++;
             flat_id_symnode->var_addr = -8 * curr_func_symnode_anp->num_vars; // the first variable is at -8(fp)
           } else {
-            flat_id_symnode->mem_addr_type = global;
+            flat_id_symnode->mem_addr_type = absolute;
             num_global_vars++;
             flat_id_symnode->var_addr = -8 * num_global_vars; // the first variable is at -8 off the global variable pointer
           }
@@ -268,7 +285,7 @@ int fill_id_types(ast_node node)
             curr_func_symnode_anp->num_vars++;
             flat_id_symnode->var_addr = -8 * curr_func_symnode_anp->num_vars; // the first variable is at -8(fp)
           } else {
-            flat_id_symnode->mem_addr_type = global;
+            flat_id_symnode->mem_addr_type = absolute;
             num_global_vars++;
             flat_id_symnode->var_addr = -8 * num_global_vars; // the first variable is at -8 off the global variable pointer
           }
@@ -463,21 +480,24 @@ int type_check(ast_node node)
 
   switch (node->node_type) {
     case ROOT:
-      break;
+      return 0;
     case ID:
       node->data_type = node->value.sym_node->var_type;
-      break;
+      return 0;
     case INT_TYPE:
-      break;
+      return 0;
     case DBL_TYPE:
-      break;
+      return 0;
     case VOID_TYPE:
-      break;
+      return 0;
     case ARRAY_SUB:
     {
       enum vartype sub_type = node->left_child->right_sibling->data_type;
       if (sub_type != inttype) {
         mark_error(node->line_num, "Array index is not an int");
+        return 1;
+      } else if (is_array_node(node->left_child->right_sibling)) {
+        mark_error(node->line_num, "Array subscript expression cannot be an array identifier");
         return 1;
       } else if (node->left_child->value.sym_node->node_type != array_node) {
         mark_error(node->line_num, "Subscripted variable is not an array");
@@ -486,15 +506,18 @@ int type_check(ast_node node)
 
       node->data_type = node->left_child->value.sym_node->var_type;
 
-      break;
+      return 0;
     }
     case ARRAY_NONSUB:
       node->data_type = node->left_child->right_sibling->value.sym_node->var_type;
-      break;
+      return 0;
     case OP_ASSIGN:
     {
-      if (node->left_child->node_type == ID && node->left_child->value.sym_node->node_type == array_node) {
+      if (is_array_node(node->left_child)) {
           mark_error(node->line_num, "Cannot assign to an array pointer");
+          return 1;
+      } else if (is_array_node(node->left_child->right_sibling)) {
+          mark_error(node->line_num, "Cannot assign an array pointer to a variable");
           return 1;
       }
 
@@ -508,103 +531,133 @@ int type_check(ast_node node)
         return 1;
       }
       node->data_type = ltype;
-      break;
+      return 0;
     }
     case OP_ADD:
-      standard_binary_op_typecheck_widening(node);
-      break;
+      return standard_binary_op_typecheck_widening(node);
     case OP_SUB:
-      standard_binary_op_typecheck_widening(node);
-      break;
+      return standard_binary_op_typecheck_widening(node);
     case OP_MULT:
-      standard_binary_op_typecheck_widening(node);
-      break;
+      return standard_binary_op_typecheck_widening(node);
     case OP_DIV:
-      standard_binary_op_typecheck_widening(node);
-      break;
+      return standard_binary_op_typecheck_widening(node);
     case OP_MOD:
     {
       enum vartype ltype = node->left_child->data_type;
       enum vartype rtype = node->left_child->right_sibling->data_type;
+
       if (ltype != inttype || rtype != inttype) {
         mark_error(node->line_num, "An operand of mod is not of type int");  
         return 1;
+      } else if (is_array_node(node->left_child) || is_array_node(node->left_child->right_sibling)) {
+        mark_error(node->line_num, "The mod operator cannot act on an array identifier operand");
+        return 1;
       }
+
       node->data_type = inttype;
-      break;
+      return 0;
     }
     case OP_LT:
-      standard_binary_op_typecheck_int(node);
+      return standard_binary_op_typecheck_int(node);
     case OP_LEQ:
-      standard_binary_op_typecheck_int(node);
+      return standard_binary_op_typecheck_int(node);
     case OP_GT:
-      standard_binary_op_typecheck_int(node);
+      return standard_binary_op_typecheck_int(node);
     case OP_GEQ:
-      standard_binary_op_typecheck_int(node);
+      return standard_binary_op_typecheck_int(node);
     case OP_EQ:
-      standard_binary_op_typecheck_int(node);
+      return standard_binary_op_typecheck_int(node);
     case OP_NEQ:
-      standard_binary_op_typecheck_int(node);
+      return standard_binary_op_typecheck_int(node);
     case OP_AND:
     {
       enum vartype ltype = node->left_child->data_type;
       enum vartype rtype = node->left_child->right_sibling->data_type;
+
       if (ltype != inttype || rtype != inttype) {
         mark_error(node->line_num, "An operand of && is not an int");  
         return 1;
+      } else if (is_array_node(node->left_child) || is_array_node(node->left_child->right_sibling)) {
+        mark_error(node->line_num, "The && operator cannot act on an array identifier operand");
+        return 1;
       }
+
       node->data_type = inttype;
-      break;
+      return 0;
     }
     case OP_OR:
     {
       enum vartype ltype = node->left_child->data_type;
       enum vartype rtype = node->left_child->right_sibling->data_type;
+
       if (ltype != inttype || rtype != inttype) {
         mark_error(node->line_num, "An operand of || is not an int");  
         return 1;
+      } else if (is_array_node(node->left_child) || is_array_node(node->left_child->right_sibling)) {
+        mark_error(node->line_num, "The || operator cannot act on an array identifier operand");
+        return 1;
       }
+
       node->data_type = inttype;
-      break;
+      return 0;
     }
     case OP_BANG:
     {
       if (node->left_child->data_type != inttype) {
         mark_error(node->line_num, "The operand of ! is not an int");  
         return 1;
+      } else if (is_array_node(node->left_child)) {
+        mark_error(node->line_num, "The ! operator cannot act on an array identifier operand");
+        return 1;
       }
+
       node->data_type = inttype;
-      break;
+      return 0;
     }
     case OP_NEG:
     {
       enum vartype dtype = node->left_child->data_type;
+
       if (dtype != inttype && dtype != doubletype) {
         mark_error(node->line_num, "The operand of - (unary minus) is not an int or double");  
         return 1;
+      } else if (is_array_node(node->left_child)) {
+        mark_error(node->line_num, "The negation operator cannot act on an array identifier operand");
+        return 1;
       }
+
       node->data_type = dtype;
-      break;
+      return 0;
     }
     case OP_INC:
     {
       enum vartype dtype = node->left_child->data_type;
+
       if (dtype != inttype) {
         mark_error(node->line_num, "The operand of ++ is not an int");  
         return 1;
+      } else if (is_array_node(node->left_child)) {
+        mark_error(node->line_num, "The ++ operator cannot act on an array identifier operand");
+        return 1;
       }
+
       node->data_type = inttype;
-      break;
+      return 0;
     }
     case OP_DEC:
     {
       enum vartype dtype = node->left_child->data_type;
+
       if (dtype != inttype) {
         mark_error(node->line_num, "The operand of -- is not an int");  
         return 1;
+      } else if (is_array_node(node->left_child)) {
+        mark_error(node->line_num, "The -- operator cannot act on an array identifier operand");
+        return 1;
       }
+
       node->data_type = inttype;
-      break;
+      return 0;
     }
     case FUNC_DECL:
     {
@@ -627,12 +680,12 @@ int type_check(ast_node node)
 
       node->return_type = decl_return_type;
 
-      break;
+      return 0;
     }
     case VAR_DECL:
-      break;
+      return 0;
     case FORMAL_PARAM:
-      break;
+      return 0;
     case SEQ:
     {
       ast_node child;
@@ -647,48 +700,59 @@ int type_check(ast_node node)
         }
       }
 
-      break;
+      return 0;
     }
     case IF_STMT:
       node->return_type = node->left_child->right_sibling->return_type;
 
-      break;
+      return 0;
     case WHILE_LOOP:
       node->return_type = node->left_child->right_sibling->return_type;
 
-      break;
+      return 0;
     case DO_WHILE_LOOP:
       node->return_type = node->left_child->return_type;
 
-      break;
+      return 0;
     case FOR_STMT:
       node->return_type = node->left_child->right_sibling->right_sibling->right_sibling->return_type;
 
-      break;
+      return 0;
     case RETURN_STMT:
+      if (is_array_node(node->left_child)) {
+        mark_error(node->line_num, "Cannot return an array variable");
+        return 1;
+      }
+
       if (node->left_child != NULL) {
         node->return_type = node->left_child->data_type;
       } else {
         node->return_type = voidtype;
       }
 
-      break;
+      return 0;
     case READ_STMT:
-      // TODO: check to make sure it is an int or double var (including subscripted array)
-      break;
+      if (is_array_node(node->left_child)) {
+        mark_error(node->line_num, "Cannot read into an array variable that is not subscripted");
+      }
+
+      return 0;
     case PRINT_STMT:
-      // TODO: check to make sure it isn't an array (could be a subscripted array)
-      break;
+      if (is_array_node(node->left_child)) {
+        mark_error(node->line_num, "Cannot print an array variable that is not subscripted");
+      }
+
+      return 0;
     case STRING_LITERAL:
-      break;
+      return 0;
     case INT_LITERAL:
       node->data_type = inttype;
 
-      break;
+      return 0;
     case DOUBLE_LITERAL:
       node->data_type = doubletype;
 
-      break;
+      return 0;
     case FUNC_CALL:
     {
       // get function's sym_node
@@ -727,10 +791,10 @@ int type_check(ast_node node)
         }
       }
 
-      break;
+      return 0;
     }
     case EMPTY_EXPR:
-      break;
+      return 0;
   }
 
   if (djdebug) {
@@ -747,9 +811,13 @@ int standard_binary_op_typecheck_widening(ast_node node)
 {
   enum vartype ltype = node->left_child->data_type;
   enum vartype rtype = node->left_child->right_sibling->data_type;
+  
   if ((ltype != inttype && ltype != doubletype) ||
       (rtype != inttype && rtype != doubletype)) {
     mark_error(node->line_num, "An operand is not of type int or double");  
+    return 1;
+  } else if (is_array_node(node->left_child) || is_array_node(node->left_child->right_sibling)) {
+    mark_error(node->line_num, "One of the operands is an array variable");
     return 1;
   } else if ((ltype == doubletype) || (rtype == doubletype)) {
     node->data_type = doubletype;
@@ -766,12 +834,22 @@ int standard_binary_op_typecheck_int(ast_node node)
 {
   enum vartype ltype = node->left_child->data_type;
   enum vartype rtype = node->left_child->right_sibling->data_type;
+
   if ((ltype != inttype && ltype != doubletype) ||
       (rtype != inttype && rtype != doubletype)) {
     mark_error(node->line_num, "An operand is not of type int or float");  
     return 1;
+  } else if (is_array_node(node->left_child) || is_array_node(node->left_child->right_sibling)) {
+    mark_error(node->line_num, "One of the operands is an array variable");
+    return 1;
   }
+
   node->data_type = inttype;
 
   return 0;
+}
+
+// Returns true if the given AST node is an ID and is an array node
+int is_array_node(ast_node node) {
+  return node->node_type == ID && node->value.sym_node->node_type == array_node;
 }

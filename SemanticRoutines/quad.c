@@ -23,6 +23,9 @@ extern int djdebug;
 
 int temp_count = 0;
 
+// The symnode of the main function (declared in symtab.h)
+extern symnode main_func_symnode;
+
 /* human readable quad operation names */
 char *quad_op_string[] = {
   "call_func_op",
@@ -69,14 +72,14 @@ char *quad_op_string[] = {
   "goto_op",
   "read_int_op",
   "read_double_op",
-  "halt_op",
   "func_decl_op",
   "push_param_op",
   "pop_params_op",
   "alloc_array_op",
   "return_op",
   "assign_int_literal",
-  "assign_double_literal"
+  "assign_double_literal",
+  "initial_main_call"
 };
 
 /* ~~~~~~~~~~~~~~~ Function Prototypes ~~~~~~~~~~~~~~~~~~~ */
@@ -164,9 +167,9 @@ quad_arg get_new_temp(symboltable symtab, enum vartype var_type)
   if (curr_func_symnode_quad != NULL) {
     temp_symnode->mem_addr_type = off_fp;
     curr_func_symnode_quad->num_temps++;
-    temp_symnode->var_addr = -8 * (curr_func_symnode_quad->num_vars + curr_func_symnode_quad->num_temps) - 4;
+    temp_symnode->var_addr = -8 * (curr_func_symnode_quad->num_vars + curr_func_symnode_quad->num_temps);
   } else {
-    temp_symnode->mem_addr_type = global;
+    temp_symnode->mem_addr_type = absolute;
     num_global_temps++;
     temp_symnode->var_addr = -8 * (num_global_vars + num_global_temps);
   }
@@ -197,8 +200,21 @@ quad_arg generate_intermediate_code(ast_node node)
   switch (node->node_type) {
     case ROOT:
     {
+      // Generate code for the global variable declarations
       for (child = node->left_child; child != NULL; child = child->right_sibling) {
-        generate_intermediate_code(child);
+        if (child->node_type == VAR_DECL) {
+          generate_intermediate_code(child);
+        }
+      }
+
+      // Generate a quad for the initial call to main
+      generate_quad(initial_main_call, NULL, NULL, NULL);
+
+      // Generate code for the function declarations
+      for (child = node->left_child; child != NULL; child = child->right_sibling) {
+        if (child->node_type == FUNC_DECL) {
+          generate_intermediate_code(child);
+        }
       }
 
       return NULL;
@@ -479,8 +495,14 @@ quad_arg generate_intermediate_code(ast_node node)
       generate_quad(func_decl_op, func_id_arg, NULL, NULL);
 
       curr_func_symnode_quad = node->left_child->right_sibling->value.sym_node;
-      generate_intermediate_code(node->left_child->right_sibling->right_sibling);
+
+      // Generate intermediate code for the function body
+      generate_intermediate_code(rightmost_sibling(node->left_child));
+
       curr_func_symnode_quad = NULL;
+
+      // If the return type is void, generate a blank return quad at the end of the function definition
+      generate_quad(return_op, NULL, NULL, NULL);
 
       return NULL;
     }

@@ -50,14 +50,14 @@ enum quad_op {
   goto_op,
   read_int_op,
   read_double_op,
-  halt_op,
   func_decl_op,
   push_param_op,
   pop_params_op,
   alloc_array_op, // (alloc_array_op, array id, arg holding integer size of array, -)
   return_op,
   assign_int_literal,
-  assign_double_literal
+  assign_double_literal,
+  initial_main_call
 };
 
 /* types of quad args */

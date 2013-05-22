@@ -24,6 +24,9 @@ int djdebug = 1;
 // Will be provided at the command line, or defaults
 char *assembly_file_name = "assembly.tm57";
 
+// The symnode of the main function (declared in symtab.h)
+extern symnode main_func_symnode;
+
 int yyparse();
 
 int main()
@@ -43,6 +46,10 @@ int main()
   if (parseError) {
       fprintf(stderr, "WARING: There were parse errors.\nParse tree may be ill-formed.\n");
   } else if (haveRoot == 0) {
+      main_func_symnode = NULL;
+
+      // TODO: make sure we have a main function and that it takes no parameters
+
       if (djdebug) {
         printf("\n~~~~~~~~~~~~~~ fill_id_types ~~~~~~~~~~\n");
       }

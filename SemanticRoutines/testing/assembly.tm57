@@ -1,47 +1,58 @@
+0:	LD	6,0(0)
+1:	LDA	6,1(6)
 
-*	0:	(assign_int_literal, ID: temp0, int: 7, null)
-0:	LDC	0,7(0)
-1:	ST	0,-16(0)
+*	0:	(initial_main_call, null, null, null)
+2:	LDA	6,-4(6)
+3:	LDA	0,5(7)
+4:	ST	0,0(6)
+5:	LDA	6,-4(6)
+6:	ST	5,0(6)
+7:	LDA	5,0(6)
+9:	HALT	0,0,0
 
-*	1:	(assign_int_literal, ID: temp1, int: 8, null)
-2:	LDC	0,8(0)
-3:	ST	0,-24(0)
+*	1:	(func_decl_op, ID: 0$f, null, null)
 
-*	2:	(div_ints_op, ID: temp2, ID: temp0, ID: temp1)
-4:	LD	0,-16(0)
-5:	LD	1,-24(0)
-6:	DIV	0,0,1
-7:	ST	0,-32(0)
+*	2:	(print_int_op, ID: 1$x, null, null)
+10:	LDA	0,0(0)
+11:	LD	0,16(5)
+12:	OUT	0,0,0
 
-*	3:	(assn_int_to_var_op, ID: 0$a, ID: temp2, null)
-8:	LD	0,-32(0)
-9:	ST	0,-8(0)
+*	3:	(return_op, null, null, null)
+13:	LDA	6,0(5)
+14:	LDA	6,8(6)
+15:	LD	2,4(5)
+16:	LD	5,0(5)
+17:	LDA	7,0(2)
 
-*	4:	(func_decl_op, ID: 1$f1, null, null)
+*	4:	(func_decl_op, ID: 2$main, null, null)
 
-*	5:	(func_decl_op, ID: 3$f0, null, null)
+*	5:	(assign_int_literal, ID: temp0, int: 2, null)
+18:	LDC	0,2(0)
+19:	ST	0,-8(5)
 
-*	6:	(print_int_op, ID: 0$a, null, null)
-10:	LD	0,-8(0)
-11:	OUT	0,0,0
+*	6:	(push_param_op, ID: temp0, null, null)
+20:	LDA	6,-8(6)
+21:	LDA	0,0(0)
+22:	LD	0,-8(5)
+23:	ST	0,0(6)
 
-*	7:	(push_param_op, ID: 0$a, null, null)
+*	7:	(call_func_op, ID: 0$f, null, null)
+24:	LDA	6,-4(6)
+25:	LDA	0,5(7)
+26:	ST	0,0(6)
+27:	LDA	6,-4(6)
+28:	ST	5,0(6)
+29:	LDA	5,0(6)
+30:	LDC	7,10(0)
 
-*	8:	(call_func_op, ID: 1$f1, ID: temp3, null)
+*	8:	(pop_params_op, int: 1, null, null)
+31:	LDC	0,8(0)
+32:	ADD	6,6,0
 
-*	9:	(pop_params_op, int: 1, null, null)
-12:	LDC	0,8(0)
-13:	ADD	6,6,0
-
-*	10:	(assign_int_literal, ID: temp4, int: 3, null)
-14:	LDC	0,3(0)
-15:	ST	0,-20(5)
-
-*	11:	(return_op, ID: temp4, null, null)
-16:	LD	4,-20(5)
-17:	LDA	6,0(5)
-18:	LDC	0,8(0)
-19:	ADD	6,6,0
-20:	LD	3,4(5)
-21:	LD	5,0(5)
-22:	LDA	7,0(3)
+*	9:	(return_op, null, null, null)
+33:	LDA	6,0(5)
+34:	LDA	6,8(6)
+35:	LD	2,4(5)
+36:	LD	5,0(5)
+37:	LDA	7,0(2)
+8:	LDC	7,18(0)

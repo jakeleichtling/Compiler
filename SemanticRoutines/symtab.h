@@ -32,8 +32,7 @@ enum nodetype {
 /* Indicates the type of the memory address */
 enum memaddrtype {
   off_fp, // relative to FP for local function variables
-  global, // relative to global var pointer
-  absolute // for passing arrays by reference
+  absolute // for global vars and passing arrays by reference
 };
 
 /* Node in a linked list within the symbol table. */
@@ -43,7 +42,7 @@ struct symnode {
   symnode next;	    /* next symnode in list */
   /* Other attributes go here. */
   enum vartype var_type; // The type of a variable or return type of a function (irrelevant for the string table)
-  int var_addr; // irrelevant for string constants
+  int var_addr; // irrelevant for string constants; assembly index for functions
   enum memaddrtype mem_addr_type;
   enum nodetype node_type; // The thing that the identifier identifies (irrelevant for the string table)
   int array_size; // only relevant for nodes of type array_node
@@ -55,6 +54,9 @@ struct symnode {
   int num_params; // number of formal parameters
   symnode *param_symnode_array; // array of pointers to the formal param symnodes for type checking
 };
+
+// The symnode of the main function
+symnode main_func_symnode;
 
 /* Does the identifier in this node equal name? */
 int name_is_equal(symnode node, char *name);
