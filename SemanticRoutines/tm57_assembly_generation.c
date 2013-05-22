@@ -253,8 +253,14 @@ void generate_quad_assembly()
 		}
     case assn_int_to_arraysub_op:
     {
-			// Get the offset into the array, assuming buckets of 8 bytes, and put it in r0
+			// Get the offset into the array in terms of number of elements and put it in r0
       gen_load_int(curr_quad->arg2->value.var_node, 0);
+
+      // r1 <- 8
+      print_rm(LDC, 1, 8, 0);
+
+      // r0 <- element offset * 8 = byte offset into the array
+      print_ro(MUL, 0, 0, 1);
 
       // Get the absolute address of the first element of the array and put it in r1
       symnode array_id_node = curr_quad->arg1->value.var_node;
@@ -284,8 +290,14 @@ void generate_quad_assembly()
 		}
     case assn_int_from_arraysub_op:
     {
-      // Get the offset into the array, assuming buckets of 8 bytes, and put it in r0
-      gen_load_int(curr_quad->arg3->value.var_node, 0);
+      // Get the offset into the array in terms of number of elements and put it in r0
+      gen_load_int(curr_quad->arg2->value.var_node, 0);
+
+      // r1 <- 8
+      print_rm(LDC, 1, 8, 0);
+
+      // r0 <- element offset * 8 = byte offset into the array
+      print_ro(MUL, 0, 0, 1);
 
       // Get the absolute address of the first element of the array and put it in r1
       symnode array_id_node = curr_quad->arg1->value.var_node;
@@ -325,8 +337,14 @@ void generate_quad_assembly()
     }
     case assn_float_to_arraysub_op:
     {
-      // Get the offset into the array, assuming buckets of 8 bytes, and put it in r0
+      // Get the offset into the array in terms of number of elements and put it in r0
       gen_load_int(curr_quad->arg2->value.var_node, 0);
+
+      // r1 <- 8
+      print_rm(LDC, 1, 8, 0);
+
+      // r0 <- element offset * 8 = byte offset into the array
+      print_ro(MUL, 0, 0, 1);
 
       // Get the absolute address of the first element of the array and put it in r1
       symnode array_id_node = curr_quad->arg1->value.var_node;
@@ -356,8 +374,14 @@ void generate_quad_assembly()
     }
     case assn_float_from_arraysub_op:
     {
-      // Get the offset into the array, assuming buckets of 8 bytes, and put it in r0
-      gen_load_int(curr_quad->arg3->value.var_node, 0);
+      // Get the offset into the array in terms of number of elements and put it in r0
+      gen_load_int(curr_quad->arg2->value.var_node, 0);
+
+      // r1 <- 8
+      print_rm(LDC, 1, 8, 0);
+
+      // r0 <- element offset * 8 = byte offset into the array
+      print_ro(MUL, 0, 0, 1);
 
       // Get the absolute address of the first element of the array and put it in r1
       symnode array_id_node = curr_quad->arg1->value.var_node;
@@ -815,8 +839,14 @@ void generate_quad_assembly()
 		}
     case array_inc_op:
     {
-			// Get the offset into the array, assuming buckets of 8 bytes, and put it in r0
+      // Get the offset into the array in terms of number of elements and put it in r0
       gen_load_int(curr_quad->arg2->value.var_node, 0);
+
+      // r1 <- 8
+      print_rm(LDC, 1, 8, 0);
+
+      // r0 <- element offset * 8 = byte offset into the array
+      print_ro(MUL, 0, 0, 1);
 
       // Get the absolute address of the first element of the array and put it in r1
       symnode array_id_node = curr_quad->arg1->value.var_node;
@@ -865,8 +895,14 @@ void generate_quad_assembly()
 		}
     case array_dec_op:
     {
-			// Get the offset into the array, assuming buckets of 8 bytes, and put it in r0
+      // Get the offset into the array in terms of number of elements and put it in r0
       gen_load_int(curr_quad->arg2->value.var_node, 0);
+
+      // r1 <- 8
+      print_rm(LDC, 1, 8, 0);
+
+      // r0 <- element offset * 8 = byte offset into the array
+      print_ro(MUL, 0, 0, 1);
 
       // Get the absolute address of the first element of the array and put it in r1
       symnode array_id_node = curr_quad->arg1->value.var_node;
@@ -956,7 +992,13 @@ void generate_quad_assembly()
       symnode func_symnode = curr_quad->arg1->value.var_node;
       func_symnode->var_addr = assembly_index;
 
-      // Note: assembly_index is not incremented
+      // Make room for variables and temps
+      symnode func_id_node = curr_quad->arg1->value.var_node;
+      int num_vars_and_temps = func_id_node->num_vars + func_id_node->num_temps;
+      print_rm(LDC, 0, num_vars_and_temps, 0); // r0 <- num_vars_and_temps
+      print_rm(LDC, 1, -8, 0); // r1 <- -8
+      print_ro(MUL, 0, 0, 1); // r0 <- num_vars_and_temps * -8
+      print_ro(ADD, stack_ptr_reg, stack_ptr_reg, 0); // sp <- sp + (-8 * num_vars_and_temps)
 
 			return;
 		}
@@ -999,13 +1041,13 @@ void generate_quad_assembly()
 			// r0 <- size of the array
       gen_load_int(curr_quad->arg2->value.var_node, 0);
 
-      // r1 <- 8
-      print_rm(LDC, 1, 8, 0);
+      // r1 <- -8
+      print_rm(LDC, 1, -8, 0);
 
-      // r0 <- size of the array * 8
+      // r0 <- size of the array * -8
       print_ro(MUL, 0, 0, 1);
 
-      // SP <- SP + (8 * size of the array)
+      // SP <- SP + (-8 * size of the array)
       print_ro(ADD, stack_ptr_reg, stack_ptr_reg, 0);
 
       // Get the absolute address of the array ID (pointer to the first element) and put it in r1

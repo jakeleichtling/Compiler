@@ -746,8 +746,6 @@ quad_arg generate_binary_op_with_widening(ast_node node, enum quad_op quad_op_in
   quad_arg left_arg = generate_intermediate_code(node->left_child);
   quad_arg right_arg = generate_intermediate_code(node->left_child->right_sibling);
 
-  printf("@ %d <-> %d\n", node->left_child->data_type, node->left_child->right_sibling->data_type);
-
   if (node->left_child->data_type == inttype && node->left_child->right_sibling->data_type == inttype) {
     result_arg = get_new_temp(flat_id_table, inttype);
     generate_quad(quad_op_ints, result_arg, left_arg, right_arg);

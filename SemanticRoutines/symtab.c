@@ -27,6 +27,11 @@ char *node_type_string[] = {
   "array_node"
 };
 
+char *mem_addr_type_string[] = {
+  "off_fp",
+  "absolute"
+};
+
 /*
  * Functions for symnodes.
  */
@@ -221,10 +226,11 @@ void leave_scope(symboltable symtab) {
 void print_symnode(symnode node)
 {
     if (node) {
-      printf("Node: %s, type: %s, vartype: %s, addr: %d, ptr: %p \n", node->name,
+      printf("Node: %s, type: %s, vartype: %s, addr: %d, addr type: %s, ptr: %p \n", node->name,
       node_type_string[node->node_type],
       var_type_string[node->var_type], 
       node->var_addr,
+      mem_addr_type_string[node->mem_addr_type],
             node
             );
     } else {

@@ -10,49 +10,2782 @@
 7:	LDA	5,0(6)
 9:	HALT	0,0,0
 
-*	1:	(func_decl_op, ID: 0$f, null, null)
+*	1:	(func_decl_op, ID: 0$parent, null, null)
+10:	LDC	0,2(0)
+11:	LDC	1,-8(0)
+12:	MUL	0,0,1
+13:	ADD	6,6,0
 
-*	2:	(print_int_op, ID: 1$x, null, null)
-10:	LDA	0,0(0)
-11:	LD	0,8(5)
-12:	OUT	0,0,0
+*	2:	(assign_int_literal, ID: temp0, int: 2, null)
+14:	LDC	0,2(0)
+15:	ST	0,-8(5)
 
-*	3:	(return_op, null, null, null)
-13:	LDA	6,0(5)
-14:	LDA	6,8(6)
-15:	LD	2,4(5)
-16:	LD	5,0(5)
-17:	LDA	7,0(2)
+*	3:	(div_ints_op, ID: temp1, ID: 1$i, ID: temp0)
+16:	LDA	0,0(0)
+17:	LD	0,8(5)
+18:	LDA	0,0(0)
+19:	LD	1,-8(5)
+20:	DIV	0,0,1
+21:	ST	0,-16(5)
 
-*	4:	(func_decl_op, ID: 2$main, null, null)
+*	4:	(return_op, ID: temp1, null, null)
+22:	LDA	0,0(0)
+23:	LD	3,-16(5)
+24:	LDA	6,0(5)
+25:	LDA	6,8(6)
+26:	LD	2,4(5)
+27:	LD	5,0(5)
+28:	LDA	7,0(2)
 
-*	5:	(assign_int_literal, ID: temp0, int: 17, null)
-18:	LDC	0,17(0)
-19:	ST	0,-8(5)
+*	5:	(return_op, null, null, null)
+29:	LDA	6,0(5)
+30:	LDA	6,8(6)
+31:	LD	2,4(5)
+32:	LD	5,0(5)
+33:	LDA	7,0(2)
 
-*	6:	(push_param_op, ID: temp0, null, null)
-20:	LDA	6,-8(6)
-21:	LDA	0,0(0)
-22:	LD	0,-8(5)
-23:	ST	0,0(6)
+*	6:	(func_decl_op, ID: 2$left, null, null)
+34:	LDC	0,2(0)
+35:	LDC	1,-8(0)
+36:	MUL	0,0,1
+37:	ADD	6,6,0
 
-*	7:	(call_func_op, ID: 0$f, null, null)
-24:	LDA	6,-4(6)
-25:	LDA	0,5(7)
-26:	ST	0,0(6)
-27:	LDA	6,-4(6)
-28:	ST	5,0(6)
-29:	LDA	5,0(6)
-30:	LDC	7,10(0)
+*	7:	(assign_int_literal, ID: temp2, int: 2, null)
+38:	LDC	0,2(0)
+39:	ST	0,-8(5)
 
-*	8:	(pop_params_op, int: 1, null, null)
-31:	LDC	0,8(0)
-32:	ADD	6,6,0
+*	8:	(mult_ints_op, ID: temp3, ID: temp2, ID: 3$i)
+40:	LDA	0,0(0)
+41:	LD	0,-8(5)
+42:	LDA	0,0(0)
+43:	LD	1,8(5)
+44:	MUL	0,0,1
+45:	ST	0,-16(5)
 
-*	9:	(return_op, null, null, null)
-33:	LDA	6,0(5)
-34:	LDA	6,8(6)
-35:	LD	2,4(5)
-36:	LD	5,0(5)
-37:	LDA	7,0(2)
-8:	LDC	7,18(0)
+*	9:	(return_op, ID: temp3, null, null)
+46:	LDA	0,0(0)
+47:	LD	3,-16(5)
+48:	LDA	6,0(5)
+49:	LDA	6,8(6)
+50:	LD	2,4(5)
+51:	LD	5,0(5)
+52:	LDA	7,0(2)
+
+*	10:	(return_op, null, null, null)
+53:	LDA	6,0(5)
+54:	LDA	6,8(6)
+55:	LD	2,4(5)
+56:	LD	5,0(5)
+57:	LDA	7,0(2)
+
+*	11:	(func_decl_op, ID: 4$right, null, null)
+58:	LDC	0,4(0)
+59:	LDC	1,-8(0)
+60:	MUL	0,0,1
+61:	ADD	6,6,0
+
+*	12:	(assign_int_literal, ID: temp4, int: 2, null)
+62:	LDC	0,2(0)
+63:	ST	0,-8(5)
+
+*	13:	(mult_ints_op, ID: temp5, ID: temp4, ID: 5$i)
+64:	LDA	0,0(0)
+65:	LD	0,-8(5)
+66:	LDA	0,0(0)
+67:	LD	1,8(5)
+68:	MUL	0,0,1
+69:	ST	0,-16(5)
+
+*	14:	(assign_int_literal, ID: temp6, int: 1, null)
+70:	LDC	0,1(0)
+71:	ST	0,-24(5)
+
+*	15:	(add_ints_op, ID: temp7, ID: temp5, ID: temp6)
+72:	LDA	0,0(0)
+73:	LD	0,-16(5)
+74:	LDA	0,0(0)
+75:	LD	1,-24(5)
+76:	ADD	0,0,1
+77:	ST	0,-32(5)
+
+*	16:	(return_op, ID: temp7, null, null)
+78:	LDA	0,0(0)
+79:	LD	3,-32(5)
+80:	LDA	6,0(5)
+81:	LDA	6,8(6)
+82:	LD	2,4(5)
+83:	LD	5,0(5)
+84:	LDA	7,0(2)
+
+*	17:	(return_op, null, null, null)
+85:	LDA	6,0(5)
+86:	LDA	6,8(6)
+87:	LD	2,4(5)
+88:	LD	5,0(5)
+89:	LDA	7,0(2)
+
+*	18:	(func_decl_op, ID: 6$exchange, null, null)
+90:	LDC	0,8(0)
+91:	LDC	1,-8(0)
+92:	MUL	0,0,1
+93:	ADD	6,6,0
+
+*	19:	(assn_float_from_arraysub_op, ID: temp8, ID: 7$key, ID: 10$i)
+94:	LDA	0,0(0)
+95:	LD	0,16(5)
+96:	LDC	1,8(0)
+97:	MUL	0,0,1
+98:	LD	1,-24(5)
+99:	ADD	0,0,1
+100:	LDF	1,0(0)
+101:	STF	1,-24(5)
+
+*	20:	(assn_float_to_var_op, ID: 12$key_temp, ID: temp8, null)
+102:	LDA	0,0(0)
+103:	LDF	0,-24(5)
+104:	STF	0,-8(5)
+
+*	21:	(assn_float_from_arraysub_op, ID: temp9, ID: 7$key, ID: 11$j)
+105:	LDA	0,0(0)
+106:	LD	0,16(5)
+107:	LDC	1,8(0)
+108:	MUL	0,0,1
+109:	LD	1,-32(5)
+110:	ADD	0,0,1
+111:	LDF	1,0(0)
+112:	STF	1,-32(5)
+
+*	22:	(assn_float_to_arraysub_op, ID: 7$key, ID: 10$i, ID: temp9)
+113:	LDA	0,0(0)
+114:	LD	0,32(5)
+115:	LDC	1,8(0)
+116:	MUL	0,0,1
+117:	LD	1,16(5)
+118:	ADD	0,0,1
+119:	LDA	0,0(0)
+120:	LDF	1,-32(5)
+121:	STF	1,0(0)
+
+*	23:	(assn_float_to_arraysub_op, ID: 7$key, ID: 11$j, ID: 12$key_temp)
+122:	LDA	0,0(0)
+123:	LD	0,40(5)
+124:	LDC	1,8(0)
+125:	MUL	0,0,1
+126:	LD	1,16(5)
+127:	ADD	0,0,1
+128:	LDA	0,0(0)
+129:	LDF	1,-8(5)
+130:	STF	1,0(0)
+
+*	24:	(assn_int_from_arraysub_op, ID: temp10, ID: 8$handle, ID: 10$i)
+131:	LDA	0,0(0)
+132:	LD	0,24(5)
+133:	LDC	1,8(0)
+134:	MUL	0,0,1
+135:	LD	1,-40(5)
+136:	ADD	0,0,1
+137:	LD	1,0(0)
+138:	ST	1,-40(5)
+
+*	25:	(assn_int_to_var_op, ID: 13$handle_temp, ID: temp10, null)
+139:	LDA	0,0(0)
+140:	LD	0,-40(5)
+141:	ST	0,-16(5)
+
+*	26:	(assn_int_from_arraysub_op, ID: temp11, ID: 8$handle, ID: 11$j)
+142:	LDA	0,0(0)
+143:	LD	0,24(5)
+144:	LDC	1,8(0)
+145:	MUL	0,0,1
+146:	LD	1,-48(5)
+147:	ADD	0,0,1
+148:	LD	1,0(0)
+149:	ST	1,-48(5)
+
+*	27:	(assn_int_to_arraysub_op, ID: 8$handle, ID: 10$i, ID: temp11)
+150:	LDA	0,0(0)
+151:	LD	0,32(5)
+152:	LDC	1,8(0)
+153:	MUL	0,0,1
+154:	LD	1,24(5)
+155:	ADD	0,0,1
+156:	LDA	0,0(0)
+157:	LD	1,-48(5)
+158:	ST	1,0(0)
+
+*	28:	(assn_int_to_arraysub_op, ID: 8$handle, ID: 11$j, ID: 13$handle_temp)
+159:	LDA	0,0(0)
+160:	LD	0,40(5)
+161:	LDC	1,8(0)
+162:	MUL	0,0,1
+163:	LD	1,24(5)
+164:	ADD	0,0,1
+165:	LDA	0,0(0)
+166:	LD	1,-16(5)
+167:	ST	1,0(0)
+
+*	29:	(assn_int_from_arraysub_op, ID: temp12, ID: 8$handle, ID: 10$i)
+168:	LDA	0,0(0)
+169:	LD	0,24(5)
+170:	LDC	1,8(0)
+171:	MUL	0,0,1
+172:	LD	1,-56(5)
+173:	ADD	0,0,1
+174:	LD	1,0(0)
+175:	ST	1,-56(5)
+
+*	30:	(assn_int_to_arraysub_op, ID: 9$heap_index, ID: temp12, ID: 10$i)
+176:	LDA	0,0(0)
+177:	LD	0,-56(5)
+178:	LDC	1,8(0)
+179:	MUL	0,0,1
+180:	LD	1,32(5)
+181:	ADD	0,0,1
+182:	LDA	0,0(0)
+183:	LD	1,32(5)
+184:	ST	1,0(0)
+
+*	31:	(assn_int_from_arraysub_op, ID: temp13, ID: 8$handle, ID: 11$j)
+185:	LDA	0,0(0)
+186:	LD	0,24(5)
+187:	LDC	1,8(0)
+188:	MUL	0,0,1
+189:	LD	1,-64(5)
+190:	ADD	0,0,1
+191:	LD	1,0(0)
+192:	ST	1,-64(5)
+
+*	32:	(assn_int_to_arraysub_op, ID: 9$heap_index, ID: temp13, ID: 11$j)
+193:	LDA	0,0(0)
+194:	LD	0,-64(5)
+195:	LDC	1,8(0)
+196:	MUL	0,0,1
+197:	LD	1,32(5)
+198:	ADD	0,0,1
+199:	LDA	0,0(0)
+200:	LD	1,40(5)
+201:	ST	1,0(0)
+
+*	33:	(return_op, null, null, null)
+202:	LDA	6,0(5)
+203:	LDA	6,8(6)
+204:	LD	2,4(5)
+205:	LD	5,0(5)
+206:	LDA	7,0(2)
+
+*	34:	(func_decl_op, ID: 14$heapify, null, null)
+207:	LDC	0,16(0)
+208:	LDC	1,-8(0)
+209:	MUL	0,0,1
+210:	ADD	6,6,0
+
+*	35:	(push_param_op, ID: 18$i, null, null)
+211:	LDA	6,-8(6)
+212:	LDA	0,0(0)
+213:	LD	0,32(5)
+214:	ST	0,0(6)
+
+*	36:	(call_func_op, ID: 2$left, ID: temp14, null)
+215:	LDA	6,-4(6)
+216:	LDA	0,5(7)
+217:	ST	0,0(6)
+218:	LDA	6,-4(6)
+219:	ST	5,0(6)
+220:	LDA	5,0(6)
+221:	LDC	7,34(0)
+222:	ST	3,-32(5)
+
+*	37:	(pop_params_op, int: 1, null, null)
+223:	LDC	0,8(0)
+224:	ADD	6,6,0
+
+*	38:	(assn_int_to_var_op, ID: 20$l, ID: temp14, null)
+225:	LDA	0,0(0)
+226:	LD	0,-32(5)
+227:	ST	0,-8(5)
+
+*	39:	(push_param_op, ID: 18$i, null, null)
+228:	LDA	6,-8(6)
+229:	LDA	0,0(0)
+230:	LD	0,32(5)
+231:	ST	0,0(6)
+
+*	40:	(call_func_op, ID: 4$right, ID: temp15, null)
+232:	LDA	6,-4(6)
+233:	LDA	0,5(7)
+234:	ST	0,0(6)
+235:	LDA	6,-4(6)
+236:	ST	5,0(6)
+237:	LDA	5,0(6)
+238:	LDC	7,58(0)
+239:	ST	3,-40(5)
+
+*	41:	(pop_params_op, int: 1, null, null)
+240:	LDC	0,8(0)
+241:	ADD	6,6,0
+
+*	42:	(assn_int_to_var_op, ID: 21$r, ID: temp15, null)
+242:	LDA	0,0(0)
+243:	LD	0,-40(5)
+244:	ST	0,-16(5)
+
+*	43:	(leq_ints_op, ID: temp17, ID: 20$l, ID: 19$size)
+245:	LDA	0,0(0)
+246:	LD	0,-8(5)
+247:	LDA	0,0(0)
+248:	LD	1,40(5)
+249:	SUB	0,0,1
+250:	JLE	0,2(7)
+251:	LDC	0,0(0)
+252:	LDA	7,1(7)
+253:	LDC	0,1(0)
+254:	ST	0,-56(5)
+
+*	44:	(if_false_op, ID: temp17, int: 51, null)
+
+*	45:	(assn_float_from_arraysub_op, ID: temp18, ID: 15$key, ID: 20$l)
+259:	LDA	0,0(0)
+260:	LD	0,16(5)
+261:	LDC	1,8(0)
+262:	MUL	0,0,1
+263:	LD	1,-64(5)
+264:	ADD	0,0,1
+265:	LDF	1,0(0)
+266:	STF	1,-64(5)
+
+*	46:	(assn_float_from_arraysub_op, ID: temp19, ID: 15$key, ID: 18$i)
+267:	LDA	0,0(0)
+268:	LD	0,16(5)
+269:	LDC	1,8(0)
+270:	MUL	0,0,1
+271:	LD	1,-72(5)
+272:	ADD	0,0,1
+273:	LDF	1,0(0)
+274:	STF	1,-72(5)
+
+*	47:	(lt_floats_op, ID: temp20, ID: temp18, ID: temp19)
+275:	LDA	0,0(0)
+276:	LDF	0,-64(5)
+277:	LDA	0,0(0)
+278:	LDF	1,-72(5)
+279:	SUBF	0,0,1
+280:	JFLT	0,2(7)
+281:	LDFC	0,0(0)
+282:	LDA	7,1(7)
+283:	LDC	0,1(0)
+284:	STF	0,-80(5)
+
+*	48:	(if_false_op, ID: temp20, int: 51, null)
+
+*	49:	(assign_int_literal, ID: temp16, int: 1, null)
+289:	LDC	0,1(0)
+290:	ST	0,-48(5)
+
+*	50:	(goto_op, int: 52, null, null)
+
+*	51:	(assign_int_literal, ID: temp16, int: 0, null)
+292:	LDC	0,0(0)
+293:	ST	0,-48(5)
+
+*	52:	(if_false_op, ID: temp16, int: 55, null)
+
+*	53:	(assn_int_to_var_op, ID: 22$smallest, ID: 20$l, null)
+298:	LDA	0,0(0)
+299:	LD	0,-8(5)
+300:	ST	0,-24(5)
+
+*	54:	(goto_op, int: 56, null, null)
+
+*	55:	(assn_int_to_var_op, ID: 22$smallest, ID: 18$i, null)
+302:	LDA	0,0(0)
+303:	LD	0,32(5)
+304:	ST	0,-24(5)
+
+*	56:	(leq_ints_op, ID: temp22, ID: 21$r, ID: 19$size)
+305:	LDA	0,0(0)
+306:	LD	0,-16(5)
+307:	LDA	0,0(0)
+308:	LD	1,40(5)
+309:	SUB	0,0,1
+310:	JLE	0,2(7)
+311:	LDC	0,0(0)
+312:	LDA	7,1(7)
+313:	LDC	0,1(0)
+314:	ST	0,-96(5)
+
+*	57:	(if_false_op, ID: temp22, int: 64, null)
+
+*	58:	(assn_float_from_arraysub_op, ID: temp23, ID: 15$key, ID: 21$r)
+319:	LDA	0,0(0)
+320:	LD	0,16(5)
+321:	LDC	1,8(0)
+322:	MUL	0,0,1
+323:	LD	1,-104(5)
+324:	ADD	0,0,1
+325:	LDF	1,0(0)
+326:	STF	1,-104(5)
+
+*	59:	(assn_float_from_arraysub_op, ID: temp24, ID: 15$key, ID: 22$smallest)
+327:	LDA	0,0(0)
+328:	LD	0,16(5)
+329:	LDC	1,8(0)
+330:	MUL	0,0,1
+331:	LD	1,-112(5)
+332:	ADD	0,0,1
+333:	LDF	1,0(0)
+334:	STF	1,-112(5)
+
+*	60:	(lt_floats_op, ID: temp25, ID: temp23, ID: temp24)
+335:	LDA	0,0(0)
+336:	LDF	0,-104(5)
+337:	LDA	0,0(0)
+338:	LDF	1,-112(5)
+339:	SUBF	0,0,1
+340:	JFLT	0,2(7)
+341:	LDFC	0,0(0)
+342:	LDA	7,1(7)
+343:	LDC	0,1(0)
+344:	STF	0,-120(5)
+
+*	61:	(if_false_op, ID: temp25, int: 64, null)
+
+*	62:	(assign_int_literal, ID: temp21, int: 1, null)
+349:	LDC	0,1(0)
+350:	ST	0,-88(5)
+
+*	63:	(goto_op, int: 65, null, null)
+
+*	64:	(assign_int_literal, ID: temp21, int: 0, null)
+352:	LDC	0,0(0)
+353:	ST	0,-88(5)
+
+*	65:	(if_false_op, ID: temp21, int: 68, null)
+
+*	66:	(assn_int_to_var_op, ID: 22$smallest, ID: 21$r, null)
+358:	LDA	0,0(0)
+359:	LD	0,-16(5)
+360:	ST	0,-24(5)
+
+*	67:	(goto_op, int: 68, null, null)
+
+*	68:	(neq_ints_op, ID: temp26, ID: 22$smallest, ID: 18$i)
+362:	LDA	0,0(0)
+363:	LD	0,-24(5)
+364:	LDA	0,0(0)
+365:	LD	1,32(5)
+366:	SUB	0,0,1
+367:	JNE	0,2(7)
+368:	LDC	0,0(0)
+369:	LDA	7,1(7)
+370:	LDC	0,1(0)
+371:	ST	0,-128(5)
+
+*	69:	(if_false_op, ID: temp26, int: 85, null)
+
+*	70:	(push_param_op, ID: 22$smallest, null, null)
+376:	LDA	6,-8(6)
+377:	LDA	0,0(0)
+378:	LD	0,-24(5)
+379:	ST	0,0(6)
+
+*	71:	(push_param_op, ID: 18$i, null, null)
+380:	LDA	6,-8(6)
+381:	LDA	0,0(0)
+382:	LD	0,32(5)
+383:	ST	0,0(6)
+
+*	72:	(push_param_op, ID: 17$heap_index, null, null)
+384:	LDA	6,-8(6)
+385:	LDA	0,0(0)
+386:	LD	0,32(5)
+387:	ST	0,0(6)
+
+*	73:	(push_param_op, ID: 16$handle, null, null)
+388:	LDA	6,-8(6)
+389:	LDA	0,0(0)
+390:	LD	0,24(5)
+391:	ST	0,0(6)
+
+*	74:	(push_param_op, ID: 15$key, null, null)
+392:	LDA	6,-8(6)
+393:	LDA	0,0(0)
+394:	LDF	0,16(5)
+395:	STF	0,0(6)
+
+*	75:	(call_func_op, ID: 6$exchange, null, null)
+396:	LDA	6,-4(6)
+397:	LDA	0,5(7)
+398:	ST	0,0(6)
+399:	LDA	6,-4(6)
+400:	ST	5,0(6)
+401:	LDA	5,0(6)
+402:	LDC	7,90(0)
+
+*	76:	(pop_params_op, int: 5, null, null)
+403:	LDC	0,40(0)
+404:	ADD	6,6,0
+
+*	77:	(push_param_op, ID: 19$size, null, null)
+405:	LDA	6,-8(6)
+406:	LDA	0,0(0)
+407:	LD	0,40(5)
+408:	ST	0,0(6)
+
+*	78:	(push_param_op, ID: 22$smallest, null, null)
+409:	LDA	6,-8(6)
+410:	LDA	0,0(0)
+411:	LD	0,-24(5)
+412:	ST	0,0(6)
+
+*	79:	(push_param_op, ID: 17$heap_index, null, null)
+413:	LDA	6,-8(6)
+414:	LDA	0,0(0)
+415:	LD	0,32(5)
+416:	ST	0,0(6)
+
+*	80:	(push_param_op, ID: 16$handle, null, null)
+417:	LDA	6,-8(6)
+418:	LDA	0,0(0)
+419:	LD	0,24(5)
+420:	ST	0,0(6)
+
+*	81:	(push_param_op, ID: 15$key, null, null)
+421:	LDA	6,-8(6)
+422:	LDA	0,0(0)
+423:	LDF	0,16(5)
+424:	STF	0,0(6)
+
+*	82:	(call_func_op, ID: 14$heapify, null, null)
+425:	LDA	6,-4(6)
+426:	LDA	0,5(7)
+427:	ST	0,0(6)
+428:	LDA	6,-4(6)
+429:	ST	5,0(6)
+430:	LDA	5,0(6)
+431:	LDC	7,207(0)
+
+*	83:	(pop_params_op, int: 5, null, null)
+432:	LDC	0,40(0)
+433:	ADD	6,6,0
+
+*	84:	(goto_op, int: 85, null, null)
+
+*	85:	(return_op, null, null, null)
+435:	LDA	6,0(5)
+436:	LDA	6,8(6)
+437:	LD	2,4(5)
+438:	LD	5,0(5)
+439:	LDA	7,0(2)
+
+*	86:	(func_decl_op, ID: 23$build_heap, null, null)
+440:	LDC	0,5(0)
+441:	LDC	1,-8(0)
+442:	MUL	0,0,1
+443:	ADD	6,6,0
+
+*	87:	(assign_int_literal, ID: temp27, int: 2, null)
+444:	LDC	0,2(0)
+445:	ST	0,-16(5)
+
+*	88:	(div_ints_op, ID: temp28, ID: 27$size, ID: temp27)
+446:	LDA	0,0(0)
+447:	LD	0,32(5)
+448:	LDA	0,0(0)
+449:	LD	1,-16(5)
+450:	DIV	0,0,1
+451:	ST	0,-24(5)
+
+*	89:	(assn_int_to_var_op, ID: 28$i, ID: temp28, null)
+452:	LDA	0,0(0)
+453:	LD	0,-24(5)
+454:	ST	0,-8(5)
+
+*	90:	(assign_int_literal, ID: temp29, int: 1, null)
+455:	LDC	0,1(0)
+456:	ST	0,-32(5)
+
+*	91:	(geq_ints_op, ID: temp30, ID: 28$i, ID: temp29)
+457:	LDA	0,0(0)
+458:	LD	0,-8(5)
+459:	LDA	0,0(0)
+460:	LD	1,-32(5)
+461:	SUB	0,0,1
+462:	JGE	0,2(7)
+463:	LDC	0,0(0)
+464:	LDA	7,1(7)
+465:	LDC	0,1(0)
+466:	ST	0,-40(5)
+
+*	92:	(if_false_op, ID: temp30, int: 102, null)
+
+*	93:	(push_param_op, ID: 27$size, null, null)
+471:	LDA	6,-8(6)
+472:	LDA	0,0(0)
+473:	LD	0,32(5)
+474:	ST	0,0(6)
+
+*	94:	(push_param_op, ID: 28$i, null, null)
+475:	LDA	6,-8(6)
+476:	LDA	0,0(0)
+477:	LD	0,-8(5)
+478:	ST	0,0(6)
+
+*	95:	(push_param_op, ID: 26$heap_index, null, null)
+479:	LDA	6,-8(6)
+480:	LDA	0,0(0)
+481:	LD	0,32(5)
+482:	ST	0,0(6)
+
+*	96:	(push_param_op, ID: 25$handle, null, null)
+483:	LDA	6,-8(6)
+484:	LDA	0,0(0)
+485:	LD	0,24(5)
+486:	ST	0,0(6)
+
+*	97:	(push_param_op, ID: 24$key, null, null)
+487:	LDA	6,-8(6)
+488:	LDA	0,0(0)
+489:	LDF	0,16(5)
+490:	STF	0,0(6)
+
+*	98:	(call_func_op, ID: 14$heapify, null, null)
+491:	LDA	6,-4(6)
+492:	LDA	0,5(7)
+493:	ST	0,0(6)
+494:	LDA	6,-4(6)
+495:	ST	5,0(6)
+496:	LDA	5,0(6)
+497:	LDC	7,207(0)
+
+*	99:	(pop_params_op, int: 5, null, null)
+498:	LDC	0,40(0)
+499:	ADD	6,6,0
+
+*	100:	(var_dec_op, ID: 28$i, null, null)
+500:	LDC	1,-1(0)
+501:	LDA	0,0(0)
+502:	LD	0,-8(5)
+503:	ADD	0,0,1
+504:	ST	0,-8(5)
+
+*	101:	(goto_op, int: 90, null, null)
+
+*	102:	(return_op, null, null, null)
+506:	LDA	6,0(5)
+507:	LDA	6,8(6)
+508:	LD	2,4(5)
+509:	LD	5,0(5)
+510:	LDA	7,0(2)
+
+*	103:	(func_decl_op, ID: 29$extract_min, null, null)
+511:	LDC	0,4(0)
+512:	LDC	1,-8(0)
+513:	MUL	0,0,1
+514:	ADD	6,6,0
+
+*	104:	(push_param_op, ID: 33$size, null, null)
+515:	LDA	6,-8(6)
+516:	LDA	0,0(0)
+517:	LD	0,32(5)
+518:	ST	0,0(6)
+
+*	105:	(assign_int_literal, ID: temp31, int: 1, null)
+519:	LDC	0,1(0)
+520:	ST	0,-8(5)
+
+*	106:	(push_param_op, ID: temp31, null, null)
+521:	LDA	6,-8(6)
+522:	LDA	0,0(0)
+523:	LD	0,-8(5)
+524:	ST	0,0(6)
+
+*	107:	(push_param_op, ID: 32$heap_index, null, null)
+525:	LDA	6,-8(6)
+526:	LDA	0,0(0)
+527:	LD	0,32(5)
+528:	ST	0,0(6)
+
+*	108:	(push_param_op, ID: 31$handle, null, null)
+529:	LDA	6,-8(6)
+530:	LDA	0,0(0)
+531:	LD	0,24(5)
+532:	ST	0,0(6)
+
+*	109:	(push_param_op, ID: 30$key, null, null)
+533:	LDA	6,-8(6)
+534:	LDA	0,0(0)
+535:	LDF	0,16(5)
+536:	STF	0,0(6)
+
+*	110:	(call_func_op, ID: 6$exchange, null, null)
+537:	LDA	6,-4(6)
+538:	LDA	0,5(7)
+539:	ST	0,0(6)
+540:	LDA	6,-4(6)
+541:	ST	5,0(6)
+542:	LDA	5,0(6)
+543:	LDC	7,90(0)
+
+*	111:	(pop_params_op, int: 5, null, null)
+544:	LDC	0,40(0)
+545:	ADD	6,6,0
+
+*	112:	(assign_int_literal, ID: temp32, int: 1, null)
+546:	LDC	0,1(0)
+547:	ST	0,-16(5)
+
+*	113:	(sub_ints_op, ID: temp33, ID: 33$size, ID: temp32)
+548:	LDA	0,0(0)
+549:	LD	0,32(5)
+550:	LDA	0,0(0)
+551:	LD	1,-16(5)
+552:	SUB	0,0,1
+553:	ST	0,-24(5)
+
+*	114:	(push_param_op, ID: temp33, null, null)
+554:	LDA	6,-8(6)
+555:	LDA	0,0(0)
+556:	LD	0,-24(5)
+557:	ST	0,0(6)
+
+*	115:	(assign_int_literal, ID: temp34, int: 1, null)
+558:	LDC	0,1(0)
+559:	ST	0,-32(5)
+
+*	116:	(push_param_op, ID: temp34, null, null)
+560:	LDA	6,-8(6)
+561:	LDA	0,0(0)
+562:	LD	0,-32(5)
+563:	ST	0,0(6)
+
+*	117:	(push_param_op, ID: 32$heap_index, null, null)
+564:	LDA	6,-8(6)
+565:	LDA	0,0(0)
+566:	LD	0,32(5)
+567:	ST	0,0(6)
+
+*	118:	(push_param_op, ID: 31$handle, null, null)
+568:	LDA	6,-8(6)
+569:	LDA	0,0(0)
+570:	LD	0,24(5)
+571:	ST	0,0(6)
+
+*	119:	(push_param_op, ID: 30$key, null, null)
+572:	LDA	6,-8(6)
+573:	LDA	0,0(0)
+574:	LDF	0,16(5)
+575:	STF	0,0(6)
+
+*	120:	(call_func_op, ID: 14$heapify, null, null)
+576:	LDA	6,-4(6)
+577:	LDA	0,5(7)
+578:	ST	0,0(6)
+579:	LDA	6,-4(6)
+580:	ST	5,0(6)
+581:	LDA	5,0(6)
+582:	LDC	7,207(0)
+
+*	121:	(pop_params_op, int: 5, null, null)
+583:	LDC	0,40(0)
+584:	ADD	6,6,0
+
+*	122:	(return_op, null, null, null)
+585:	LDA	6,0(5)
+586:	LDA	6,8(6)
+587:	LD	2,4(5)
+588:	LD	5,0(5)
+589:	LDA	7,0(2)
+
+*	123:	(func_decl_op, ID: 34$decrease_key, null, null)
+590:	LDC	0,9(0)
+591:	LDC	1,-8(0)
+592:	MUL	0,0,1
+593:	ADD	6,6,0
+
+*	124:	(assn_float_to_arraysub_op, ID: 35$key, ID: 38$i, ID: 40$new_key)
+594:	LDA	0,0(0)
+595:	LD	0,32(5)
+596:	LDC	1,8(0)
+597:	MUL	0,0,1
+598:	LD	1,16(5)
+599:	ADD	0,0,1
+600:	LDA	0,0(0)
+601:	LDF	1,48(5)
+602:	STF	1,0(0)
+
+*	125:	(assign_int_literal, ID: temp36, int: 1, null)
+603:	LDC	0,1(0)
+604:	ST	0,-16(5)
+
+*	126:	(gt_ints_op, ID: temp37, ID: 38$i, ID: temp36)
+605:	LDA	0,0(0)
+606:	LD	0,32(5)
+607:	LDA	0,0(0)
+608:	LD	1,-16(5)
+609:	SUB	0,0,1
+610:	JGT	0,2(7)
+611:	LDC	0,0(0)
+612:	LDA	7,1(7)
+613:	LDC	0,1(0)
+614:	ST	0,-24(5)
+
+*	127:	(if_false_op, ID: temp37, int: 137, null)
+
+*	128:	(push_param_op, ID: 38$i, null, null)
+619:	LDA	6,-8(6)
+620:	LDA	0,0(0)
+621:	LD	0,32(5)
+622:	ST	0,0(6)
+
+*	129:	(call_func_op, ID: 0$parent, ID: temp39, null)
+623:	LDA	6,-4(6)
+624:	LDA	0,5(7)
+625:	ST	0,0(6)
+626:	LDA	6,-4(6)
+627:	ST	5,0(6)
+628:	LDA	5,0(6)
+629:	LDC	7,10(0)
+630:	ST	3,-40(5)
+
+*	130:	(pop_params_op, int: 1, null, null)
+631:	LDC	0,8(0)
+632:	ADD	6,6,0
+
+*	131:	(assn_float_from_arraysub_op, ID: temp38, ID: 35$key, ID: temp39)
+633:	LDA	0,0(0)
+634:	LD	0,16(5)
+635:	LDC	1,8(0)
+636:	MUL	0,0,1
+637:	LD	1,-32(5)
+638:	ADD	0,0,1
+639:	LDF	1,0(0)
+640:	STF	1,-32(5)
+
+*	132:	(assn_float_from_arraysub_op, ID: temp40, ID: 35$key, ID: 38$i)
+641:	LDA	0,0(0)
+642:	LD	0,16(5)
+643:	LDC	1,8(0)
+644:	MUL	0,0,1
+645:	LD	1,-48(5)
+646:	ADD	0,0,1
+647:	LDF	1,0(0)
+648:	STF	1,-48(5)
+
+*	133:	(gt_floats_op, ID: temp41, ID: temp38, ID: temp40)
+649:	LDA	0,0(0)
+650:	LDF	0,-32(5)
+651:	LDA	0,0(0)
+652:	LDF	1,-48(5)
+653:	SUBF	0,0,1
+654:	JFGT	0,2(7)
+655:	LDFC	0,0(0)
+656:	LDA	7,1(7)
+657:	LDC	0,1(0)
+658:	STF	0,-56(5)
+
+*	134:	(if_false_op, ID: temp41, int: 137, null)
+
+*	135:	(assign_int_literal, ID: temp35, int: 1, null)
+663:	LDC	0,1(0)
+664:	ST	0,-8(5)
+
+*	136:	(goto_op, int: 138, null, null)
+
+*	137:	(assign_int_literal, ID: temp35, int: 0, null)
+666:	LDC	0,0(0)
+667:	ST	0,-8(5)
+
+*	138:	(if_false_op, ID: temp35, int: 154, null)
+
+*	139:	(push_param_op, ID: 38$i, null, null)
+672:	LDA	6,-8(6)
+673:	LDA	0,0(0)
+674:	LD	0,32(5)
+675:	ST	0,0(6)
+
+*	140:	(call_func_op, ID: 0$parent, ID: temp42, null)
+676:	LDA	6,-4(6)
+677:	LDA	0,5(7)
+678:	ST	0,0(6)
+679:	LDA	6,-4(6)
+680:	ST	5,0(6)
+681:	LDA	5,0(6)
+682:	LDC	7,10(0)
+683:	ST	3,-64(5)
+
+*	141:	(pop_params_op, int: 1, null, null)
+684:	LDC	0,8(0)
+685:	ADD	6,6,0
+
+*	142:	(push_param_op, ID: temp42, null, null)
+686:	LDA	6,-8(6)
+687:	LDA	0,0(0)
+688:	LD	0,-64(5)
+689:	ST	0,0(6)
+
+*	143:	(push_param_op, ID: 38$i, null, null)
+690:	LDA	6,-8(6)
+691:	LDA	0,0(0)
+692:	LD	0,32(5)
+693:	ST	0,0(6)
+
+*	144:	(push_param_op, ID: 37$heap_index, null, null)
+694:	LDA	6,-8(6)
+695:	LDA	0,0(0)
+696:	LD	0,32(5)
+697:	ST	0,0(6)
+
+*	145:	(push_param_op, ID: 36$handle, null, null)
+698:	LDA	6,-8(6)
+699:	LDA	0,0(0)
+700:	LD	0,24(5)
+701:	ST	0,0(6)
+
+*	146:	(push_param_op, ID: 35$key, null, null)
+702:	LDA	6,-8(6)
+703:	LDA	0,0(0)
+704:	LDF	0,16(5)
+705:	STF	0,0(6)
+
+*	147:	(call_func_op, ID: 6$exchange, null, null)
+706:	LDA	6,-4(6)
+707:	LDA	0,5(7)
+708:	ST	0,0(6)
+709:	LDA	6,-4(6)
+710:	ST	5,0(6)
+711:	LDA	5,0(6)
+712:	LDC	7,90(0)
+
+*	148:	(pop_params_op, int: 5, null, null)
+713:	LDC	0,40(0)
+714:	ADD	6,6,0
+
+*	149:	(push_param_op, ID: 38$i, null, null)
+715:	LDA	6,-8(6)
+716:	LDA	0,0(0)
+717:	LD	0,32(5)
+718:	ST	0,0(6)
+
+*	150:	(call_func_op, ID: 0$parent, ID: temp43, null)
+719:	LDA	6,-4(6)
+720:	LDA	0,5(7)
+721:	ST	0,0(6)
+722:	LDA	6,-4(6)
+723:	ST	5,0(6)
+724:	LDA	5,0(6)
+725:	LDC	7,10(0)
+726:	ST	3,-72(5)
+
+*	151:	(pop_params_op, int: 1, null, null)
+727:	LDC	0,8(0)
+728:	ADD	6,6,0
+
+*	152:	(assn_int_to_var_op, ID: 38$i, ID: temp43, null)
+729:	LDA	0,0(0)
+730:	LD	0,-72(5)
+731:	ST	0,32(5)
+
+*	153:	(goto_op, int: 125, null, null)
+
+*	154:	(return_op, null, null, null)
+733:	LDA	6,0(5)
+734:	LDA	6,8(6)
+735:	LD	2,4(5)
+736:	LD	5,0(5)
+737:	LDA	7,0(2)
+
+*	155:	(func_decl_op, ID: 41$insert, null, null)
+738:	LDC	0,1(0)
+739:	LDC	1,-8(0)
+740:	MUL	0,0,1
+741:	ADD	6,6,0
+
+*	156:	(assign_double_literal, ID: temp44, double: 1000000000.000000, null)
+742:	LDFC	0,1000000000(0)
+743:	STF	0,-8(5)
+
+*	157:	(var_inc_op, ID: 46$size, null, null)
+744:	LDC	1,1(0)
+745:	LDA	0,0(0)
+746:	LD	0,40(5)
+747:	ADD	0,0,1
+748:	ST	0,40(5)
+
+*	158:	(assn_float_to_arraysub_op, ID: 42$key, ID: 46$size, ID: temp44)
+749:	LDA	0,0(0)
+750:	LD	0,40(5)
+751:	LDC	1,8(0)
+752:	MUL	0,0,1
+753:	LD	1,16(5)
+754:	ADD	0,0,1
+755:	LDA	0,0(0)
+756:	LDF	1,-8(5)
+757:	STF	1,0(0)
+
+*	159:	(assn_int_to_arraysub_op, ID: 43$handle, ID: 46$size, ID: 45$vertex)
+758:	LDA	0,0(0)
+759:	LD	0,40(5)
+760:	LDC	1,8(0)
+761:	MUL	0,0,1
+762:	LD	1,24(5)
+763:	ADD	0,0,1
+764:	LDA	0,0(0)
+765:	LD	1,32(5)
+766:	ST	1,0(0)
+
+*	160:	(assn_int_to_arraysub_op, ID: 44$heap_index, ID: 45$vertex, ID: 46$size)
+767:	LDA	0,0(0)
+768:	LD	0,32(5)
+769:	LDC	1,8(0)
+770:	MUL	0,0,1
+771:	LD	1,32(5)
+772:	ADD	0,0,1
+773:	LDA	0,0(0)
+774:	LD	1,40(5)
+775:	ST	1,0(0)
+
+*	161:	(push_param_op, ID: 47$new_key, null, null)
+776:	LDA	6,-8(6)
+777:	LDA	0,0(0)
+778:	LDF	0,48(5)
+779:	STF	0,0(6)
+
+*	162:	(push_param_op, ID: 46$size, null, null)
+780:	LDA	6,-8(6)
+781:	LDA	0,0(0)
+782:	LD	0,40(5)
+783:	ST	0,0(6)
+
+*	163:	(push_param_op, ID: 46$size, null, null)
+784:	LDA	6,-8(6)
+785:	LDA	0,0(0)
+786:	LD	0,40(5)
+787:	ST	0,0(6)
+
+*	164:	(push_param_op, ID: 44$heap_index, null, null)
+788:	LDA	6,-8(6)
+789:	LDA	0,0(0)
+790:	LD	0,32(5)
+791:	ST	0,0(6)
+
+*	165:	(push_param_op, ID: 43$handle, null, null)
+792:	LDA	6,-8(6)
+793:	LDA	0,0(0)
+794:	LD	0,24(5)
+795:	ST	0,0(6)
+
+*	166:	(push_param_op, ID: 42$key, null, null)
+796:	LDA	6,-8(6)
+797:	LDA	0,0(0)
+798:	LDF	0,16(5)
+799:	STF	0,0(6)
+
+*	167:	(call_func_op, ID: 34$decrease_key, null, null)
+800:	LDA	6,-4(6)
+801:	LDA	0,5(7)
+802:	ST	0,0(6)
+803:	LDA	6,-4(6)
+804:	ST	5,0(6)
+805:	LDA	5,0(6)
+806:	LDC	7,590(0)
+
+*	168:	(pop_params_op, int: 6, null, null)
+807:	LDC	0,48(0)
+808:	ADD	6,6,0
+
+*	169:	(return_op, null, null, null)
+809:	LDA	6,0(5)
+810:	LDA	6,8(6)
+811:	LD	2,4(5)
+812:	LD	5,0(5)
+813:	LDA	7,0(2)
+
+*	170:	(func_decl_op, ID: 48$relax, null, null)
+814:	LDC	0,10(0)
+815:	LDC	1,-8(0)
+816:	MUL	0,0,1
+817:	ADD	6,6,0
+
+*	171:	(assn_int_from_arraysub_op, ID: temp46, ID: 54$heap_index, ID: 50$v)
+818:	LDA	0,0(0)
+819:	LD	0,56(5)
+820:	LDC	1,8(0)
+821:	MUL	0,0,1
+822:	LD	1,-16(5)
+823:	ADD	0,0,1
+824:	LD	1,0(0)
+825:	ST	1,-16(5)
+
+*	172:	(assn_float_from_arraysub_op, ID: temp45, ID: 52$key, ID: temp46)
+826:	LDA	0,0(0)
+827:	LD	0,40(5)
+828:	LDC	1,8(0)
+829:	MUL	0,0,1
+830:	LD	1,-8(5)
+831:	ADD	0,0,1
+832:	LDF	1,0(0)
+833:	STF	1,-8(5)
+
+*	173:	(assn_int_from_arraysub_op, ID: temp48, ID: 54$heap_index, ID: 49$u)
+834:	LDA	0,0(0)
+835:	LD	0,56(5)
+836:	LDC	1,8(0)
+837:	MUL	0,0,1
+838:	LD	1,-32(5)
+839:	ADD	0,0,1
+840:	LD	1,0(0)
+841:	ST	1,-32(5)
+
+*	174:	(assn_float_from_arraysub_op, ID: temp47, ID: 52$key, ID: temp48)
+842:	LDA	0,0(0)
+843:	LD	0,40(5)
+844:	LDC	1,8(0)
+845:	MUL	0,0,1
+846:	LD	1,-24(5)
+847:	ADD	0,0,1
+848:	LDF	1,0(0)
+849:	STF	1,-24(5)
+
+*	175:	(add_floats_op, ID: temp49, ID: temp47, ID: 51$w)
+850:	LDA	0,0(0)
+851:	LDF	0,-24(5)
+852:	LDA	0,0(0)
+853:	LDF	1,24(5)
+854:	ADDF	0,0,1
+855:	STF	0,-40(5)
+
+*	176:	(gt_floats_op, ID: temp50, ID: temp45, ID: temp49)
+856:	LDA	0,0(0)
+857:	LDF	0,-8(5)
+858:	LDA	0,0(0)
+859:	LDF	1,-40(5)
+860:	SUBF	0,0,1
+861:	JFGT	0,2(7)
+862:	LDFC	0,0(0)
+863:	LDA	7,1(7)
+864:	LDC	0,1(0)
+865:	STF	0,-48(5)
+
+*	177:	(if_false_op, ID: temp50, int: 192, null)
+
+*	178:	(assn_int_from_arraysub_op, ID: temp52, ID: 54$heap_index, ID: 49$u)
+870:	LDA	0,0(0)
+871:	LD	0,56(5)
+872:	LDC	1,8(0)
+873:	MUL	0,0,1
+874:	LD	1,-64(5)
+875:	ADD	0,0,1
+876:	LD	1,0(0)
+877:	ST	1,-64(5)
+
+*	179:	(assn_float_from_arraysub_op, ID: temp51, ID: 52$key, ID: temp52)
+878:	LDA	0,0(0)
+879:	LD	0,40(5)
+880:	LDC	1,8(0)
+881:	MUL	0,0,1
+882:	LD	1,-56(5)
+883:	ADD	0,0,1
+884:	LDF	1,0(0)
+885:	STF	1,-56(5)
+
+*	180:	(add_floats_op, ID: temp53, ID: temp51, ID: 51$w)
+886:	LDA	0,0(0)
+887:	LDF	0,-56(5)
+888:	LDA	0,0(0)
+889:	LDF	1,24(5)
+890:	ADDF	0,0,1
+891:	STF	0,-72(5)
+
+*	181:	(push_param_op, ID: temp53, null, null)
+892:	LDA	6,-8(6)
+893:	LDA	0,0(0)
+894:	LDF	0,-72(5)
+895:	STF	0,0(6)
+
+*	182:	(push_param_op, ID: 55$size, null, null)
+896:	LDA	6,-8(6)
+897:	LDA	0,0(0)
+898:	LD	0,56(5)
+899:	ST	0,0(6)
+
+*	183:	(assn_int_from_arraysub_op, ID: temp54, ID: 54$heap_index, ID: 50$v)
+900:	LDA	0,0(0)
+901:	LD	0,56(5)
+902:	LDC	1,8(0)
+903:	MUL	0,0,1
+904:	LD	1,-80(5)
+905:	ADD	0,0,1
+906:	LD	1,0(0)
+907:	ST	1,-80(5)
+
+*	184:	(push_param_op, ID: temp54, null, null)
+908:	LDA	6,-8(6)
+909:	LDA	0,0(0)
+910:	LD	0,-80(5)
+911:	ST	0,0(6)
+
+*	185:	(push_param_op, ID: 54$heap_index, null, null)
+912:	LDA	6,-8(6)
+913:	LDA	0,0(0)
+914:	LD	0,56(5)
+915:	ST	0,0(6)
+
+*	186:	(push_param_op, ID: 53$handle, null, null)
+916:	LDA	6,-8(6)
+917:	LDA	0,0(0)
+918:	LD	0,48(5)
+919:	ST	0,0(6)
+
+*	187:	(push_param_op, ID: 52$key, null, null)
+920:	LDA	6,-8(6)
+921:	LDA	0,0(0)
+922:	LDF	0,40(5)
+923:	STF	0,0(6)
+
+*	188:	(call_func_op, ID: 34$decrease_key, null, null)
+924:	LDA	6,-4(6)
+925:	LDA	0,5(7)
+926:	ST	0,0(6)
+927:	LDA	6,-4(6)
+928:	ST	5,0(6)
+929:	LDA	5,0(6)
+930:	LDC	7,590(0)
+
+*	189:	(pop_params_op, int: 6, null, null)
+931:	LDC	0,48(0)
+932:	ADD	6,6,0
+
+*	190:	(assn_int_to_arraysub_op, ID: 56$pi, ID: 50$v, ID: 49$u)
+933:	LDA	0,0(0)
+934:	LD	0,16(5)
+935:	LDC	1,8(0)
+936:	MUL	0,0,1
+937:	LD	1,72(5)
+938:	ADD	0,0,1
+939:	LDA	0,0(0)
+940:	LD	1,8(5)
+941:	ST	1,0(0)
+
+*	191:	(goto_op, int: 192, null, null)
+
+*	192:	(return_op, null, null, null)
+943:	LDA	6,0(5)
+944:	LDA	6,8(6)
+945:	LD	2,4(5)
+946:	LD	5,0(5)
+947:	LDA	7,0(2)
+
+*	193:	(func_decl_op, ID: 57$initialize_single_source, null, null)
+948:	LDC	0,6(0)
+949:	LDC	1,-8(0)
+950:	MUL	0,0,1
+951:	ADD	6,6,0
+
+*	194:	(assign_int_literal, ID: temp55, int: 1, null)
+952:	LDC	0,1(0)
+953:	ST	0,-16(5)
+
+*	195:	(assn_int_to_var_op, ID: 64$i, ID: temp55, null)
+954:	LDA	0,0(0)
+955:	LD	0,-16(5)
+956:	ST	0,-8(5)
+
+*	196:	(leq_ints_op, ID: temp56, ID: 64$i, ID: 63$n)
+957:	LDA	0,0(0)
+958:	LD	0,-8(5)
+959:	LDA	0,0(0)
+960:	LD	1,48(5)
+961:	SUB	0,0,1
+962:	JLE	0,2(7)
+963:	LDC	0,0(0)
+964:	LDA	7,1(7)
+965:	LDC	0,1(0)
+966:	ST	0,-24(5)
+
+*	197:	(if_false_op, ID: temp56, int: 206, null)
+
+*	198:	(assign_double_literal, ID: temp57, double: 1000000000.000000, null)
+971:	LDFC	0,1000000000(0)
+972:	STF	0,-32(5)
+
+*	199:	(assn_float_to_arraysub_op, ID: 58$key, ID: 64$i, ID: temp57)
+973:	LDA	0,0(0)
+974:	LD	0,-8(5)
+975:	LDC	1,8(0)
+976:	MUL	0,0,1
+977:	LD	1,16(5)
+978:	ADD	0,0,1
+979:	LDA	0,0(0)
+980:	LDF	1,-32(5)
+981:	STF	1,0(0)
+
+*	200:	(assn_int_to_arraysub_op, ID: 59$handle, ID: 64$i, ID: 64$i)
+982:	LDA	0,0(0)
+983:	LD	0,-8(5)
+984:	LDC	1,8(0)
+985:	MUL	0,0,1
+986:	LD	1,24(5)
+987:	ADD	0,0,1
+988:	LDA	0,0(0)
+989:	LD	1,-8(5)
+990:	ST	1,0(0)
+
+*	201:	(assn_int_to_arraysub_op, ID: 60$heap_index, ID: 64$i, ID: 64$i)
+991:	LDA	0,0(0)
+992:	LD	0,-8(5)
+993:	LDC	1,8(0)
+994:	MUL	0,0,1
+995:	LD	1,32(5)
+996:	ADD	0,0,1
+997:	LDA	0,0(0)
+998:	LD	1,-8(5)
+999:	ST	1,0(0)
+
+*	202:	(assign_int_literal, ID: temp58, int: 0, null)
+1000:	LDC	0,0(0)
+1001:	ST	0,-40(5)
+
+*	203:	(assn_int_to_arraysub_op, ID: 61$pi, ID: 64$i, ID: temp58)
+1002:	LDA	0,0(0)
+1003:	LD	0,-8(5)
+1004:	LDC	1,8(0)
+1005:	MUL	0,0,1
+1006:	LD	1,40(5)
+1007:	ADD	0,0,1
+1008:	LDA	0,0(0)
+1009:	LD	1,-40(5)
+1010:	ST	1,0(0)
+
+*	204:	(var_inc_op, ID: 64$i, null, null)
+1011:	LDC	1,1(0)
+1012:	LDA	0,0(0)
+1013:	LD	0,-8(5)
+1014:	ADD	0,0,1
+1015:	ST	0,-8(5)
+
+*	205:	(goto_op, int: 196, null, null)
+
+*	206:	(assign_double_literal, ID: temp59, double: 0.000000, null)
+1017:	LDFC	0,0(0)
+1018:	STF	0,-48(5)
+
+*	207:	(assn_float_to_arraysub_op, ID: 58$key, ID: 62$s, ID: temp59)
+1019:	LDA	0,0(0)
+1020:	LD	0,40(5)
+1021:	LDC	1,8(0)
+1022:	MUL	0,0,1
+1023:	LD	1,16(5)
+1024:	ADD	0,0,1
+1025:	LDA	0,0(0)
+1026:	LDF	1,-48(5)
+1027:	STF	1,0(0)
+
+*	208:	(push_param_op, ID: 63$n, null, null)
+1028:	LDA	6,-8(6)
+1029:	LDA	0,0(0)
+1030:	LD	0,48(5)
+1031:	ST	0,0(6)
+
+*	209:	(push_param_op, ID: 60$heap_index, null, null)
+1032:	LDA	6,-8(6)
+1033:	LDA	0,0(0)
+1034:	LD	0,32(5)
+1035:	ST	0,0(6)
+
+*	210:	(push_param_op, ID: 59$handle, null, null)
+1036:	LDA	6,-8(6)
+1037:	LDA	0,0(0)
+1038:	LD	0,24(5)
+1039:	ST	0,0(6)
+
+*	211:	(push_param_op, ID: 58$key, null, null)
+1040:	LDA	6,-8(6)
+1041:	LDA	0,0(0)
+1042:	LDF	0,16(5)
+1043:	STF	0,0(6)
+
+*	212:	(call_func_op, ID: 23$build_heap, null, null)
+1044:	LDA	6,-4(6)
+1045:	LDA	0,5(7)
+1046:	ST	0,0(6)
+1047:	LDA	6,-4(6)
+1048:	ST	5,0(6)
+1049:	LDA	5,0(6)
+1050:	LDC	7,440(0)
+
+*	213:	(pop_params_op, int: 4, null, null)
+1051:	LDC	0,32(0)
+1052:	ADD	6,6,0
+
+*	214:	(return_op, null, null, null)
+1053:	LDA	6,0(5)
+1054:	LDA	6,8(6)
+1055:	LD	2,4(5)
+1056:	LD	5,0(5)
+1057:	LDA	7,0(2)
+
+*	215:	(func_decl_op, ID: 65$dijkstra, null, null)
+1058:	LDC	0,14(0)
+1059:	LDC	1,-8(0)
+1060:	MUL	0,0,1
+1061:	ADD	6,6,0
+
+*	216:	(assn_int_to_var_op, ID: 76$size, ID: 73$n, null)
+1062:	LDA	0,0(0)
+1063:	LD	0,64(5)
+1064:	ST	0,-8(5)
+
+*	217:	(push_param_op, ID: 73$n, null, null)
+1065:	LDA	6,-8(6)
+1066:	LDA	0,0(0)
+1067:	LD	0,64(5)
+1068:	ST	0,0(6)
+
+*	218:	(push_param_op, ID: 72$s, null, null)
+1069:	LDA	6,-8(6)
+1070:	LDA	0,0(0)
+1071:	LD	0,56(5)
+1072:	ST	0,0(6)
+
+*	219:	(push_param_op, ID: 71$pi, null, null)
+1073:	LDA	6,-8(6)
+1074:	LDA	0,0(0)
+1075:	LD	0,56(5)
+1076:	ST	0,0(6)
+
+*	220:	(push_param_op, ID: 75$heap_index, null, null)
+1077:	LDA	6,-8(6)
+1078:	LDA	0,0(0)
+1079:	LD	0,88(5)
+1080:	ST	0,0(6)
+
+*	221:	(push_param_op, ID: 74$handle, null, null)
+1081:	LDA	6,-8(6)
+1082:	LDA	0,0(0)
+1083:	LD	0,80(5)
+1084:	ST	0,0(6)
+
+*	222:	(push_param_op, ID: 70$d, null, null)
+1085:	LDA	6,-8(6)
+1086:	LDA	0,0(0)
+1087:	LDF	0,48(5)
+1088:	STF	0,0(6)
+
+*	223:	(call_func_op, ID: 57$initialize_single_source, null, null)
+1089:	LDA	6,-4(6)
+1090:	LDA	0,5(7)
+1091:	ST	0,0(6)
+1092:	LDA	6,-4(6)
+1093:	ST	5,0(6)
+1094:	LDA	5,0(6)
+1095:	LDC	7,948(0)
+
+*	224:	(pop_params_op, int: 6, null, null)
+1096:	LDC	0,48(0)
+1097:	ADD	6,6,0
+
+*	225:	(assign_int_literal, ID: temp60, int: 0, null)
+1098:	LDC	0,0(0)
+1099:	ST	0,-40(5)
+
+*	226:	(gt_ints_op, ID: temp61, ID: 76$size, ID: temp60)
+1100:	LDA	0,0(0)
+1101:	LD	0,-8(5)
+1102:	LDA	0,0(0)
+1103:	LD	1,-40(5)
+1104:	SUB	0,0,1
+1105:	JGT	0,2(7)
+1106:	LDC	0,0(0)
+1107:	LDA	7,1(7)
+1108:	LDC	0,1(0)
+1109:	ST	0,-48(5)
+
+*	227:	(if_false_op, ID: temp61, int: 260, null)
+
+*	228:	(assign_int_literal, ID: temp63, int: 1, null)
+1114:	LDC	0,1(0)
+1115:	ST	0,-64(5)
+
+*	229:	(assn_int_from_arraysub_op, ID: temp62, ID: 74$handle, ID: temp63)
+1116:	LDA	0,0(0)
+1117:	LD	0,80(5)
+1118:	LDC	1,8(0)
+1119:	MUL	0,0,1
+1120:	LD	1,-56(5)
+1121:	ADD	0,0,1
+1122:	LD	1,0(0)
+1123:	ST	1,-56(5)
+
+*	230:	(assn_int_to_var_op, ID: 77$u, ID: temp62, null)
+1124:	LDA	0,0(0)
+1125:	LD	0,-56(5)
+1126:	ST	0,-16(5)
+
+*	231:	(push_param_op, ID: 76$size, null, null)
+1127:	LDA	6,-8(6)
+1128:	LDA	0,0(0)
+1129:	LD	0,-8(5)
+1130:	ST	0,0(6)
+
+*	232:	(push_param_op, ID: 75$heap_index, null, null)
+1131:	LDA	6,-8(6)
+1132:	LDA	0,0(0)
+1133:	LD	0,88(5)
+1134:	ST	0,0(6)
+
+*	233:	(push_param_op, ID: 74$handle, null, null)
+1135:	LDA	6,-8(6)
+1136:	LDA	0,0(0)
+1137:	LD	0,80(5)
+1138:	ST	0,0(6)
+
+*	234:	(push_param_op, ID: 70$d, null, null)
+1139:	LDA	6,-8(6)
+1140:	LDA	0,0(0)
+1141:	LDF	0,48(5)
+1142:	STF	0,0(6)
+
+*	235:	(call_func_op, ID: 29$extract_min, null, null)
+1143:	LDA	6,-4(6)
+1144:	LDA	0,5(7)
+1145:	ST	0,0(6)
+1146:	LDA	6,-4(6)
+1147:	ST	5,0(6)
+1148:	LDA	5,0(6)
+1149:	LDC	7,511(0)
+
+*	236:	(pop_params_op, int: 4, null, null)
+1150:	LDC	0,32(0)
+1151:	ADD	6,6,0
+
+*	237:	(var_dec_op, ID: 76$size, null, null)
+1152:	LDC	1,-1(0)
+1153:	LDA	0,0(0)
+1154:	LD	0,-8(5)
+1155:	ADD	0,0,1
+1156:	ST	0,-8(5)
+
+*	238:	(assn_int_from_arraysub_op, ID: temp64, ID: 66$first, ID: 77$u)
+1157:	LDA	0,0(0)
+1158:	LD	0,16(5)
+1159:	LDC	1,8(0)
+1160:	MUL	0,0,1
+1161:	LD	1,-72(5)
+1162:	ADD	0,0,1
+1163:	LD	1,0(0)
+1164:	ST	1,-72(5)
+
+*	239:	(assn_int_to_var_op, ID: 79$i, ID: temp64, null)
+1165:	LDA	0,0(0)
+1166:	LD	0,-72(5)
+1167:	ST	0,-32(5)
+
+*	240:	(assign_int_literal, ID: temp65, int: 0, null)
+1168:	LDC	0,0(0)
+1169:	ST	0,-80(5)
+
+*	241:	(gt_ints_op, ID: temp66, ID: 79$i, ID: temp65)
+1170:	LDA	0,0(0)
+1171:	LD	0,-32(5)
+1172:	LDA	0,0(0)
+1173:	LD	1,-80(5)
+1174:	SUB	0,0,1
+1175:	JGT	0,2(7)
+1176:	LDC	0,0(0)
+1177:	LDA	7,1(7)
+1178:	LDC	0,1(0)
+1179:	ST	0,-88(5)
+
+*	242:	(if_false_op, ID: temp66, int: 259, null)
+
+*	243:	(assn_int_from_arraysub_op, ID: temp67, ID: 67$node, ID: 79$i)
+1184:	LDA	0,0(0)
+1185:	LD	0,24(5)
+1186:	LDC	1,8(0)
+1187:	MUL	0,0,1
+1188:	LD	1,-96(5)
+1189:	ADD	0,0,1
+1190:	LD	1,0(0)
+1191:	ST	1,-96(5)
+
+*	244:	(assn_int_to_var_op, ID: 78$v, ID: temp67, null)
+1192:	LDA	0,0(0)
+1193:	LD	0,-96(5)
+1194:	ST	0,-24(5)
+
+*	245:	(push_param_op, ID: 71$pi, null, null)
+1195:	LDA	6,-8(6)
+1196:	LDA	0,0(0)
+1197:	LD	0,56(5)
+1198:	ST	0,0(6)
+
+*	246:	(push_param_op, ID: 76$size, null, null)
+1199:	LDA	6,-8(6)
+1200:	LDA	0,0(0)
+1201:	LD	0,-8(5)
+1202:	ST	0,0(6)
+
+*	247:	(push_param_op, ID: 75$heap_index, null, null)
+1203:	LDA	6,-8(6)
+1204:	LDA	0,0(0)
+1205:	LD	0,88(5)
+1206:	ST	0,0(6)
+
+*	248:	(push_param_op, ID: 74$handle, null, null)
+1207:	LDA	6,-8(6)
+1208:	LDA	0,0(0)
+1209:	LD	0,80(5)
+1210:	ST	0,0(6)
+
+*	249:	(push_param_op, ID: 70$d, null, null)
+1211:	LDA	6,-8(6)
+1212:	LDA	0,0(0)
+1213:	LDF	0,48(5)
+1214:	STF	0,0(6)
+
+*	250:	(assn_float_from_arraysub_op, ID: temp68, ID: 69$w, ID: 79$i)
+1215:	LDA	0,0(0)
+1216:	LD	0,40(5)
+1217:	LDC	1,8(0)
+1218:	MUL	0,0,1
+1219:	LD	1,-104(5)
+1220:	ADD	0,0,1
+1221:	LDF	1,0(0)
+1222:	STF	1,-104(5)
+
+*	251:	(push_param_op, ID: temp68, null, null)
+1223:	LDA	6,-8(6)
+1224:	LDA	0,0(0)
+1225:	LDF	0,-104(5)
+1226:	STF	0,0(6)
+
+*	252:	(push_param_op, ID: 78$v, null, null)
+1227:	LDA	6,-8(6)
+1228:	LDA	0,0(0)
+1229:	LD	0,-24(5)
+1230:	ST	0,0(6)
+
+*	253:	(push_param_op, ID: 77$u, null, null)
+1231:	LDA	6,-8(6)
+1232:	LDA	0,0(0)
+1233:	LD	0,-16(5)
+1234:	ST	0,0(6)
+
+*	254:	(call_func_op, ID: 48$relax, null, null)
+1235:	LDA	6,-4(6)
+1236:	LDA	0,5(7)
+1237:	ST	0,0(6)
+1238:	LDA	6,-4(6)
+1239:	ST	5,0(6)
+1240:	LDA	5,0(6)
+1241:	LDC	7,814(0)
+
+*	255:	(pop_params_op, int: 8, null, null)
+1242:	LDC	0,64(0)
+1243:	ADD	6,6,0
+
+*	256:	(assn_int_from_arraysub_op, ID: temp69, ID: 68$next, ID: 79$i)
+1244:	LDA	0,0(0)
+1245:	LD	0,32(5)
+1246:	LDC	1,8(0)
+1247:	MUL	0,0,1
+1248:	LD	1,-112(5)
+1249:	ADD	0,0,1
+1250:	LD	1,0(0)
+1251:	ST	1,-112(5)
+
+*	257:	(assn_int_to_var_op, ID: 79$i, ID: temp69, null)
+1252:	LDA	0,0(0)
+1253:	LD	0,-112(5)
+1254:	ST	0,-32(5)
+
+*	258:	(goto_op, int: 240, null, null)
+
+*	259:	(goto_op, int: 225, null, null)
+
+*	260:	(return_op, null, null, null)
+1257:	LDA	6,0(5)
+1258:	LDA	6,8(6)
+1259:	LD	2,4(5)
+1260:	LD	5,0(5)
+1261:	LDA	7,0(2)
+
+*	261:	(func_decl_op, ID: 80$main, null, null)
+1262:	LDC	0,95(0)
+1263:	LDC	1,-8(0)
+1264:	MUL	0,0,1
+1265:	ADD	6,6,0
+
+*	262:	(assign_int_literal, ID: temp70, int: 6, null)
+1266:	LDC	0,6(0)
+1267:	ST	0,-88(5)
+
+*	263:	(alloc_array_op, ID: 81$first, ID: temp70, null)
+1268:	LDA	0,0(0)
+1269:	LD	0,-88(5)
+1270:	LDC	1,-8(0)
+1271:	MUL	0,0,1
+1272:	ADD	6,6,0
+1273:	LDA	1,-8(5)
+1274:	ST	6,0(1)
+
+*	264:	(assign_int_literal, ID: temp71, int: 11, null)
+1275:	LDC	0,11(0)
+1276:	ST	0,-96(5)
+
+*	265:	(alloc_array_op, ID: 82$node, ID: temp71, null)
+1277:	LDA	0,0(0)
+1278:	LD	0,-96(5)
+1279:	LDC	1,-8(0)
+1280:	MUL	0,0,1
+1281:	ADD	6,6,0
+1282:	LDA	1,-16(5)
+1283:	ST	6,0(1)
+
+*	266:	(assign_int_literal, ID: temp72, int: 11, null)
+1284:	LDC	0,11(0)
+1285:	ST	0,-104(5)
+
+*	267:	(alloc_array_op, ID: 83$next, ID: temp72, null)
+1286:	LDA	0,0(0)
+1287:	LD	0,-104(5)
+1288:	LDC	1,-8(0)
+1289:	MUL	0,0,1
+1290:	ADD	6,6,0
+1291:	LDA	1,-24(5)
+1292:	ST	6,0(1)
+
+*	268:	(assign_int_literal, ID: temp73, int: 6, null)
+1293:	LDC	0,6(0)
+1294:	ST	0,-112(5)
+
+*	269:	(alloc_array_op, ID: 84$pi, ID: temp73, null)
+1295:	LDA	0,0(0)
+1296:	LD	0,-112(5)
+1297:	LDC	1,-8(0)
+1298:	MUL	0,0,1
+1299:	ADD	6,6,0
+1300:	LDA	1,-32(5)
+1301:	ST	6,0(1)
+
+*	270:	(assign_int_literal, ID: temp74, int: 6, null)
+1302:	LDC	0,6(0)
+1303:	ST	0,-120(5)
+
+*	271:	(alloc_array_op, ID: 85$handle, ID: temp74, null)
+1304:	LDA	0,0(0)
+1305:	LD	0,-120(5)
+1306:	LDC	1,-8(0)
+1307:	MUL	0,0,1
+1308:	ADD	6,6,0
+1309:	LDA	1,-40(5)
+1310:	ST	6,0(1)
+
+*	272:	(assign_int_literal, ID: temp75, int: 6, null)
+1311:	LDC	0,6(0)
+1312:	ST	0,-128(5)
+
+*	273:	(alloc_array_op, ID: 86$heap_index, ID: temp75, null)
+1313:	LDA	0,0(0)
+1314:	LD	0,-128(5)
+1315:	LDC	1,-8(0)
+1316:	MUL	0,0,1
+1317:	ADD	6,6,0
+1318:	LDA	1,-48(5)
+1319:	ST	6,0(1)
+
+*	274:	(assign_int_literal, ID: temp76, int: 11, null)
+1320:	LDC	0,11(0)
+1321:	ST	0,-136(5)
+
+*	275:	(alloc_array_op, ID: 87$w, ID: temp76, null)
+1322:	LDA	0,0(0)
+1323:	LD	0,-136(5)
+1324:	LDC	1,-8(0)
+1325:	MUL	0,0,1
+1326:	ADD	6,6,0
+1327:	LDA	1,-56(5)
+1328:	ST	6,0(1)
+
+*	276:	(assign_int_literal, ID: temp77, int: 6, null)
+1329:	LDC	0,6(0)
+1330:	ST	0,-144(5)
+
+*	277:	(alloc_array_op, ID: 88$d, ID: temp77, null)
+1331:	LDA	0,0(0)
+1332:	LD	0,-144(5)
+1333:	LDC	1,-8(0)
+1334:	MUL	0,0,1
+1335:	ADD	6,6,0
+1336:	LDA	1,-64(5)
+1337:	ST	6,0(1)
+
+*	278:	(assign_int_literal, ID: temp78, int: 1, null)
+1338:	LDC	0,1(0)
+1339:	ST	0,-152(5)
+
+*	279:	(assign_int_literal, ID: temp79, int: 1, null)
+1340:	LDC	0,1(0)
+1341:	ST	0,-160(5)
+
+*	280:	(assn_int_to_arraysub_op, ID: 81$first, ID: temp79, ID: temp78)
+1342:	LDA	0,0(0)
+1343:	LD	0,-160(5)
+1344:	LDC	1,8(0)
+1345:	MUL	0,0,1
+1346:	LD	1,-8(5)
+1347:	ADD	0,0,1
+1348:	LDA	0,0(0)
+1349:	LD	1,-152(5)
+1350:	ST	1,0(0)
+
+*	281:	(assign_int_literal, ID: temp80, int: 3, null)
+1351:	LDC	0,3(0)
+1352:	ST	0,-168(5)
+
+*	282:	(assign_int_literal, ID: temp81, int: 2, null)
+1353:	LDC	0,2(0)
+1354:	ST	0,-176(5)
+
+*	283:	(assn_int_to_arraysub_op, ID: 81$first, ID: temp81, ID: temp80)
+1355:	LDA	0,0(0)
+1356:	LD	0,-176(5)
+1357:	LDC	1,8(0)
+1358:	MUL	0,0,1
+1359:	LD	1,-8(5)
+1360:	ADD	0,0,1
+1361:	LDA	0,0(0)
+1362:	LD	1,-168(5)
+1363:	ST	1,0(0)
+
+*	284:	(assign_int_literal, ID: temp82, int: 5, null)
+1364:	LDC	0,5(0)
+1365:	ST	0,-184(5)
+
+*	285:	(assign_int_literal, ID: temp83, int: 3, null)
+1366:	LDC	0,3(0)
+1367:	ST	0,-192(5)
+
+*	286:	(assn_int_to_arraysub_op, ID: 81$first, ID: temp83, ID: temp82)
+1368:	LDA	0,0(0)
+1369:	LD	0,-192(5)
+1370:	LDC	1,8(0)
+1371:	MUL	0,0,1
+1372:	LD	1,-8(5)
+1373:	ADD	0,0,1
+1374:	LDA	0,0(0)
+1375:	LD	1,-184(5)
+1376:	ST	1,0(0)
+
+*	287:	(assign_int_literal, ID: temp84, int: 6, null)
+1377:	LDC	0,6(0)
+1378:	ST	0,-200(5)
+
+*	288:	(assign_int_literal, ID: temp85, int: 4, null)
+1379:	LDC	0,4(0)
+1380:	ST	0,-208(5)
+
+*	289:	(assn_int_to_arraysub_op, ID: 81$first, ID: temp85, ID: temp84)
+1381:	LDA	0,0(0)
+1382:	LD	0,-208(5)
+1383:	LDC	1,8(0)
+1384:	MUL	0,0,1
+1385:	LD	1,-8(5)
+1386:	ADD	0,0,1
+1387:	LDA	0,0(0)
+1388:	LD	1,-200(5)
+1389:	ST	1,0(0)
+
+*	290:	(assign_int_literal, ID: temp86, int: 9, null)
+1390:	LDC	0,9(0)
+1391:	ST	0,-216(5)
+
+*	291:	(assign_int_literal, ID: temp87, int: 5, null)
+1392:	LDC	0,5(0)
+1393:	ST	0,-224(5)
+
+*	292:	(assn_int_to_arraysub_op, ID: 81$first, ID: temp87, ID: temp86)
+1394:	LDA	0,0(0)
+1395:	LD	0,-224(5)
+1396:	LDC	1,8(0)
+1397:	MUL	0,0,1
+1398:	LD	1,-8(5)
+1399:	ADD	0,0,1
+1400:	LDA	0,0(0)
+1401:	LD	1,-216(5)
+1402:	ST	1,0(0)
+
+*	293:	(assign_int_literal, ID: temp88, int: 2, null)
+1403:	LDC	0,2(0)
+1404:	ST	0,-232(5)
+
+*	294:	(assign_int_literal, ID: temp89, int: 1, null)
+1405:	LDC	0,1(0)
+1406:	ST	0,-240(5)
+
+*	295:	(assn_int_to_arraysub_op, ID: 82$node, ID: temp89, ID: temp88)
+1407:	LDA	0,0(0)
+1408:	LD	0,-240(5)
+1409:	LDC	1,8(0)
+1410:	MUL	0,0,1
+1411:	LD	1,-16(5)
+1412:	ADD	0,0,1
+1413:	LDA	0,0(0)
+1414:	LD	1,-232(5)
+1415:	ST	1,0(0)
+
+*	296:	(assign_int_literal, ID: temp90, int: 4, null)
+1416:	LDC	0,4(0)
+1417:	ST	0,-248(5)
+
+*	297:	(assign_int_literal, ID: temp91, int: 2, null)
+1418:	LDC	0,2(0)
+1419:	ST	0,-256(5)
+
+*	298:	(assn_int_to_arraysub_op, ID: 82$node, ID: temp91, ID: temp90)
+1420:	LDA	0,0(0)
+1421:	LD	0,-256(5)
+1422:	LDC	1,8(0)
+1423:	MUL	0,0,1
+1424:	LD	1,-16(5)
+1425:	ADD	0,0,1
+1426:	LDA	0,0(0)
+1427:	LD	1,-248(5)
+1428:	ST	1,0(0)
+
+*	299:	(assign_int_literal, ID: temp92, int: 3, null)
+1429:	LDC	0,3(0)
+1430:	ST	0,-264(5)
+
+*	300:	(assign_int_literal, ID: temp93, int: 3, null)
+1431:	LDC	0,3(0)
+1432:	ST	0,-272(5)
+
+*	301:	(assn_int_to_arraysub_op, ID: 82$node, ID: temp93, ID: temp92)
+1433:	LDA	0,0(0)
+1434:	LD	0,-272(5)
+1435:	LDC	1,8(0)
+1436:	MUL	0,0,1
+1437:	LD	1,-16(5)
+1438:	ADD	0,0,1
+1439:	LDA	0,0(0)
+1440:	LD	1,-264(5)
+1441:	ST	1,0(0)
+
+*	302:	(assign_int_literal, ID: temp94, int: 4, null)
+1442:	LDC	0,4(0)
+1443:	ST	0,-280(5)
+
+*	303:	(assign_int_literal, ID: temp95, int: 4, null)
+1444:	LDC	0,4(0)
+1445:	ST	0,-288(5)
+
+*	304:	(assn_int_to_arraysub_op, ID: 82$node, ID: temp95, ID: temp94)
+1446:	LDA	0,0(0)
+1447:	LD	0,-288(5)
+1448:	LDC	1,8(0)
+1449:	MUL	0,0,1
+1450:	LD	1,-16(5)
+1451:	ADD	0,0,1
+1452:	LDA	0,0(0)
+1453:	LD	1,-280(5)
+1454:	ST	1,0(0)
+
+*	305:	(assign_int_literal, ID: temp96, int: 5, null)
+1455:	LDC	0,5(0)
+1456:	ST	0,-296(5)
+
+*	306:	(assign_int_literal, ID: temp97, int: 5, null)
+1457:	LDC	0,5(0)
+1458:	ST	0,-304(5)
+
+*	307:	(assn_int_to_arraysub_op, ID: 82$node, ID: temp97, ID: temp96)
+1459:	LDA	0,0(0)
+1460:	LD	0,-304(5)
+1461:	LDC	1,8(0)
+1462:	MUL	0,0,1
+1463:	LD	1,-16(5)
+1464:	ADD	0,0,1
+1465:	LDA	0,0(0)
+1466:	LD	1,-296(5)
+1467:	ST	1,0(0)
+
+*	308:	(assign_int_literal, ID: temp98, int: 2, null)
+1468:	LDC	0,2(0)
+1469:	ST	0,-312(5)
+
+*	309:	(assign_int_literal, ID: temp99, int: 6, null)
+1470:	LDC	0,6(0)
+1471:	ST	0,-320(5)
+
+*	310:	(assn_int_to_arraysub_op, ID: 82$node, ID: temp99, ID: temp98)
+1472:	LDA	0,0(0)
+1473:	LD	0,-320(5)
+1474:	LDC	1,8(0)
+1475:	MUL	0,0,1
+1476:	LD	1,-16(5)
+1477:	ADD	0,0,1
+1478:	LDA	0,0(0)
+1479:	LD	1,-312(5)
+1480:	ST	1,0(0)
+
+*	311:	(assign_int_literal, ID: temp100, int: 3, null)
+1481:	LDC	0,3(0)
+1482:	ST	0,-328(5)
+
+*	312:	(assign_int_literal, ID: temp101, int: 7, null)
+1483:	LDC	0,7(0)
+1484:	ST	0,-336(5)
+
+*	313:	(assn_int_to_arraysub_op, ID: 82$node, ID: temp101, ID: temp100)
+1485:	LDA	0,0(0)
+1486:	LD	0,-336(5)
+1487:	LDC	1,8(0)
+1488:	MUL	0,0,1
+1489:	LD	1,-16(5)
+1490:	ADD	0,0,1
+1491:	LDA	0,0(0)
+1492:	LD	1,-328(5)
+1493:	ST	1,0(0)
+
+*	314:	(assign_int_literal, ID: temp102, int: 5, null)
+1494:	LDC	0,5(0)
+1495:	ST	0,-344(5)
+
+*	315:	(assign_int_literal, ID: temp103, int: 8, null)
+1496:	LDC	0,8(0)
+1497:	ST	0,-352(5)
+
+*	316:	(assn_int_to_arraysub_op, ID: 82$node, ID: temp103, ID: temp102)
+1498:	LDA	0,0(0)
+1499:	LD	0,-352(5)
+1500:	LDC	1,8(0)
+1501:	MUL	0,0,1
+1502:	LD	1,-16(5)
+1503:	ADD	0,0,1
+1504:	LDA	0,0(0)
+1505:	LD	1,-344(5)
+1506:	ST	1,0(0)
+
+*	317:	(assign_int_literal, ID: temp104, int: 1, null)
+1507:	LDC	0,1(0)
+1508:	ST	0,-360(5)
+
+*	318:	(assign_int_literal, ID: temp105, int: 9, null)
+1509:	LDC	0,9(0)
+1510:	ST	0,-368(5)
+
+*	319:	(assn_int_to_arraysub_op, ID: 82$node, ID: temp105, ID: temp104)
+1511:	LDA	0,0(0)
+1512:	LD	0,-368(5)
+1513:	LDC	1,8(0)
+1514:	MUL	0,0,1
+1515:	LD	1,-16(5)
+1516:	ADD	0,0,1
+1517:	LDA	0,0(0)
+1518:	LD	1,-360(5)
+1519:	ST	1,0(0)
+
+*	320:	(assign_int_literal, ID: temp106, int: 3, null)
+1520:	LDC	0,3(0)
+1521:	ST	0,-376(5)
+
+*	321:	(assign_int_literal, ID: temp107, int: 10, null)
+1522:	LDC	0,10(0)
+1523:	ST	0,-384(5)
+
+*	322:	(assn_int_to_arraysub_op, ID: 82$node, ID: temp107, ID: temp106)
+1524:	LDA	0,0(0)
+1525:	LD	0,-384(5)
+1526:	LDC	1,8(0)
+1527:	MUL	0,0,1
+1528:	LD	1,-16(5)
+1529:	ADD	0,0,1
+1530:	LDA	0,0(0)
+1531:	LD	1,-376(5)
+1532:	ST	1,0(0)
+
+*	323:	(assign_double_literal, ID: temp108, double: 10.000000, null)
+1533:	LDFC	0,10(0)
+1534:	STF	0,-392(5)
+
+*	324:	(assign_int_literal, ID: temp109, int: 1, null)
+1535:	LDC	0,1(0)
+1536:	ST	0,-400(5)
+
+*	325:	(assn_float_to_arraysub_op, ID: 87$w, ID: temp109, ID: temp108)
+1537:	LDA	0,0(0)
+1538:	LD	0,-400(5)
+1539:	LDC	1,8(0)
+1540:	MUL	0,0,1
+1541:	LD	1,-56(5)
+1542:	ADD	0,0,1
+1543:	LDA	0,0(0)
+1544:	LDF	1,-392(5)
+1545:	STF	1,0(0)
+
+*	326:	(assign_double_literal, ID: temp110, double: 5.000000, null)
+1546:	LDFC	0,5(0)
+1547:	STF	0,-408(5)
+
+*	327:	(assign_int_literal, ID: temp111, int: 2, null)
+1548:	LDC	0,2(0)
+1549:	ST	0,-416(5)
+
+*	328:	(assn_float_to_arraysub_op, ID: 87$w, ID: temp111, ID: temp110)
+1550:	LDA	0,0(0)
+1551:	LD	0,-416(5)
+1552:	LDC	1,8(0)
+1553:	MUL	0,0,1
+1554:	LD	1,-56(5)
+1555:	ADD	0,0,1
+1556:	LDA	0,0(0)
+1557:	LDF	1,-408(5)
+1558:	STF	1,0(0)
+
+*	329:	(assign_double_literal, ID: temp112, double: 1.000000, null)
+1559:	LDFC	0,1(0)
+1560:	STF	0,-424(5)
+
+*	330:	(assign_int_literal, ID: temp113, int: 3, null)
+1561:	LDC	0,3(0)
+1562:	ST	0,-432(5)
+
+*	331:	(assn_float_to_arraysub_op, ID: 87$w, ID: temp113, ID: temp112)
+1563:	LDA	0,0(0)
+1564:	LD	0,-432(5)
+1565:	LDC	1,8(0)
+1566:	MUL	0,0,1
+1567:	LD	1,-56(5)
+1568:	ADD	0,0,1
+1569:	LDA	0,0(0)
+1570:	LDF	1,-424(5)
+1571:	STF	1,0(0)
+
+*	332:	(assign_double_literal, ID: temp114, double: 2.000000, null)
+1572:	LDFC	0,2(0)
+1573:	STF	0,-440(5)
+
+*	333:	(assign_int_literal, ID: temp115, int: 4, null)
+1574:	LDC	0,4(0)
+1575:	ST	0,-448(5)
+
+*	334:	(assn_float_to_arraysub_op, ID: 87$w, ID: temp115, ID: temp114)
+1576:	LDA	0,0(0)
+1577:	LD	0,-448(5)
+1578:	LDC	1,8(0)
+1579:	MUL	0,0,1
+1580:	LD	1,-56(5)
+1581:	ADD	0,0,1
+1582:	LDA	0,0(0)
+1583:	LDF	1,-440(5)
+1584:	STF	1,0(0)
+
+*	335:	(assign_double_literal, ID: temp116, double: 4.000000, null)
+1585:	LDFC	0,4(0)
+1586:	STF	0,-456(5)
+
+*	336:	(assign_int_literal, ID: temp117, int: 5, null)
+1587:	LDC	0,5(0)
+1588:	ST	0,-464(5)
+
+*	337:	(assn_float_to_arraysub_op, ID: 87$w, ID: temp117, ID: temp116)
+1589:	LDA	0,0(0)
+1590:	LD	0,-464(5)
+1591:	LDC	1,8(0)
+1592:	MUL	0,0,1
+1593:	LD	1,-56(5)
+1594:	ADD	0,0,1
+1595:	LDA	0,0(0)
+1596:	LDF	1,-456(5)
+1597:	STF	1,0(0)
+
+*	338:	(assign_double_literal, ID: temp118, double: 3.000000, null)
+1598:	LDFC	0,3(0)
+1599:	STF	0,-472(5)
+
+*	339:	(assign_int_literal, ID: temp119, int: 6, null)
+1600:	LDC	0,6(0)
+1601:	ST	0,-480(5)
+
+*	340:	(assn_float_to_arraysub_op, ID: 87$w, ID: temp119, ID: temp118)
+1602:	LDA	0,0(0)
+1603:	LD	0,-480(5)
+1604:	LDC	1,8(0)
+1605:	MUL	0,0,1
+1606:	LD	1,-56(5)
+1607:	ADD	0,0,1
+1608:	LDA	0,0(0)
+1609:	LDF	1,-472(5)
+1610:	STF	1,0(0)
+
+*	341:	(assign_double_literal, ID: temp120, double: 9.000000, null)
+1611:	LDFC	0,9(0)
+1612:	STF	0,-488(5)
+
+*	342:	(assign_int_literal, ID: temp121, int: 7, null)
+1613:	LDC	0,7(0)
+1614:	ST	0,-496(5)
+
+*	343:	(assn_float_to_arraysub_op, ID: 87$w, ID: temp121, ID: temp120)
+1615:	LDA	0,0(0)
+1616:	LD	0,-496(5)
+1617:	LDC	1,8(0)
+1618:	MUL	0,0,1
+1619:	LD	1,-56(5)
+1620:	ADD	0,0,1
+1621:	LDA	0,0(0)
+1622:	LDF	1,-488(5)
+1623:	STF	1,0(0)
+
+*	344:	(assign_double_literal, ID: temp122, double: 2.000000, null)
+1624:	LDFC	0,2(0)
+1625:	STF	0,-504(5)
+
+*	345:	(assign_int_literal, ID: temp123, int: 8, null)
+1626:	LDC	0,8(0)
+1627:	ST	0,-512(5)
+
+*	346:	(assn_float_to_arraysub_op, ID: 87$w, ID: temp123, ID: temp122)
+1628:	LDA	0,0(0)
+1629:	LD	0,-512(5)
+1630:	LDC	1,8(0)
+1631:	MUL	0,0,1
+1632:	LD	1,-56(5)
+1633:	ADD	0,0,1
+1634:	LDA	0,0(0)
+1635:	LDF	1,-504(5)
+1636:	STF	1,0(0)
+
+*	347:	(assign_double_literal, ID: temp124, double: 7.000000, null)
+1637:	LDFC	0,7(0)
+1638:	STF	0,-520(5)
+
+*	348:	(assign_int_literal, ID: temp125, int: 9, null)
+1639:	LDC	0,9(0)
+1640:	ST	0,-528(5)
+
+*	349:	(assn_float_to_arraysub_op, ID: 87$w, ID: temp125, ID: temp124)
+1641:	LDA	0,0(0)
+1642:	LD	0,-528(5)
+1643:	LDC	1,8(0)
+1644:	MUL	0,0,1
+1645:	LD	1,-56(5)
+1646:	ADD	0,0,1
+1647:	LDA	0,0(0)
+1648:	LDF	1,-520(5)
+1649:	STF	1,0(0)
+
+*	350:	(assign_double_literal, ID: temp126, double: 6.000000, null)
+1650:	LDFC	0,6(0)
+1651:	STF	0,-536(5)
+
+*	351:	(assign_int_literal, ID: temp127, int: 10, null)
+1652:	LDC	0,10(0)
+1653:	ST	0,-544(5)
+
+*	352:	(assn_float_to_arraysub_op, ID: 87$w, ID: temp127, ID: temp126)
+1654:	LDA	0,0(0)
+1655:	LD	0,-544(5)
+1656:	LDC	1,8(0)
+1657:	MUL	0,0,1
+1658:	LD	1,-56(5)
+1659:	ADD	0,0,1
+1660:	LDA	0,0(0)
+1661:	LDF	1,-536(5)
+1662:	STF	1,0(0)
+
+*	353:	(assign_int_literal, ID: temp128, int: 2, null)
+1663:	LDC	0,2(0)
+1664:	ST	0,-552(5)
+
+*	354:	(assign_int_literal, ID: temp129, int: 1, null)
+1665:	LDC	0,1(0)
+1666:	ST	0,-560(5)
+
+*	355:	(assn_int_to_arraysub_op, ID: 83$next, ID: temp129, ID: temp128)
+1667:	LDA	0,0(0)
+1668:	LD	0,-560(5)
+1669:	LDC	1,8(0)
+1670:	MUL	0,0,1
+1671:	LD	1,-24(5)
+1672:	ADD	0,0,1
+1673:	LDA	0,0(0)
+1674:	LD	1,-552(5)
+1675:	ST	1,0(0)
+
+*	356:	(assign_int_literal, ID: temp130, int: 0, null)
+1676:	LDC	0,0(0)
+1677:	ST	0,-568(5)
+
+*	357:	(assign_int_literal, ID: temp131, int: 2, null)
+1678:	LDC	0,2(0)
+1679:	ST	0,-576(5)
+
+*	358:	(assn_int_to_arraysub_op, ID: 83$next, ID: temp131, ID: temp130)
+1680:	LDA	0,0(0)
+1681:	LD	0,-576(5)
+1682:	LDC	1,8(0)
+1683:	MUL	0,0,1
+1684:	LD	1,-24(5)
+1685:	ADD	0,0,1
+1686:	LDA	0,0(0)
+1687:	LD	1,-568(5)
+1688:	ST	1,0(0)
+
+*	359:	(assign_int_literal, ID: temp132, int: 4, null)
+1689:	LDC	0,4(0)
+1690:	ST	0,-584(5)
+
+*	360:	(assign_int_literal, ID: temp133, int: 3, null)
+1691:	LDC	0,3(0)
+1692:	ST	0,-592(5)
+
+*	361:	(assn_int_to_arraysub_op, ID: 83$next, ID: temp133, ID: temp132)
+1693:	LDA	0,0(0)
+1694:	LD	0,-592(5)
+1695:	LDC	1,8(0)
+1696:	MUL	0,0,1
+1697:	LD	1,-24(5)
+1698:	ADD	0,0,1
+1699:	LDA	0,0(0)
+1700:	LD	1,-584(5)
+1701:	ST	1,0(0)
+
+*	362:	(assign_int_literal, ID: temp134, int: 0, null)
+1702:	LDC	0,0(0)
+1703:	ST	0,-600(5)
+
+*	363:	(assign_int_literal, ID: temp135, int: 4, null)
+1704:	LDC	0,4(0)
+1705:	ST	0,-608(5)
+
+*	364:	(assn_int_to_arraysub_op, ID: 83$next, ID: temp135, ID: temp134)
+1706:	LDA	0,0(0)
+1707:	LD	0,-608(5)
+1708:	LDC	1,8(0)
+1709:	MUL	0,0,1
+1710:	LD	1,-24(5)
+1711:	ADD	0,0,1
+1712:	LDA	0,0(0)
+1713:	LD	1,-600(5)
+1714:	ST	1,0(0)
+
+*	365:	(assign_int_literal, ID: temp136, int: 0, null)
+1715:	LDC	0,0(0)
+1716:	ST	0,-616(5)
+
+*	366:	(assign_int_literal, ID: temp137, int: 5, null)
+1717:	LDC	0,5(0)
+1718:	ST	0,-624(5)
+
+*	367:	(assn_int_to_arraysub_op, ID: 83$next, ID: temp137, ID: temp136)
+1719:	LDA	0,0(0)
+1720:	LD	0,-624(5)
+1721:	LDC	1,8(0)
+1722:	MUL	0,0,1
+1723:	LD	1,-24(5)
+1724:	ADD	0,0,1
+1725:	LDA	0,0(0)
+1726:	LD	1,-616(5)
+1727:	ST	1,0(0)
+
+*	368:	(assign_int_literal, ID: temp138, int: 7, null)
+1728:	LDC	0,7(0)
+1729:	ST	0,-632(5)
+
+*	369:	(assign_int_literal, ID: temp139, int: 6, null)
+1730:	LDC	0,6(0)
+1731:	ST	0,-640(5)
+
+*	370:	(assn_int_to_arraysub_op, ID: 83$next, ID: temp139, ID: temp138)
+1732:	LDA	0,0(0)
+1733:	LD	0,-640(5)
+1734:	LDC	1,8(0)
+1735:	MUL	0,0,1
+1736:	LD	1,-24(5)
+1737:	ADD	0,0,1
+1738:	LDA	0,0(0)
+1739:	LD	1,-632(5)
+1740:	ST	1,0(0)
+
+*	371:	(assign_int_literal, ID: temp140, int: 8, null)
+1741:	LDC	0,8(0)
+1742:	ST	0,-648(5)
+
+*	372:	(assign_int_literal, ID: temp141, int: 7, null)
+1743:	LDC	0,7(0)
+1744:	ST	0,-656(5)
+
+*	373:	(assn_int_to_arraysub_op, ID: 83$next, ID: temp141, ID: temp140)
+1745:	LDA	0,0(0)
+1746:	LD	0,-656(5)
+1747:	LDC	1,8(0)
+1748:	MUL	0,0,1
+1749:	LD	1,-24(5)
+1750:	ADD	0,0,1
+1751:	LDA	0,0(0)
+1752:	LD	1,-648(5)
+1753:	ST	1,0(0)
+
+*	374:	(assign_int_literal, ID: temp142, int: 0, null)
+1754:	LDC	0,0(0)
+1755:	ST	0,-664(5)
+
+*	375:	(assign_int_literal, ID: temp143, int: 8, null)
+1756:	LDC	0,8(0)
+1757:	ST	0,-672(5)
+
+*	376:	(assn_int_to_arraysub_op, ID: 83$next, ID: temp143, ID: temp142)
+1758:	LDA	0,0(0)
+1759:	LD	0,-672(5)
+1760:	LDC	1,8(0)
+1761:	MUL	0,0,1
+1762:	LD	1,-24(5)
+1763:	ADD	0,0,1
+1764:	LDA	0,0(0)
+1765:	LD	1,-664(5)
+1766:	ST	1,0(0)
+
+*	377:	(assign_int_literal, ID: temp144, int: 10, null)
+1767:	LDC	0,10(0)
+1768:	ST	0,-680(5)
+
+*	378:	(assign_int_literal, ID: temp145, int: 9, null)
+1769:	LDC	0,9(0)
+1770:	ST	0,-688(5)
+
+*	379:	(assn_int_to_arraysub_op, ID: 83$next, ID: temp145, ID: temp144)
+1771:	LDA	0,0(0)
+1772:	LD	0,-688(5)
+1773:	LDC	1,8(0)
+1774:	MUL	0,0,1
+1775:	LD	1,-24(5)
+1776:	ADD	0,0,1
+1777:	LDA	0,0(0)
+1778:	LD	1,-680(5)
+1779:	ST	1,0(0)
+
+*	380:	(assign_int_literal, ID: temp146, int: 0, null)
+1780:	LDC	0,0(0)
+1781:	ST	0,-696(5)
+
+*	381:	(assign_int_literal, ID: temp147, int: 10, null)
+1782:	LDC	0,10(0)
+1783:	ST	0,-704(5)
+
+*	382:	(assn_int_to_arraysub_op, ID: 83$next, ID: temp147, ID: temp146)
+1784:	LDA	0,0(0)
+1785:	LD	0,-704(5)
+1786:	LDC	1,8(0)
+1787:	MUL	0,0,1
+1788:	LD	1,-24(5)
+1789:	ADD	0,0,1
+1790:	LDA	0,0(0)
+1791:	LD	1,-696(5)
+1792:	ST	1,0(0)
+
+*	383:	(print_string_op, arg type not specified, null, null)
+1793:	LDC	0,69(0)
+1794:	OUTB	0,0,0
+1795:	LDC	0,110(0)
+1796:	OUTB	0,0,0
+1797:	LDC	0,116(0)
+1798:	OUTB	0,0,0
+1799:	LDC	0,101(0)
+1800:	OUTB	0,0,0
+1801:	LDC	0,114(0)
+1802:	OUTB	0,0,0
+1803:	LDC	0,32(0)
+1804:	OUTB	0,0,0
+1805:	LDC	0,115(0)
+1806:	OUTB	0,0,0
+1807:	LDC	0,111(0)
+1808:	OUTB	0,0,0
+1809:	LDC	0,117(0)
+1810:	OUTB	0,0,0
+1811:	LDC	0,114(0)
+1812:	OUTB	0,0,0
+1813:	LDC	0,99(0)
+1814:	OUTB	0,0,0
+1815:	LDC	0,101(0)
+1816:	OUTB	0,0,0
+1817:	LDC	0,32(0)
+1818:	OUTB	0,0,0
+1819:	LDC	0,110(0)
+1820:	OUTB	0,0,0
+1821:	LDC	0,111(0)
+1822:	OUTB	0,0,0
+1823:	LDC	0,100(0)
+1824:	OUTB	0,0,0
+1825:	LDC	0,101(0)
+1826:	OUTB	0,0,0
+1827:	LDC	0,58(0)
+1828:	OUTB	0,0,0
+1829:	LDC	0,32(0)
+1830:	OUTB	0,0,0
+
+*	384:	(read_int_op, ID: 89$s, null, null)
+1831:	IN	0,0,0
+1832:	ST	0,-72(5)
+
+*	385:	(push_param_op, ID: 86$heap_index, null, null)
+1833:	LDA	6,-8(6)
+1834:	LDA	0,0(0)
+1835:	LD	0,-48(5)
+1836:	ST	0,0(6)
+
+*	386:	(push_param_op, ID: 85$handle, null, null)
+1837:	LDA	6,-8(6)
+1838:	LDA	0,0(0)
+1839:	LD	0,-40(5)
+1840:	ST	0,0(6)
+
+*	387:	(assign_int_literal, ID: temp148, int: 5, null)
+1841:	LDC	0,5(0)
+1842:	ST	0,-712(5)
+
+*	388:	(push_param_op, ID: temp148, null, null)
+1843:	LDA	6,-8(6)
+1844:	LDA	0,0(0)
+1845:	LD	0,-712(5)
+1846:	ST	0,0(6)
+
+*	389:	(push_param_op, ID: 89$s, null, null)
+1847:	LDA	6,-8(6)
+1848:	LDA	0,0(0)
+1849:	LD	0,-72(5)
+1850:	ST	0,0(6)
+
+*	390:	(push_param_op, ID: 84$pi, null, null)
+1851:	LDA	6,-8(6)
+1852:	LDA	0,0(0)
+1853:	LD	0,-32(5)
+1854:	ST	0,0(6)
+
+*	391:	(push_param_op, ID: 88$d, null, null)
+1855:	LDA	6,-8(6)
+1856:	LDA	0,0(0)
+1857:	LDF	0,-64(5)
+1858:	STF	0,0(6)
+
+*	392:	(push_param_op, ID: 87$w, null, null)
+1859:	LDA	6,-8(6)
+1860:	LDA	0,0(0)
+1861:	LDF	0,-56(5)
+1862:	STF	0,0(6)
+
+*	393:	(push_param_op, ID: 83$next, null, null)
+1863:	LDA	6,-8(6)
+1864:	LDA	0,0(0)
+1865:	LD	0,-24(5)
+1866:	ST	0,0(6)
+
+*	394:	(push_param_op, ID: 82$node, null, null)
+1867:	LDA	6,-8(6)
+1868:	LDA	0,0(0)
+1869:	LD	0,-16(5)
+1870:	ST	0,0(6)
+
+*	395:	(push_param_op, ID: 81$first, null, null)
+1871:	LDA	6,-8(6)
+1872:	LDA	0,0(0)
+1873:	LD	0,-8(5)
+1874:	ST	0,0(6)
+
+*	396:	(call_func_op, ID: 65$dijkstra, null, null)
+1875:	LDA	6,-4(6)
+1876:	LDA	0,5(7)
+1877:	ST	0,0(6)
+1878:	LDA	6,-4(6)
+1879:	ST	5,0(6)
+1880:	LDA	5,0(6)
+1881:	LDC	7,1058(0)
+
+*	397:	(pop_params_op, int: 10, null, null)
+1882:	LDC	0,80(0)
+1883:	ADD	6,6,0
+
+*	398:	(assign_int_literal, ID: temp149, int: 1, null)
+1884:	LDC	0,1(0)
+1885:	ST	0,-720(5)
+
+*	399:	(assn_int_to_var_op, ID: 90$i, ID: temp149, null)
+1886:	LDA	0,0(0)
+1887:	LD	0,-720(5)
+1888:	ST	0,-80(5)
+
+*	400:	(assign_int_literal, ID: temp150, int: 5, null)
+1889:	LDC	0,5(0)
+1890:	ST	0,-728(5)
+
+*	401:	(leq_ints_op, ID: temp151, ID: 90$i, ID: temp150)
+1891:	LDA	0,0(0)
+1892:	LD	0,-80(5)
+1893:	LDA	0,0(0)
+1894:	LD	1,-728(5)
+1895:	SUB	0,0,1
+1896:	JLE	0,2(7)
+1897:	LDC	0,0(0)
+1898:	LDA	7,1(7)
+1899:	LDC	0,1(0)
+1900:	ST	0,-736(5)
+
+*	402:	(if_false_op, ID: temp151, int: 414, null)
+
+*	403:	(print_int_op, ID: 90$i, null, null)
+1905:	LDA	0,0(0)
+1906:	LD	0,-80(5)
+1907:	OUT	0,0,0
+
+*	404:	(print_string_op, arg type not specified, null, null)
+1908:	LDC	0,58(0)
+1909:	OUTB	0,0,0
+1910:	LDC	0,32(0)
+1911:	OUTB	0,0,0
+
+*	405:	(assn_int_from_arraysub_op, ID: temp153, ID: 86$heap_index, ID: 90$i)
+1912:	LDA	0,0(0)
+1913:	LD	0,-48(5)
+1914:	LDC	1,8(0)
+1915:	MUL	0,0,1
+1916:	LD	1,-752(5)
+1917:	ADD	0,0,1
+1918:	LD	1,0(0)
+1919:	ST	1,-752(5)
+
+*	406:	(assn_float_from_arraysub_op, ID: temp152, ID: 88$d, ID: temp153)
+1920:	LDA	0,0(0)
+1921:	LD	0,-64(5)
+1922:	LDC	1,8(0)
+1923:	MUL	0,0,1
+1924:	LD	1,-744(5)
+1925:	ADD	0,0,1
+1926:	LDF	1,0(0)
+1927:	STF	1,-744(5)
+
+*	407:	(print_float_op, ID: temp152, null, null)
+1928:	LDA	0,0(0)
+1929:	LDF	0,-744(5)
+1930:	OUTF	0,0,0
+
+*	408:	(print_string_op, arg type not specified, null, null)
+1931:	LDC	0,32(0)
+1932:	OUTB	0,0,0
+1933:	LDC	0,32(0)
+1934:	OUTB	0,0,0
+
+*	409:	(assn_int_from_arraysub_op, ID: temp154, ID: 84$pi, ID: 90$i)
+1935:	LDA	0,0(0)
+1936:	LD	0,-32(5)
+1937:	LDC	1,8(0)
+1938:	MUL	0,0,1
+1939:	LD	1,-760(5)
+1940:	ADD	0,0,1
+1941:	LD	1,0(0)
+1942:	ST	1,-760(5)
+
+*	410:	(print_int_op, ID: temp154, null, null)
+1943:	LDA	0,0(0)
+1944:	LD	0,-760(5)
+1945:	OUT	0,0,0
+
+*	411:	(print_string_op, arg type not specified, null, null)
+1946:	LDC	0,92(0)
+1947:	OUTB	0,0,0
+1948:	LDC	0,110(0)
+1949:	OUTB	0,0,0
+
+*	412:	(var_inc_op, ID: 90$i, null, null)
+1950:	LDC	1,1(0)
+1951:	LDA	0,0(0)
+1952:	LD	0,-80(5)
+1953:	ADD	0,0,1
+1954:	ST	0,-80(5)
+
+*	413:	(goto_op, int: 400, null, null)
+
+*	414:	(return_op, null, null, null)
+1956:	LDA	6,0(5)
+1957:	LDA	6,8(6)
+1958:	LD	2,4(5)
+1959:	LD	5,0(5)
+1960:	LDA	7,0(2)
+255:	LDA	0,0(0)
+256:	LD	0,-56(5)
+257:	LDC	1,0(0)
+258:	JEQ	0,292(1)
+285:	LDA	0,0(0)
+286:	LDF	0,-80(5)
+287:	LDC	1,0(0)
+288:	JEQ	0,292(1)
+291:	LDC	7,294(0)
+294:	LDA	0,0(0)
+295:	LD	0,-48(5)
+296:	LDC	1,0(0)
+297:	JEQ	0,302(1)
+301:	LDC	7,305(0)
+315:	LDA	0,0(0)
+316:	LD	0,-96(5)
+317:	LDC	1,0(0)
+318:	JEQ	0,352(1)
+345:	LDA	0,0(0)
+346:	LDF	0,-120(5)
+347:	LDC	1,0(0)
+348:	JEQ	0,352(1)
+351:	LDC	7,354(0)
+354:	LDA	0,0(0)
+355:	LD	0,-88(5)
+356:	LDC	1,0(0)
+357:	JEQ	0,362(1)
+361:	LDC	7,362(0)
+372:	LDA	0,0(0)
+373:	LD	0,-128(5)
+374:	LDC	1,0(0)
+375:	JEQ	0,435(1)
+434:	LDC	7,435(0)
+467:	LDA	0,0(0)
+468:	LD	0,-40(5)
+469:	LDC	1,0(0)
+470:	JEQ	0,506(1)
+505:	LDC	7,455(0)
+615:	LDA	0,0(0)
+616:	LD	0,-24(5)
+617:	LDC	1,0(0)
+618:	JEQ	0,666(1)
+659:	LDA	0,0(0)
+660:	LDF	0,-56(5)
+661:	LDC	1,0(0)
+662:	JEQ	0,666(1)
+665:	LDC	7,668(0)
+668:	LDA	0,0(0)
+669:	LD	0,-8(5)
+670:	LDC	1,0(0)
+671:	JEQ	0,733(1)
+732:	LDC	7,603(0)
+866:	LDA	0,0(0)
+867:	LDF	0,-48(5)
+868:	LDC	1,0(0)
+869:	JEQ	0,943(1)
+942:	LDC	7,943(0)
+967:	LDA	0,0(0)
+968:	LD	0,-24(5)
+969:	LDC	1,0(0)
+970:	JEQ	0,1017(1)
+1016:	LDC	7,957(0)
+1110:	LDA	0,0(0)
+1111:	LD	0,-48(5)
+1112:	LDC	1,0(0)
+1113:	JEQ	0,1257(1)
+1180:	LDA	0,0(0)
+1181:	LD	0,-88(5)
+1182:	LDC	1,0(0)
+1183:	JEQ	0,1256(1)
+1255:	LDC	7,1168(0)
+1256:	LDC	7,1098(0)
+1901:	LDA	0,0(0)
+1902:	LD	0,-736(5)
+1903:	LDC	1,0(0)
+1904:	JEQ	0,1956(1)
+1955:	LDC	7,1889(0)
+8:	LDC	7,1262(0)

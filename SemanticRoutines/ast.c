@@ -74,11 +74,7 @@ static struct token_lookup token_table[] = {
     { NULL,0 }
 };
 
-char *mem_addr_type_string[] = {
-  "off_fp",
-  "global",
-  "absolute"
-};
+extern char *mem_addr_type_string[];
 
 /* Create a node with a given token type and return a pointer to the
    node. */
