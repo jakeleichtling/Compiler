@@ -98,18 +98,19 @@ void add_quad_to_array(quad new_quad);
 void expand_quad_array();
 
 // Push the parameters from back to front, using autowidening when necessary
-void push_params_recursively(symnode callee_symnode, ast_node param_node, int i);
+void push_params_recursively(int line_num, symnode callee_symnode, ast_node param_node, int i);
 
 /* ~~~~~~~~~~~~~~~ Function Definitions ~~~~~~~~~~~~~~~~~~~ */
 
 // Creates a quad and adds it to the quad array
-quad generate_quad(enum quad_op _op, quad_arg _arg1, quad_arg _arg2, quad_arg _arg3)
+quad generate_quad(int line_num, enum quad_op _op, quad_arg _arg1, quad_arg _arg2, quad_arg _arg3)
 {
   quad new_quad = (quad) calloc(1, sizeof(struct quad));
   new_quad->op = _op;
   new_quad->arg1 = _arg1;
   new_quad->arg2 = _arg2;
   new_quad->arg3 = _arg3;
+  new_quad->line_num = line_num;
 
   add_quad_to_array(new_quad);
 
@@ -208,7 +209,7 @@ quad_arg generate_intermediate_code(ast_node node)
       }
 
       // Generate a quad for the initial call to main
-      generate_quad(initial_main_call, NULL, NULL, NULL);
+      generate_quad(node->line_num, initial_main_call, NULL, NULL, NULL);
 
       // Generate code for the function declarations
       for (child = node->left_child; child != NULL; child = child->right_sibling) {
@@ -248,9 +249,9 @@ quad_arg generate_intermediate_code(ast_node node)
       quad_arg index_arg = generate_intermediate_code(node->left_child->right_sibling);
 
       if (id_symnode->var_type == inttype) {
-        generate_quad(assn_int_from_arraysub_op, value_arg, array_arg, index_arg);
+        generate_quad(node->line_num, assn_int_from_arraysub_op, value_arg, array_arg, index_arg);
       } else {
-        generate_quad(assn_float_from_arraysub_op, value_arg, array_arg, index_arg);
+        generate_quad(node->line_num, assn_float_from_arraysub_op, value_arg, array_arg, index_arg);
       }
 
       return value_arg;
@@ -269,7 +270,7 @@ quad_arg generate_intermediate_code(ast_node node)
           id_quad_arg->value.var_node = node->left_child->value.sym_node;
 
           // Assign the right side to the ID
-          generate_quad(assn_int_to_var_op, id_quad_arg, right_side_arg, NULL);
+          generate_quad(node->line_num, assn_int_to_var_op, id_quad_arg, right_side_arg, NULL);
 
           return right_side_arg;
         } else { // subscripted arrays
@@ -281,7 +282,7 @@ quad_arg generate_intermediate_code(ast_node node)
           quad_arg index_arg = generate_intermediate_code(node->left_child->left_child->right_sibling);
 
           // Assign the right side to the array at the index
-          generate_quad(assn_int_to_arraysub_op, array_id_arg, index_arg, right_side_arg);
+          generate_quad(node->line_num, assn_int_to_arraysub_op, array_id_arg, index_arg, right_side_arg);
 
           return right_side_arg;
         }
@@ -290,7 +291,7 @@ quad_arg generate_intermediate_code(ast_node node)
         quad_arg right_side_float_arg;
         if (node->left_child->right_sibling->data_type == inttype) {
           right_side_float_arg = get_new_temp(flat_id_table, doubletype);
-          generate_quad(int_to_float_op, right_side_float_arg, right_side_arg, NULL);
+          generate_quad(node->line_num, int_to_float_op, right_side_float_arg, right_side_arg, NULL);
         } else {
           right_side_float_arg = right_side_arg;
         }
@@ -301,7 +302,7 @@ quad_arg generate_intermediate_code(ast_node node)
           id_quad_arg->value.var_node = node->left_child->value.sym_node;
 
           // Assign the right side to the ID
-          generate_quad(assn_float_to_var_op, id_quad_arg, right_side_float_arg, NULL);
+          generate_quad(node->line_num, assn_float_to_var_op, id_quad_arg, right_side_float_arg, NULL);
 
           return right_side_float_arg;
         } else { // subscripted arrays
@@ -313,7 +314,7 @@ quad_arg generate_intermediate_code(ast_node node)
           quad_arg index_arg = generate_intermediate_code(node->left_child->left_child->right_sibling);
 
           // Assign the right side to the array at the index
-          generate_quad(assn_float_to_arraysub_op, array_id_arg, index_arg, right_side_float_arg);
+          generate_quad(node->line_num, assn_float_to_arraysub_op, array_id_arg, index_arg, right_side_float_arg);
 
           return right_side_float_arg;
         }
@@ -351,26 +352,26 @@ quad_arg generate_intermediate_code(ast_node node)
         quad_arg left_exp_arg = generate_intermediate_code(node->left_child);
 
         // If it is false, jump to L1
-        quad left_fail_jump_quad = generate_quad(if_false_op, left_exp_arg, NULL, NULL);
+        quad left_fail_jump_quad = generate_quad(node->line_num, if_false_op, left_exp_arg, NULL, NULL);
 
         // Evaluate the right expression
         quad_arg right_exp_arg = generate_intermediate_code(node->left_child->right_sibling);
 
         // If it is false, jump to L1
-        quad right_fail_jump_quad = generate_quad(if_false_op, right_exp_arg, NULL, NULL);
+        quad right_fail_jump_quad = generate_quad(node->line_num, if_false_op, right_exp_arg, NULL, NULL);
 
         // Save 1 in the result argument and jump to the quad following the and operation
         quad_arg true_int_literal_arg = generate_quad_arg(int_arg);
         true_int_literal_arg->value.int_value = 1;
-        generate_quad(assign_int_literal, result_arg, true_int_literal_arg, NULL);
-        quad after_true_jump_quad = generate_quad(goto_op, NULL, NULL, NULL);
+        generate_quad(node->line_num, assign_int_literal, result_arg, true_int_literal_arg, NULL);
+        quad after_true_jump_quad = generate_quad(node->line_num, goto_op, NULL, NULL, NULL);
 
         // L1: Save 0 in the result argument
         quad_arg L1_arg = generate_quad_arg(int_arg);
         L1_arg->value.int_value = next_quad_index;
         quad_arg false_int_literal_arg = generate_quad_arg(int_arg);
         false_int_literal_arg->value.int_value = 0;
-        generate_quad(assign_int_literal, result_arg, false_int_literal_arg, NULL);
+        generate_quad(node->line_num, assign_int_literal, result_arg, false_int_literal_arg, NULL);
 
         // Backpatch
         patch_quad(left_fail_jump_quad, 2, L1_arg);
@@ -390,26 +391,26 @@ quad_arg generate_intermediate_code(ast_node node)
         quad_arg left_exp_arg = generate_intermediate_code(node->left_child);
 
         // If it is true, jump to L1
-        quad left_succ_jump_quad = generate_quad(if_true_op, left_exp_arg, NULL, NULL);
+        quad left_succ_jump_quad = generate_quad(node->line_num, if_true_op, left_exp_arg, NULL, NULL);
 
         // Evaluate the right expression
         quad_arg right_exp_arg = generate_intermediate_code(node->left_child->right_sibling);
 
         // If it is true, jump to L1
-        quad right_succ_jump_quad = generate_quad(if_true_op, right_exp_arg, NULL, NULL);
+        quad right_succ_jump_quad = generate_quad(node->line_num, if_true_op, right_exp_arg, NULL, NULL);
 
         // Save 0 in the result argument and jump to the quad following the or operation
         quad_arg false_int_literal_arg = generate_quad_arg(int_arg);
         false_int_literal_arg->value.int_value = 0;
-        generate_quad(assign_int_literal, result_arg, false_int_literal_arg, NULL);
-        quad after_false_jump_quad = generate_quad(goto_op, NULL, NULL, NULL);
+        generate_quad(node->line_num, assign_int_literal, result_arg, false_int_literal_arg, NULL);
+        quad after_false_jump_quad = generate_quad(node->line_num, goto_op, NULL, NULL, NULL);
 
         // L1: Save 1 in the result argument
         quad_arg L1_arg = generate_quad_arg(int_arg);
         L1_arg->value.int_value = next_quad_index;
         quad_arg true_int_literal_arg = generate_quad_arg(int_arg);
         true_int_literal_arg->value.int_value = 1;
-        generate_quad(assign_int_literal, result_arg, true_int_literal_arg, NULL);
+        generate_quad(node->line_num, assign_int_literal, result_arg, true_int_literal_arg, NULL);
 
         // Backpatch
         patch_quad(left_succ_jump_quad, 2, L1_arg);
@@ -426,7 +427,7 @@ quad_arg generate_intermediate_code(ast_node node)
       quad_arg result_arg = get_new_temp(flat_id_table, inttype);
       quad_arg exp_arg = generate_intermediate_code(node->left_child);
 
-      generate_quad(bang_op, result_arg, exp_arg, NULL);
+      generate_quad(node->line_num, bang_op, result_arg, exp_arg, NULL);
 
       return result_arg;
     }
@@ -439,7 +440,7 @@ quad_arg generate_intermediate_code(ast_node node)
         quad_arg id_quad_arg = generate_quad_arg(id_arg);
         id_quad_arg->value.var_node = node->left_child->value.sym_node;
 
-        generate_quad(var_inc_op, id_quad_arg, NULL, NULL);
+        generate_quad(node->line_num, var_inc_op, id_quad_arg, NULL, NULL);
         return id_quad_arg;
       } else { // Child is an ARRAY_SUB ast node
         // Get the ID symnode
@@ -451,11 +452,11 @@ quad_arg generate_intermediate_code(ast_node node)
         quad_arg index_arg = generate_intermediate_code(node->left_child->left_child->right_sibling);
 
         // Generate the quad to increment the value at that index
-        generate_quad(array_inc_op, id_quad_arg, index_arg, NULL);
+        generate_quad(node->line_num, array_inc_op, id_quad_arg, index_arg, NULL);
 
         // Put the new value at that index into a temp
         quad_arg value_temp = get_new_temp(flat_id_table, inttype);
-        generate_quad(assn_int_from_arraysub_op, value_temp, id_quad_arg, index_arg);
+        generate_quad(node->line_num, assn_int_from_arraysub_op, value_temp, id_quad_arg, index_arg);
 
         return value_temp;
       }
@@ -467,7 +468,7 @@ quad_arg generate_intermediate_code(ast_node node)
         quad_arg id_quad_arg = generate_quad_arg(id_arg);
         id_quad_arg->value.var_node = node->left_child->value.sym_node;
 
-        generate_quad(var_dec_op, id_quad_arg, NULL, NULL);
+        generate_quad(node->line_num, var_dec_op, id_quad_arg, NULL, NULL);
         return id_quad_arg;
       } else { // Child is an ARRAY_SUB ast node
         // Get the ID symnode
@@ -479,11 +480,11 @@ quad_arg generate_intermediate_code(ast_node node)
         quad_arg index_arg = generate_intermediate_code(node->left_child->left_child->right_sibling);
 
         // Generate the quad to decrement the value at that index
-        generate_quad(array_dec_op, id_quad_arg, index_arg, NULL);
+        generate_quad(node->line_num, array_dec_op, id_quad_arg, index_arg, NULL);
 
         // Put the new value at that index into a temp
         quad_arg value_temp = get_new_temp(flat_id_table, inttype);
-        generate_quad(assn_int_from_arraysub_op, value_temp, id_quad_arg, index_arg);
+        generate_quad(node->line_num, assn_int_from_arraysub_op, value_temp, id_quad_arg, index_arg);
 
         return value_temp;
       }
@@ -492,7 +493,7 @@ quad_arg generate_intermediate_code(ast_node node)
     {
       quad_arg func_id_arg = generate_quad_arg(id_arg);
       func_id_arg->value.var_node = node->left_child->right_sibling->value.sym_node;
-      generate_quad(func_decl_op, func_id_arg, NULL, NULL);
+      generate_quad(node->line_num, func_decl_op, func_id_arg, NULL, NULL);
 
       curr_func_symnode_quad = node->left_child->right_sibling->value.sym_node;
 
@@ -502,7 +503,7 @@ quad_arg generate_intermediate_code(ast_node node)
       curr_func_symnode_quad = NULL;
 
       // If the return type is void, generate a blank return quad at the end of the function definition
-      generate_quad(return_op, NULL, NULL, NULL);
+      generate_quad(node->line_num, return_op, NULL, NULL, NULL);
 
       return NULL;
     }
@@ -518,7 +519,7 @@ quad_arg generate_intermediate_code(ast_node node)
           // Get the size of the array into an arg
           quad_arg array_size_arg = generate_intermediate_code(child->left_child->right_sibling);
 
-          generate_quad(alloc_array_op, array_id_arg, array_size_arg, NULL);
+          generate_quad(node->line_num, alloc_array_op, array_id_arg, array_size_arg, NULL);
         } else if (child->node_type == OP_ASSIGN) {
           // Recurse on the assignment node
           generate_intermediate_code(child);
@@ -545,11 +546,11 @@ quad_arg generate_intermediate_code(ast_node node)
       quad_arg if_cond_arg = generate_intermediate_code(node->left_child);
 
       // Save the quad that checks the if condition to be patched
-      quad exp_check_quad = generate_quad(if_false_op, if_cond_arg, NULL, NULL);
+      quad exp_check_quad = generate_quad(node->line_num, if_false_op, if_cond_arg, NULL, NULL);
 
       // Generate the if body, including a jump quad to the end of the else stmt
       generate_intermediate_code(node->left_child->right_sibling);
-      quad jump_quad = generate_quad(goto_op, NULL, NULL, NULL);
+      quad jump_quad = generate_quad(node->line_num, goto_op, NULL, NULL, NULL);
 
       // Patch the exp_check_qud to jump to the beginning of the else body
       quad_arg start_else_stmt_arg = generate_quad_arg(inttype);
@@ -575,9 +576,9 @@ quad_arg generate_intermediate_code(ast_node node)
       expr_quad_index_arg->value.int_value = next_quad_index;
 
       quad_arg expr_arg = generate_intermediate_code(node->left_child); // generate code for the while loop's expression
-      quad expr_check_quad = generate_quad(if_false_op, expr_arg, NULL, NULL); // generate the quad that checks if the expression is true (destination quad filled in later)
+      quad expr_check_quad = generate_quad(node->line_num, if_false_op, expr_arg, NULL, NULL); // generate the quad that checks if the expression is true (destination quad filled in later)
       generate_intermediate_code(node->left_child->right_sibling); // generate quads for the interior of the while loop
-      generate_quad(goto_op, expr_quad_index_arg, NULL, NULL); // jump back to the beginning of the loop
+      generate_quad(node->line_num, goto_op, expr_quad_index_arg, NULL, NULL); // jump back to the beginning of the loop
 
       // patch expr_check_quad to jump to after the loop if the expr is false
       quad_arg end_loop_index_arg = generate_quad_arg(inttype);
@@ -594,8 +595,8 @@ quad_arg generate_intermediate_code(ast_node node)
 
       generate_intermediate_code(node->left_child); // generate code for the loop body
       quad_arg expr_arg = generate_intermediate_code(node->left_child->right_sibling); // evaluate expr
-      quad expr_check_quad = generate_quad(if_false_op, expr_arg, NULL, NULL); // check if expr is true (destination filled later)
-      generate_quad(goto_op, start_loop_index_arg, NULL, NULL); // jump back to the beginning of the loop
+      quad expr_check_quad = generate_quad(node->line_num, if_false_op, expr_arg, NULL, NULL); // check if expr is true (destination filled later)
+      generate_quad(node->line_num, goto_op, start_loop_index_arg, NULL, NULL); // jump back to the beginning of the loop
 
       // patch expr_check_quad to jump to after loop if expr is false
       quad_arg end_loop_index_arg = generate_quad_arg(inttype);
@@ -617,12 +618,12 @@ quad_arg generate_intermediate_code(ast_node node)
       quad_arg expr_arg = generate_intermediate_code(node->left_child->right_sibling);
 
       // Check if expression y is true (destination filled later)
-      quad expr_check_quad = generate_quad(if_false_op, expr_arg, NULL, NULL);
+      quad expr_check_quad = generate_quad(node->line_num, if_false_op, expr_arg, NULL, NULL);
 
       // Generate code for the body of the loop, the iteration code z, and jumping back to the evaluation of y
       generate_intermediate_code(node->left_child->right_sibling->right_sibling->right_sibling);
       generate_intermediate_code(node->left_child->right_sibling->right_sibling);
-      generate_quad(goto_op, expr_eval_index_arg, NULL, NULL);
+      generate_quad(node->line_num, goto_op, expr_eval_index_arg, NULL, NULL);
 
       // Patch the expression check quad now that we know the index of the quad after the loop
       quad_arg end_loop_index_arg = generate_quad_arg(inttype);
@@ -635,13 +636,13 @@ quad_arg generate_intermediate_code(ast_node node)
     {
       // If the node has no children, then we are returning nothing
       if (node->left_child == NULL) {
-        generate_quad(return_op, NULL, NULL, NULL);
+        generate_quad(node->line_num, return_op, NULL, NULL, NULL);
       } else {
 
         // Generate code for the return expression
         quad_arg return_exp_arg = generate_intermediate_code(node->left_child);
 
-        generate_quad(return_op, return_exp_arg, NULL, NULL);
+        generate_quad(node->line_num, return_op, return_exp_arg, NULL, NULL);
      }
 
       return NULL;
@@ -655,9 +656,9 @@ quad_arg generate_intermediate_code(ast_node node)
 
       // read into the temp
       if (var_symnode->var_type == inttype) {
-        generate_quad(read_int_op, var_arg, NULL, NULL);
+        generate_quad(node->line_num, read_int_op, var_arg, NULL, NULL);
       } else if (var_symnode->var_type) {
-        generate_quad(read_double_op, var_arg, NULL, NULL);
+        generate_quad(node->line_num, read_double_op, var_arg, NULL, NULL);
       }
 
       return NULL;
@@ -668,14 +669,14 @@ quad_arg generate_intermediate_code(ast_node node)
       if (node->left_child->node_type == STRING_LITERAL) {
         quad_arg string_arg = generate_quad_arg(str_arg);
         string_arg->value.var_node = node->left_child->value.sym_node;
-        generate_quad(print_string_op, string_arg, NULL, NULL);
+        generate_quad(node->line_num, print_string_op, string_arg, NULL, NULL);
       } else { // otherwise, evalutate the expression and then print according to data type
         quad_arg expr_arg = generate_intermediate_code(node->left_child);
 
         if (node->left_child->data_type == inttype) {
-          generate_quad(print_int_op, expr_arg, NULL, NULL);
+          generate_quad(node->line_num, print_int_op, expr_arg, NULL, NULL);
         } else if (node->left_child->data_type == doubletype) {
-          generate_quad(print_float_op, expr_arg, NULL, NULL);
+          generate_quad(node->line_num, print_float_op, expr_arg, NULL, NULL);
         }
       }
 
@@ -689,7 +690,7 @@ quad_arg generate_intermediate_code(ast_node node)
       int_lit_arg->value.int_value = node->value.int_value;
       quad_arg int_temp_arg = get_new_temp(flat_id_table, inttype);
 
-      generate_quad(assign_int_literal, int_temp_arg, int_lit_arg, NULL);
+      generate_quad(node->line_num, assign_int_literal, int_temp_arg, int_lit_arg, NULL);
 
       return int_temp_arg;
     }
@@ -699,14 +700,14 @@ quad_arg generate_intermediate_code(ast_node node)
       dbl_lit_arg->value.double_value = node->value.double_value;
       quad_arg dbl_temp_arg = get_new_temp(flat_id_table, doubletype);
 
-      generate_quad(assign_double_literal, dbl_temp_arg, dbl_lit_arg, NULL);
+      generate_quad(node->line_num, assign_double_literal, dbl_temp_arg, dbl_lit_arg, NULL);
 
       return dbl_temp_arg;
     }
     case FUNC_CALL:
     {
       // Push the actual parameters from back to front
-      push_params_recursively(node->left_child->value.sym_node, node->left_child->right_sibling, 0);
+      push_params_recursively(node->line_num, node->left_child->value.sym_node, node->left_child->right_sibling, 0);
 
       // Put the func symnode in func_id_arg
       quad_arg func_id_arg = generate_quad_arg(id_arg);
@@ -717,15 +718,15 @@ quad_arg generate_intermediate_code(ast_node node)
       quad_arg return_val_temp_arg = NULL;
       if (func_ret_type != voidtype) {
         return_val_temp_arg = get_new_temp(flat_id_table, func_ret_type);
-        generate_quad(call_func_op, func_id_arg, return_val_temp_arg, NULL);
+        generate_quad(node->line_num, call_func_op, func_id_arg, return_val_temp_arg, NULL);
       } else {
-        generate_quad(call_func_op, func_id_arg, NULL, NULL);
+        generate_quad(node->line_num, call_func_op, func_id_arg, NULL, NULL);
       }
 
       //pop params
       quad_arg num_params_arg = generate_quad_arg(int_arg);
       num_params_arg->value.int_value = node->left_child->value.sym_node->num_params;
-      generate_quad(pop_params_op, num_params_arg, NULL, NULL);
+      generate_quad(node->line_num, pop_params_op, num_params_arg, NULL, NULL);
 
       return return_val_temp_arg;
     }
@@ -748,20 +749,20 @@ quad_arg generate_binary_op_with_widening(ast_node node, enum quad_op quad_op_in
 
   if (node->left_child->data_type == inttype && node->left_child->right_sibling->data_type == inttype) {
     result_arg = get_new_temp(flat_id_table, inttype);
-    generate_quad(quad_op_ints, result_arg, left_arg, right_arg);
+    generate_quad(node->line_num, quad_op_ints, result_arg, left_arg, right_arg);
   } else {
     result_arg = get_new_temp(flat_id_table, doubletype);
 
     if (node->left_child->data_type == doubletype && node->left_child->right_sibling->data_type == doubletype) {
-      generate_quad(quad_op_floats, result_arg, left_arg, right_arg);
+      generate_quad(node->line_num, quad_op_floats, result_arg, left_arg, right_arg);
     } else if (node->left_child->data_type == doubletype) {
       temp1 = get_new_temp(flat_id_table, doubletype);
-      generate_quad(int_to_float_op, temp1, right_arg, NULL);
-      generate_quad(quad_op_floats, result_arg, left_arg, temp1);
+      generate_quad(node->line_num, int_to_float_op, temp1, right_arg, NULL);
+      generate_quad(node->line_num, quad_op_floats, result_arg, left_arg, temp1);
     } else if (node->left_child->right_sibling->data_type == doubletype) {
       temp1 = get_new_temp(flat_id_table, doubletype);
-      generate_quad(int_to_float_op, temp1, left_arg, NULL);
-      generate_quad(quad_op_floats, result_arg, temp1, right_arg);
+      generate_quad(node->line_num, int_to_float_op, temp1, left_arg, NULL);
+      generate_quad(node->line_num, quad_op_floats, result_arg, temp1, right_arg);
     }
   }
 
@@ -778,10 +779,10 @@ quad_arg generate_single_operand(ast_node node, enum quad_op quad_op_int, enum q
 
   if (node->left_child->data_type == inttype) {
     result_arg = get_new_temp(flat_id_table, inttype);
-    generate_quad(quad_op_int, result_arg, left_arg, NULL);
+    generate_quad(node->line_num, quad_op_int, result_arg, left_arg, NULL);
   } else if (node->left_child->data_type == doubletype) {
     result_arg = get_new_temp(flat_id_table, doubletype);
-    generate_quad(quad_op_float, result_arg, left_arg, NULL);
+    generate_quad(node->line_num, quad_op_float, result_arg, left_arg, NULL);
   }
 
   return result_arg;
@@ -822,7 +823,7 @@ void print_quad(quad the_quad)
   print_quad_arg(the_quad->arg2);
   printf(", ");
   print_quad_arg(the_quad->arg3);
-  printf(")\n");
+  printf(") (%d)\n", the_quad->line_num);
 }
 
 // Prints the quad_arg in human-readable format
@@ -884,14 +885,14 @@ void expand_quad_array()
 }
 
 // Push the parameters from back to front, using autowidening when necessary
-void push_params_recursively(symnode callee_symnode, ast_node param_node, int i)
+void push_params_recursively(int line_num, symnode callee_symnode, ast_node param_node, int i)
 {
   if (param_node == NULL) {
     return;
   }
 
   // Recurse on right sibling
-  push_params_recursively(callee_symnode, param_node->right_sibling, i + 1);
+  push_params_recursively(line_num, callee_symnode, param_node->right_sibling, i + 1);
 
   // Get the result of the param computation
   quad_arg param_arg = generate_intermediate_code(param_node);
@@ -902,9 +903,9 @@ void push_params_recursively(symnode callee_symnode, ast_node param_node, int i)
       formal_param->var_type == doubletype &&
       param_node->data_type == inttype) {
     quad_arg float_temp = get_new_temp(flat_id_table, doubletype);
-    generate_quad(int_to_float_op, float_temp, param_arg, NULL);
-    generate_quad(push_param_op, float_temp, NULL, NULL);
+    generate_quad(line_num, int_to_float_op, float_temp, param_arg, NULL);
+    generate_quad(line_num, push_param_op, float_temp, NULL, NULL);
   } else {
-    generate_quad(push_param_op, param_arg, NULL, NULL);
+    generate_quad(line_num, push_param_op, param_arg, NULL, NULL);
   }
 }

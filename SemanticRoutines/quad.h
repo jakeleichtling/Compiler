@@ -85,6 +85,8 @@ struct quad {
   quad_arg arg1;
   quad_arg arg2;
   quad_arg arg3;
+
+  int line_num;
 };
 
 // Initialize the quad array and store it in quad_array global variable.
@@ -93,7 +95,7 @@ struct quad {
 void init_quad_array(int size);
 
 // Creates a quad and adds it to the quad array
-quad generate_quad(enum quad_op, quad_arg, quad_arg, quad_arg);
+quad generate_quad(int line_num, enum quad_op, quad_arg, quad_arg, quad_arg);
 
 // Retroactively changes an argument of a previously generated quad
 void patch_quad(quad, int arg_index, quad_arg new_quad_arg);

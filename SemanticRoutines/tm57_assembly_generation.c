@@ -1333,7 +1333,7 @@ void print_quad_comment()
     print_quad_arg_comment(curr_quad->arg2);
     fprintf(file, ", ");
     print_quad_arg_comment(curr_quad->arg3);
-    fprintf(file, ")\n");
+    fprintf(file, ") (line: %d)\n", curr_quad->line_num);
 }
 
 void print_quad_arg_comment(quad_arg the_quad_arg)
