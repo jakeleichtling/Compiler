@@ -21,9 +21,13 @@ void gen_standard_float_binary_op(ass_op op, quad_arg dest_arg, quad_arg l_arg, 
 // increments assebly line # after print
 void print_ro(ass_op op, int dest_r, int r1, int r2);
 
-// Method to print RM instructions
+// Method to print RM instructions for int offsets
 // increments assebly line # after print
-void print_rm(ass_op op, int dest_r, int offset, int r);
+void print_rm_int(ass_op op, int dest_r, int offset, int r);
+
+// Method to print RM for float offsets
+// increments assebly line # after print
+void print_rm_float(ass_op op, int dest_r, float offset, int r);
 
 // Save variable at node w/ value from source register
 void gen_store_int(symnode node, int source_r);
@@ -112,10 +116,10 @@ void generate_program_assembly()
 
   // The first instruction initializes the stack pointer to DADDR_SIZE - 1,
   //   which is initially stored in dMem[0]
-  print_rm(LD, stack_ptr_reg, 0, 0);
+  print_rm_int(LD, stack_ptr_reg, 0, 0);
 
   // The second instructino: sp <- sp + 1 = DADDR_SIZE
-  print_rm(LDA, stack_ptr_reg, 1, stack_ptr_reg);
+  print_rm_int(LDA, stack_ptr_reg, 1, stack_ptr_reg);
 
   for (quad_index = 0; quad_index < next_quad_index; quad_index++) {
     // Save the assembly index for the start of the quad in the corresponding
@@ -138,7 +142,7 @@ void generate_program_assembly()
   // Fill in the control transfer assembly instruction for the initial main call
   assembly_index = initial_main_call_ctrl_xfer_assembly_index;
   int main_func_addr = main_func_symnode->var_addr;
-  print_rm(LDC, program_ctr_reg, main_func_addr, 0);
+  print_rm_int(LDC, program_ctr_reg, main_func_addr, 0);
 
   // Close the assembly file
   fclose(file);
@@ -157,26 +161,26 @@ void generate_quad_assembly()
     {
       // Push return address (instruction following function call) onto top of stack
       //   1.) decrement stack pointer by 4 bytes
-      print_rm(LDA, stack_ptr_reg, -4, stack_ptr_reg);
+      print_rm_int(LDA, stack_ptr_reg, -4, stack_ptr_reg);
       //   2.) r0 <- 5 + PC
-      print_rm(LDA, 0, 5, program_ctr_reg);
+      print_rm_int(LDA, 0, 5, program_ctr_reg);
       //   3.) push r0 (the return address) onto the stack
-      print_rm(ST, 0, 0, stack_ptr_reg);
+      print_rm_int(ST, 0, 0, stack_ptr_reg);
 
       // Push the current frame pointer
       //   1.) decrement stack pointer by 4 bytes
-      print_rm(LDA, stack_ptr_reg, -4, stack_ptr_reg);
+      print_rm_int(LDA, stack_ptr_reg, -4, stack_ptr_reg);
       //   2.) push the value of the FP register
-      print_rm(ST, frame_ptr_reg, 0, stack_ptr_reg);
+      print_rm_int(ST, frame_ptr_reg, 0, stack_ptr_reg);
 
       // Set the FP register to point to the top of the stack
-      print_rm(LDA, frame_ptr_reg, 0, stack_ptr_reg);
+      print_rm_int(LDA, frame_ptr_reg, 0, stack_ptr_reg);
 
       // Transfer control to the function being called:
       //   Get the assembly address of the callee and
       int callee_addr = curr_quad->arg1->value.var_node->var_addr;
       //   load that address into the PC register
-      print_rm(LDC, program_ctr_reg, callee_addr, 0);
+      print_rm_int(LDC, program_ctr_reg, callee_addr, 0);
 
       // When the callee returns, if there is a return value (r4), store it
       if (curr_quad->arg1->value.var_node->var_type == inttype) {
@@ -218,7 +222,7 @@ void generate_quad_assembly()
         ascii = (int) str[i];
 
         // Load the ascii code into r0
-        print_rm(LDC, 0, ascii, 0);
+        print_rm_int(LDC, 0, ascii, 0);
 
         // Print the ascii code in r0 as a char
         print_ro(OUTB, 0, 0, 0);
@@ -235,7 +239,7 @@ void generate_quad_assembly()
       print_ro(CVTIF, 0, 1, 0);
 
       // Save the float value in fr0 into the float variable
-      gen_load_float(curr_quad->arg1->value.var_node, 0);
+      gen_store_float(curr_quad->arg1->value.var_node, 0);
 
 			return;
 		}
@@ -255,7 +259,7 @@ void generate_quad_assembly()
       gen_load_int(curr_quad->arg2->value.var_node, 0);
 
       // r1 <- 8
-      print_rm(LDC, 1, 8, 0);
+      print_rm_int(LDC, 1, 8, 0);
 
       // r0 <- element offset * 8 = byte offset into the array
       print_ro(MUL, 0, 0, 1);
@@ -264,14 +268,14 @@ void generate_quad_assembly()
       symnode array_id_node = curr_quad->arg1->value.var_node;
       switch(array_id_node->mem_addr_type) {
           case off_fp:
-              print_rm(LD, 1, array_id_node->var_addr, frame_ptr_reg);
+              print_rm_int(LD, 1, array_id_node->var_addr, frame_ptr_reg);
               break;
 
           case absolute:
               //put 0 in reg3
-              print_rm(LDC, 3, 0, 0);
+              print_rm_int(LDC, 3, 0, 0);
 
-              print_rm(LD, 1, array_id_node->var_addr, 3);
+              print_rm_int(LD, 1, array_id_node->var_addr, 3);
               break;
       }
 
@@ -282,7 +286,7 @@ void generate_quad_assembly()
       gen_load_int(curr_quad->arg3->value.var_node, 1);
 
       // Store r1 into the array bucket (address in r0)
-      print_rm(ST, 1, 0, 0);
+      print_rm_int(ST, 1, 0, 0);
 
 			return;
 		}
@@ -292,23 +296,23 @@ void generate_quad_assembly()
       gen_load_int(curr_quad->arg3->value.var_node, 0);
 
       // r1 <- 8
-      print_rm(LDC, 1, 8, 0);
+      print_rm_int(LDC, 1, 8, 0);
 
       // r0 <- element offset * 8 = byte offset into the array
       print_ro(MUL, 0, 0, 1);
 
       // Get the absolute address of the first element of the array and put it in r1
-      symnode array_id_node = curr_quad->arg1->value.var_node;
+      symnode array_id_node = curr_quad->arg2->value.var_node;
       switch(array_id_node->mem_addr_type) {
           case off_fp:
-              print_rm(LD, 1, array_id_node->var_addr, frame_ptr_reg);
+              print_rm_int(LD, 1, array_id_node->var_addr, frame_ptr_reg);
               break;
 
           case absolute:
               //put 0 in reg3
-              print_rm(LDC, 3, 0, 0);
+              print_rm_int(LDC, 3, 0, 0);
 
-              print_rm(LD, 1, array_id_node->var_addr, 3);
+              print_rm_int(LD, 1, array_id_node->var_addr, 3);
               break;
       }
 
@@ -316,7 +320,7 @@ void generate_quad_assembly()
       print_ro(ADD, 0, 0, 1);
 
       // Load the int value from the array bucket (address in r0) into r1
-      print_rm(LD, 1, 0, 0);
+      print_rm_int(LD, 1, 0, 0);
 
       // Store the int value into the int variable
       gen_store_int(curr_quad->arg1->value.var_node, 1);
@@ -339,7 +343,7 @@ void generate_quad_assembly()
       gen_load_int(curr_quad->arg2->value.var_node, 0);
 
       // r1 <- 8
-      print_rm(LDC, 1, 8, 0);
+      print_rm_int(LDC, 1, 8, 0);
 
       // r0 <- element offset * 8 = byte offset into the array
       print_ro(MUL, 0, 0, 1);
@@ -348,14 +352,14 @@ void generate_quad_assembly()
       symnode array_id_node = curr_quad->arg1->value.var_node;
       switch(array_id_node->mem_addr_type) {
           case off_fp:
-              print_rm(LD, 1, array_id_node->var_addr, frame_ptr_reg);
+              print_rm_int(LD, 1, array_id_node->var_addr, frame_ptr_reg);
               break;
 
           case absolute:
               //put 0 in reg3
-              print_rm(LDC, 3, 0, 0);
+              print_rm_int(LDC, 3, 0, 0);
 
-              print_rm(LD, 1, array_id_node->var_addr, 3);
+              print_rm_int(LD, 1, array_id_node->var_addr, 3);
               break;
       }
 
@@ -366,7 +370,7 @@ void generate_quad_assembly()
       gen_load_float(curr_quad->arg3->value.var_node, 1);
 
       // Store fr1 into the array bucket (address in r0)
-      print_rm(STF, 1, 0, 0);
+      print_rm_int(STF, 1, 0, 0);
 
       return;
     }
@@ -376,23 +380,23 @@ void generate_quad_assembly()
       gen_load_int(curr_quad->arg3->value.var_node, 0);
 
       // r1 <- 8
-      print_rm(LDC, 1, 8, 0);
+      print_rm_int(LDC, 1, 8, 0);
 
       // r0 <- element offset * 8 = byte offset into the array
       print_ro(MUL, 0, 0, 1);
 
       // Get the absolute address of the first element of the array and put it in r1
-      symnode array_id_node = curr_quad->arg1->value.var_node;
+      symnode array_id_node = curr_quad->arg2->value.var_node;
       switch(array_id_node->mem_addr_type) {
           case off_fp:
-              print_rm(LD, 1, array_id_node->var_addr, frame_ptr_reg);
+              print_rm_int(LD, 1, array_id_node->var_addr, frame_ptr_reg);
               break;
 
           case absolute:
               //put 0 in reg3
-              print_rm(LDC, 3, 0, 0);
+              print_rm_int(LDC, 3, 0, 0);
 
-              print_rm(LD, 1, array_id_node->var_addr, 3);
+              print_rm_int(LD, 1, array_id_node->var_addr, 3);
               break;
       }
 
@@ -400,7 +404,7 @@ void generate_quad_assembly()
       print_ro(ADD, 0, 0, 1);
 
       // Load the double value from the array bucket (address in r0) into fr1
-      print_rm(LDF, 1, 0, 0);
+      print_rm_int(LDF, 1, 0, 0);
 
       // Store the double value into the double variable
       gen_store_float(curr_quad->arg1->value.var_node, 1);
@@ -465,14 +469,14 @@ void generate_quad_assembly()
       print_ro(SUB, 0, 0, 1);
 
       // If r0 < 0, jump to L1 (2 instructions)
-      print_rm(JLT, 0, 2, program_ctr_reg);
+      print_rm_int(JLT, 0, 2, program_ctr_reg);
 
       // Put 0 in r0 and jump to L2 (1 instruction)
-      print_rm(LDC, 0, 0, 0);
-      print_rm(LDA, program_ctr_reg, 1, program_ctr_reg);
+      print_rm_int(LDC, 0, 0, 0);
+      print_rm_int(LDA, program_ctr_reg, 1, program_ctr_reg);
 
       // L1: Put 1 in r0
-      print_rm(LDC, 0, 1, 0);
+      print_rm_int(LDC, 0, 1, 0);
 
       // L2: Store r0 into the int variable
       gen_store_int(curr_quad->arg1->value.var_node, 0);
@@ -491,14 +495,14 @@ void generate_quad_assembly()
       print_ro(SUBF, 0, 0, 1);
 
       // If fr0 < 0, jump to L1 (2 instructions)
-      print_rm(JFLT, 0, 2, program_ctr_reg);
+      print_rm_int(JFLT, 0, 2, program_ctr_reg);
 
       // Put 0.0 in fr0 and jump to L2 (1 instruction)
-      print_rm(LDFC, 0, 0.0, 0);
-      print_rm(LDA, program_ctr_reg, 1, program_ctr_reg);
+      print_rm_float(LDFC, 0, 0.0, 0);
+      print_rm_int(LDA, program_ctr_reg, 1, program_ctr_reg);
 
       // L1: Put 1.0 in fr0
-      print_rm(LDC, 0, 1.0, 0);
+      print_rm_int(LDC, 0, 1.0, 0);
 
       // L2: Store fr0 into the double variable
       gen_store_float(curr_quad->arg1->value.var_node, 0);
@@ -517,14 +521,14 @@ void generate_quad_assembly()
       print_ro(SUB, 0, 0, 1);
 
       // If r0 <= 0, jump to L1 (2 instructions)
-      print_rm(JLE, 0, 2, program_ctr_reg);
+      print_rm_int(JLE, 0, 2, program_ctr_reg);
 
       // Put 0 in r0 and jump to L2 (1 instruction)
-      print_rm(LDC, 0, 0, 0);
-      print_rm(LDA, program_ctr_reg, 1, program_ctr_reg);
+      print_rm_int(LDC, 0, 0, 0);
+      print_rm_int(LDA, program_ctr_reg, 1, program_ctr_reg);
 
       // L1: Put 1 in r0
-      print_rm(LDC, 0, 1, 0);
+      print_rm_int(LDC, 0, 1, 0);
 
       // L2: Store r0 into the int variable
       gen_store_int(curr_quad->arg1->value.var_node, 0);
@@ -543,14 +547,14 @@ void generate_quad_assembly()
       print_ro(SUBF, 0, 0, 1);
 
       // If fr0 <= 0, jump to L1 (2 instructions)
-      print_rm(JFLE, 0, 2, program_ctr_reg);
+      print_rm_int(JFLE, 0, 2, program_ctr_reg);
 
       // Put 0.0 in fr0 and jump to L2 (1 instruction)
-      print_rm(LDFC, 0, 0.0, 0);
-      print_rm(LDA, program_ctr_reg, 1, program_ctr_reg);
+      print_rm_float(LDFC, 0, 0.0, 0);
+      print_rm_int(LDA, program_ctr_reg, 1, program_ctr_reg);
 
       // L1: Put 1.0 in fr0
-      print_rm(LDC, 0, 1.0, 0);
+      print_rm_int(LDC, 0, 1.0, 0);
 
       // L2: Store fr0 into the double variable
       gen_store_float(curr_quad->arg1->value.var_node, 0);
@@ -569,14 +573,14 @@ void generate_quad_assembly()
       print_ro(SUB, 0, 0, 1);
 
       // If r0 > 0, jump to L1 (2 instructions)
-      print_rm(JGT, 0, 2, program_ctr_reg);
+      print_rm_int(JGT, 0, 2, program_ctr_reg);
 
       // Put 0 in r0 and jump to L2 (1 instruction)
-      print_rm(LDC, 0, 0, 0);
-      print_rm(LDA, program_ctr_reg, 1, program_ctr_reg);
+      print_rm_int(LDC, 0, 0, 0);
+      print_rm_int(LDA, program_ctr_reg, 1, program_ctr_reg);
 
       // L1: Put 1 in r0
-      print_rm(LDC, 0, 1, 0);
+      print_rm_int(LDC, 0, 1, 0);
 
       // L2: Store r0 into the int variable
       gen_store_int(curr_quad->arg1->value.var_node, 0);
@@ -595,14 +599,14 @@ void generate_quad_assembly()
       print_ro(SUBF, 0, 0, 1);
 
       // If fr0 > 0, jump to L1 (2 instructions)
-      print_rm(JFGT, 0, 2, program_ctr_reg);
+      print_rm_int(JFGT, 0, 2, program_ctr_reg);
 
       // Put 0.0 in fr0 and jump to L2 (1 instruction)
-      print_rm(LDFC, 0, 0.0, 0);
-      print_rm(LDA, program_ctr_reg, 1, program_ctr_reg);
+      print_rm_float(LDFC, 0, 0.0, 0);
+      print_rm_int(LDA, program_ctr_reg, 1, program_ctr_reg);
 
       // L1: Put 1.0 in fr0
-      print_rm(LDC, 0, 1.0, 0);
+      print_rm_int(LDC, 0, 1.0, 0);
 
       // L2: Store fr0 into the double variable
       gen_store_float(curr_quad->arg1->value.var_node, 0);
@@ -621,14 +625,14 @@ void generate_quad_assembly()
       print_ro(SUB, 0, 0, 1);
 
       // If r0 >= 0, jump to L1 (2 instructions)
-      print_rm(JGE, 0, 2, program_ctr_reg);
+      print_rm_int(JGE, 0, 2, program_ctr_reg);
 
       // Put 0 in r0 and jump to L2 (1 instruction)
-      print_rm(LDC, 0, 0, 0);
-      print_rm(LDA, program_ctr_reg, 1, program_ctr_reg);
+      print_rm_int(LDC, 0, 0, 0);
+      print_rm_int(LDA, program_ctr_reg, 1, program_ctr_reg);
 
       // L1: Put 1 in r0
-      print_rm(LDC, 0, 1, 0);
+      print_rm_int(LDC, 0, 1, 0);
 
       // L2: Store r0 into the int variable
       gen_store_int(curr_quad->arg1->value.var_node, 0);
@@ -647,14 +651,14 @@ void generate_quad_assembly()
       print_ro(SUBF, 0, 0, 1);
 
       // If fr0 >= 0, jump to L1 (2 instructions)
-      print_rm(JFGE, 0, 2, program_ctr_reg);
+      print_rm_int(JFGE, 0, 2, program_ctr_reg);
 
       // Put 0.0 in fr0 and jump to L2 (1 instruction)
-      print_rm(LDFC, 0, 0.0, 0);
-      print_rm(LDA, program_ctr_reg, 1, program_ctr_reg);
+      print_rm_float(LDFC, 0, 0.0, 0);
+      print_rm_int(LDA, program_ctr_reg, 1, program_ctr_reg);
 
       // L1: Put 1.0 in fr0
-      print_rm(LDC, 0, 1.0, 0);
+      print_rm_int(LDC, 0, 1.0, 0);
 
       // L2: Store fr0 into the double variable
       gen_store_float(curr_quad->arg1->value.var_node, 0);
@@ -673,14 +677,14 @@ void generate_quad_assembly()
       print_ro(SUB, 0, 0, 1);
 
       // If r0 == 0, jump to L1 (2 instructions)
-      print_rm(JEQ, 0, 2, program_ctr_reg);
+      print_rm_int(JEQ, 0, 2, program_ctr_reg);
 
       // Put 0 in r0 and jump to L2 (1 instruction)
-      print_rm(LDC, 0, 0, 0);
-      print_rm(LDA, program_ctr_reg, 1, program_ctr_reg);
+      print_rm_int(LDC, 0, 0, 0);
+      print_rm_int(LDA, program_ctr_reg, 1, program_ctr_reg);
 
       // L1: Put 1 in r0
-      print_rm(LDC, 0, 1, 0);
+      print_rm_int(LDC, 0, 1, 0);
 
       // L2: Store r0 into the int variable
       gen_store_int(curr_quad->arg1->value.var_node, 0);
@@ -699,14 +703,14 @@ void generate_quad_assembly()
       print_ro(SUBF, 0, 0, 1);
 
       // If fr0 == 0, jump to L1 (2 instructions)
-      print_rm(JFEQ, 0, 2, program_ctr_reg);
+      print_rm_int(JFEQ, 0, 2, program_ctr_reg);
 
       // Put 0.0 in fr0 and jump to L2 (1 instruction)
-      print_rm(LDFC, 0, 0.0, 0);
-      print_rm(LDA, program_ctr_reg, 1, program_ctr_reg);
+      print_rm_float(LDFC, 0, 0.0, 0);
+      print_rm_int(LDA, program_ctr_reg, 1, program_ctr_reg);
 
       // L1: Put 1.0 in fr0
-      print_rm(LDC, 0, 1.0, 0);
+      print_rm_int(LDC, 0, 1.0, 0);
 
       // L2: Store fr0 into the double variable
       gen_store_float(curr_quad->arg1->value.var_node, 0);
@@ -725,14 +729,14 @@ void generate_quad_assembly()
       print_ro(SUB, 0, 0, 1);
 
       // If r0 != 0, jump to L1 (2 instructions)
-      print_rm(JNE, 0, 2, program_ctr_reg);
+      print_rm_int(JNE, 0, 2, program_ctr_reg);
 
       // Put 0 in r0 and jump to L2 (1 instruction)
-      print_rm(LDC, 0, 0, 0);
-      print_rm(LDA, program_ctr_reg, 1, program_ctr_reg);
+      print_rm_int(LDC, 0, 0, 0);
+      print_rm_int(LDA, program_ctr_reg, 1, program_ctr_reg);
 
       // L1: Put 1 in r0
-      print_rm(LDC, 0, 1, 0);
+      print_rm_int(LDC, 0, 1, 0);
 
       // L2: Store r0 into the int variable
       gen_store_int(curr_quad->arg1->value.var_node, 0);
@@ -751,14 +755,14 @@ void generate_quad_assembly()
       print_ro(SUBF, 0, 0, 1);
 
       // If fr0 != 0, jump to L1 (2 instructions)
-      print_rm(JFNE, 0, 2, program_ctr_reg);
+      print_rm_int(JFNE, 0, 2, program_ctr_reg);
 
       // Put 0.0 in fr0 and jump to L2 (1 instruction)
-      print_rm(LDFC, 0, 0.0, 0);
-      print_rm(LDA, program_ctr_reg, 1, program_ctr_reg);
+      print_rm_float(LDFC, 0, 0.0, 0);
+      print_rm_int(LDA, program_ctr_reg, 1, program_ctr_reg);
 
       // L1: Put 1.0 in fr0
-      print_rm(LDC, 0, 1.0, 0);
+      print_rm_int(LDC, 0, 1.0, 0);
 
       // L2: Store fr0 into the double variable
       gen_store_float(curr_quad->arg1->value.var_node, 0);
@@ -771,16 +775,16 @@ void generate_quad_assembly()
       gen_load_int(curr_quad->arg2->value.var_node, 0);
 
       // If r0 == 0, jump to L1 (2 instructions)
-      print_rm(JEQ, 0, 2, program_ctr_reg);
+      print_rm_int(JEQ, 0, 2, program_ctr_reg);
 
       // r0 <- 0 (false)
-      print_rm(LDC, 0, 0, 0);
+      print_rm_int(LDC, 0, 0, 0);
 
       // Jump to L2 (1 instruction)
-      print_rm(LDA, program_ctr_reg, 1, program_ctr_reg);
+      print_rm_int(LDA, program_ctr_reg, 1, program_ctr_reg);
 
       // L1: r0 <- 1 (true)
-      print_rm(LDC, 0, 1, 0);
+      print_rm_int(LDC, 0, 1, 0);
 
       // L2: Store r0 in the result variable
       gen_store_int(curr_quad->arg1->value.var_node, 0);
@@ -793,7 +797,7 @@ void generate_quad_assembly()
       gen_load_int(curr_quad->arg2->value.var_node, 0);
 
       // r1 <- -1
-      print_rm(LDC, 1, -1, 0);
+      print_rm_int(LDC, 1, -1, 0);
 
       // r0 <- r0 * r1 = int variable's value * -1
       print_ro(MUL, 0, 0, 1);
@@ -809,7 +813,7 @@ void generate_quad_assembly()
       gen_load_float(curr_quad->arg2->value.var_node, 0);
 
       // fr1 <- -1.0
-      print_rm(LDFC, 1, -1.0, 0);
+      print_rm_float(LDFC, 1, -1.0, 0);
 
       // fr0 <- fr0 * fr1 = double variable's value * -1.0
       print_ro(MULF, 0, 0, 1);
@@ -822,7 +826,7 @@ void generate_quad_assembly()
     case var_inc_op:
     {
 			// r1 <- 1
-      print_rm(LDC, 1, 1, 0);
+      print_rm_int(LDC, 1, 1, 0);
 
       // r0 <- int variable's value
       gen_load_int(curr_quad->arg1->value.var_node, 0);
@@ -841,7 +845,7 @@ void generate_quad_assembly()
       gen_load_int(curr_quad->arg2->value.var_node, 0);
 
       // r1 <- 8
-      print_rm(LDC, 1, 8, 0);
+      print_rm_int(LDC, 1, 8, 0);
 
       // r0 <- element offset * 8 = byte offset into the array
       print_ro(MUL, 0, 0, 1);
@@ -850,14 +854,14 @@ void generate_quad_assembly()
       symnode array_id_node = curr_quad->arg1->value.var_node;
       switch(array_id_node->mem_addr_type) {
           case off_fp:
-              print_rm(LD, 1, array_id_node->var_addr, frame_ptr_reg);
+              print_rm_int(LD, 1, array_id_node->var_addr, frame_ptr_reg);
               break;
 
           case absolute:
               //put 0 in reg3
-              print_rm(LDC, 3, 0, 0);
+              print_rm_int(LDC, 3, 0, 0);
 
-              print_rm(LD, 1, array_id_node->var_addr, 3);
+              print_rm_int(LD, 1, array_id_node->var_addr, 3);
               break;
       }
 
@@ -865,20 +869,20 @@ void generate_quad_assembly()
       print_ro(ADD, 0, 0, 1);
 
       // Load the original value of the array bucket into r1
-      print_rm(LD, 1, 0, 0);
+      print_rm_int(LD, 1, 0, 0);
 
       // Increment the original value of the array bucket: r1 <- r1 + 1
-      print_rm(LDA, 1, 1, 1);
+      print_rm_int(LDA, 1, 1, 1);
 
       // Store r1 into the array bucket (address in r0)
-      print_rm(ST, 1, 0, 0);
+      print_rm_int(ST, 1, 0, 0);
 
       return;
 		}
     case var_dec_op:
     {
       // r1 <- -1
-      print_rm(LDC, 1, -1, 0);
+      print_rm_int(LDC, 1, -1, 0);
 
       // r0 <- int variable's value
       gen_load_int(curr_quad->arg1->value.var_node, 0);
@@ -897,7 +901,7 @@ void generate_quad_assembly()
       gen_load_int(curr_quad->arg2->value.var_node, 0);
 
       // r1 <- 8
-      print_rm(LDC, 1, 8, 0);
+      print_rm_int(LDC, 1, 8, 0);
 
       // r0 <- element offset * 8 = byte offset into the array
       print_ro(MUL, 0, 0, 1);
@@ -906,14 +910,14 @@ void generate_quad_assembly()
       symnode array_id_node = curr_quad->arg1->value.var_node;
       switch(array_id_node->mem_addr_type) {
           case off_fp:
-              print_rm(LD, 1, array_id_node->var_addr, frame_ptr_reg);
+              print_rm_int(LD, 1, array_id_node->var_addr, frame_ptr_reg);
               break;
 
           case absolute:
               //put 0 in reg3
-              print_rm(LDC, 3, 0, 0);
+              print_rm_int(LDC, 3, 0, 0);
 
-              print_rm(LD, 1, array_id_node->var_addr, 3);
+              print_rm_int(LD, 1, array_id_node->var_addr, 3);
               break;
       }
 
@@ -921,13 +925,13 @@ void generate_quad_assembly()
       print_ro(ADD, 0, 0, 1);
 
       // Load the original value of the array bucket into r1
-      print_rm(LD, 1, 0, 0);
+      print_rm_int(LD, 1, 0, 0);
 
       // Decrement the original value of the array bucket: r1 <- r1 + -1
-      print_rm(LDA, 1, -1, 1);
+      print_rm_int(LDA, 1, -1, 1);
 
       // Store r1 into the array bucket (address in r0)
-      print_rm(ST, 1, 0, 0);
+      print_rm_int(ST, 1, 0, 0);
 
       return;
 		}
@@ -993,8 +997,8 @@ void generate_quad_assembly()
       // Make room for variables and temps
       symnode func_id_node = curr_quad->arg1->value.var_node;
       int num_vars_and_temps = func_id_node->num_vars + func_id_node->num_temps;
-      print_rm(LDC, 0, num_vars_and_temps, 0); // r0 <- num_vars_and_temps
-      print_rm(LDC, 1, -8, 0); // r1 <- -8
+      print_rm_int(LDC, 0, num_vars_and_temps, 0); // r0 <- num_vars_and_temps
+      print_rm_int(LDC, 1, -8, 0); // r1 <- -8
       print_ro(MUL, 0, 0, 1); // r0 <- num_vars_and_temps * -8
       print_ro(ADD, stack_ptr_reg, stack_ptr_reg, 0); // sp <- sp + (-8 * num_vars_and_temps)
 
@@ -1003,7 +1007,7 @@ void generate_quad_assembly()
     case push_param_op:
     {
 			// Make room for the parameter: sp <- sp + -8
-      print_rm(LDA, stack_ptr_reg, -8, stack_ptr_reg);
+      print_rm_int(LDA, stack_ptr_reg, -8, stack_ptr_reg);
 
       // Push the parameter
       symnode param_node = curr_quad->arg1->value.var_node;
@@ -1012,13 +1016,13 @@ void generate_quad_assembly()
         gen_load_int(param_node, 0);
 
         // Push r0 onto the stack
-        print_rm(ST, 0, 0, stack_ptr_reg);
+        print_rm_int(ST, 0, 0, stack_ptr_reg);
       } else if (param_node->var_type == doubletype) {
         // Load the value of the parameter into fr0
         gen_load_float(param_node, 0);
 
         // Push fr0 onto the stack
-        print_rm(STF, 0, 0, stack_ptr_reg);
+        print_rm_int(STF, 0, 0, stack_ptr_reg);
       }
 
 			return;
@@ -1028,7 +1032,7 @@ void generate_quad_assembly()
       int pop_size = curr_quad->arg1->value.int_value * 8;
 
       // load 8 * num params into r0
-      print_rm(LDC, 0, pop_size, 0);
+      print_rm_int(LDC, 0, pop_size, 0);
 
       // add size of param array to sp
       print_ro(ADD, stack_ptr_reg, stack_ptr_reg, 0);
@@ -1040,7 +1044,7 @@ void generate_quad_assembly()
       gen_load_int(curr_quad->arg2->value.var_node, 0);
 
       // r1 <- -8
-      print_rm(LDC, 1, -8, 0);
+      print_rm_int(LDC, 1, -8, 0);
 
       // r0 <- size of the array * -8
       print_ro(MUL, 0, 0, 1);
@@ -1052,16 +1056,16 @@ void generate_quad_assembly()
       symnode array_id_node = curr_quad->arg1->value.var_node;
       switch(array_id_node->mem_addr_type) {
           case off_fp:
-              print_rm(LDA, 1, array_id_node->var_addr, frame_ptr_reg);
+              print_rm_int(LDA, 1, array_id_node->var_addr, frame_ptr_reg);
               break;
 
           case absolute:
-              print_rm(LDC, 1, array_id_node->var_addr, 0);
+              print_rm_int(LDC, 1, array_id_node->var_addr, 0);
               break;
       }
 
       // Store the address of element 0 (equal to value of SP) into the array ID's address (in r1)
-      print_rm(ST, stack_ptr_reg, 0, 1);
+      print_rm_int(ST, stack_ptr_reg, 0, 1);
 
 			return;
 		}
@@ -1089,26 +1093,26 @@ void generate_quad_assembly()
       }
 
       // cleanup 1) sp = fp pops all locals and temps
-      print_rm(LDA, stack_ptr_reg, 0, frame_ptr_reg);
+      print_rm_int(LDA, stack_ptr_reg, 0, frame_ptr_reg);
 
       // cleanup 2) increment sp by 8 to pop ret addr and control link
       // sp <-- sp + 8
-      print_rm(LDA, stack_ptr_reg, 8, stack_ptr_reg);
+      print_rm_int(LDA, stack_ptr_reg, 8, stack_ptr_reg);
 
       // save ret addr in r2 (4(fp))
-      print_rm(LD, 2, 4, frame_ptr_reg);
+      print_rm_int(LD, 2, 4, frame_ptr_reg);
 
       // set fp to value at control link (0(fp)) 
-      print_rm(LD, frame_ptr_reg, 0, frame_ptr_reg) ;
+      print_rm_int(LD, frame_ptr_reg, 0, frame_ptr_reg) ;
 
       //return control (set pc to r2)
-      print_rm(LDA, program_ctr_reg, 0, 2);
+      print_rm_int(LDA, program_ctr_reg, 0, 2);
 			return;
 		}
     case assign_int_literal:
     {
       // Load the int literal value into r0
-      print_rm(LDC, 0, curr_quad->arg2->value.int_value, 0);
+      print_rm_int(LDC, 0, curr_quad->arg2->value.int_value, 0);
 
       // Store r0 into the int variable
       gen_store_int(curr_quad->arg1->value.var_node, 0);
@@ -1118,7 +1122,7 @@ void generate_quad_assembly()
     case assign_double_literal:
     {
 			// Load the double literal value into fr0
-      print_rm(LDFC, 0, curr_quad->arg2->value.double_value, 0);
+      print_rm_float(LDFC, 0, curr_quad->arg2->value.double_value, 0);
 
       // Store fr0 into the double variable
       gen_store_float(curr_quad->arg1->value.var_node, 0);
@@ -1129,20 +1133,20 @@ void generate_quad_assembly()
     {
       // Push return address (instruction following function call) onto top of stack
       //   1.) decrement stack pointer by 4 bytes
-      print_rm(LDA, stack_ptr_reg, -4, stack_ptr_reg);
+      print_rm_int(LDA, stack_ptr_reg, -4, stack_ptr_reg);
       //   2.) r0 <- 5 + PC
-      print_rm(LDA, 0, 5, program_ctr_reg);
+      print_rm_int(LDA, 0, 5, program_ctr_reg);
       //   3.) push r0 (the return address) onto the stack
-      print_rm(ST, 0, 0, stack_ptr_reg);
+      print_rm_int(ST, 0, 0, stack_ptr_reg);
 
       // Push the current frame pointer
       //   1.) decrement stack pointer by 4 bytes
-      print_rm(LDA, stack_ptr_reg, -4, stack_ptr_reg);
+      print_rm_int(LDA, stack_ptr_reg, -4, stack_ptr_reg);
       //   2.) push the value of the FP register
-      print_rm(ST, frame_ptr_reg, 0, stack_ptr_reg);
+      print_rm_int(ST, frame_ptr_reg, 0, stack_ptr_reg);
 
       // Set the FP register to point to the top of the stack
-      print_rm(LDA, frame_ptr_reg, 0, stack_ptr_reg);
+      print_rm_int(LDA, frame_ptr_reg, 0, stack_ptr_reg);
 
       // Make room for the control transfer instruction
       initial_main_call_ctrl_xfer_assembly_index = assembly_index;
@@ -1150,6 +1154,15 @@ void generate_quad_assembly()
 
       // When main returns, halt
       print_ro(HALT, 0, 0, 0);
+
+      return;
+    }
+    case store_string_op:
+    {
+      // Get the string symnode
+      symnode string_node = curr_quad->arg1->value.var_node;
+
+
 
       return;
     }
@@ -1198,17 +1211,17 @@ void gen_load_int(symnode node, int dest_r) {
     switch(node->mem_addr_type) {
         case off_fp:
             // meaningless instruction so we have the same number of instructions as for an absolute address
-            print_rm(LDA, 0, 0, 0);
+            print_rm_int(LDA, 0, 0, 0);
 
-            print_rm(LD, dest_r, node->var_addr, frame_ptr_reg);
+            print_rm_int(LD, dest_r, node->var_addr, frame_ptr_reg);
             break;
 
         case absolute:
             //put 0 in reg3
-            print_rm(LDC, 3, 0, 0);
+            print_rm_int(LDC, 3, 0, 0);
 
             //load offset(0) 
-            print_rm(LD, dest_r, node->var_addr, 3);
+            print_rm_int(LD, dest_r, node->var_addr, 3);
             break;
     }
 }
@@ -1217,17 +1230,17 @@ void gen_load_float(symnode node, int dest_r) {
     switch(node->mem_addr_type) {
         case off_fp:
             // meaningless instruction so we have the same number of instructions as for an absolute address
-            print_rm(LDA, 0, 0, 0);
+            print_rm_int(LDA, 0, 0, 0);
 
-            print_rm(LDF, dest_r, node->var_addr, frame_ptr_reg);
+            print_rm_int(LDF, dest_r, node->var_addr, frame_ptr_reg);
             break;
 
         case absolute:
             //put 0 in reg3
-            print_rm(LDC, 3, 0, 0);
+            print_rm_int(LDC, 3, 0, 0);
 
             //load offset(0) 
-            print_rm(LDF, dest_r, node->var_addr, 3);
+            print_rm_int(LDF, dest_r, node->var_addr, 3);
             break;
     }
 }
@@ -1235,14 +1248,14 @@ void gen_load_float(symnode node, int dest_r) {
 void gen_store_int(symnode node, int source_r) {
     switch(node->mem_addr_type) {
         case off_fp:
-            print_rm(ST, source_r, node->var_addr, frame_ptr_reg);
+            print_rm_int(ST, source_r, node->var_addr, frame_ptr_reg);
             break;
 
         case absolute:
             //put 0 in reg3
-            print_rm(LDC, 3, 0, 0);
+            print_rm_int(LDC, 3, 0, 0);
 
-            print_rm(ST, source_r, node->var_addr, 3);
+            print_rm_int(ST, source_r, node->var_addr, 3);
             break;
     }
 }
@@ -1250,14 +1263,14 @@ void gen_store_int(symnode node, int source_r) {
 void gen_store_float(symnode node, int source_r) {
     switch(node->mem_addr_type) {
         case off_fp:
-            print_rm(STF, source_r, node->var_addr, frame_ptr_reg);
+            print_rm_int(STF, source_r, node->var_addr, frame_ptr_reg);
             break;
 
         case absolute:
             //put 0 in reg3
-            print_rm(LDC, 3, 0, 0);
+            print_rm_int(LDC, 3, 0, 0);
 
-            print_rm(STF, source_r, node->var_addr, 3);
+            print_rm_int(STF, source_r, node->var_addr, 3);
             break;
     }
 }
@@ -1312,10 +1325,17 @@ void print_ro(ass_op op, int dest_r, int r1, int r2) {
     assembly_index++;
 }
 
-// Method to print RM
-void print_rm(ass_op op, int dest_r, int offset, int r) {
+// Method to print RM for int offsets
+void print_rm_int(ass_op op, int dest_r, int offset, int r) {
     char* op_str = ass_op_str[op];
     fprintf(file, "%d:\t%s\t%d,%d(%d)\n", assembly_index, op_str, dest_r, offset, r);
+    assembly_index++;
+}
+
+// Method to print RM for float offsets
+void print_rm_float(ass_op op, int dest_r, float offset, int r) {
+    char* op_str = ass_op_str[op];
+    fprintf(file, "%d:\t%s\t%d,%f(%d)\n", assembly_index, op_str, dest_r, offset, r);
     assembly_index++;
 }
 
@@ -1366,7 +1386,7 @@ void insert_jump_assembly() {
   // The assembly index to which the jump instruction(s) should be written
   int jump_assembly_index = backpatch_jump_quads[quad_index];
 
-  // assembly_index <- jump_assembly_index so we can use print_ro and print_rm
+  // assembly_index <- jump_assembly_index so we can use print_ro and print_rm_int
   assembly_index = jump_assembly_index;
 
   // The quad index of the destination of the jump
@@ -1392,10 +1412,10 @@ void insert_jump_assembly() {
     dest_assembly_index = quad_assembly_index[dest_quad_index];
 
     // r1 <- 0
-    print_rm(LDC, 1, 0, 0);
+    print_rm_int(LDC, 1, 0, 0);
 
     // Generate the jump assembly instruction
-    print_rm(JEQ, 0, dest_assembly_index, 1);
+    print_rm_int(JEQ, 0, dest_assembly_index, 1);
   }
   else if (jump_quad->op == if_true_op)
   {
@@ -1414,10 +1434,10 @@ void insert_jump_assembly() {
     dest_assembly_index = quad_assembly_index[dest_quad_index];
 
     // r1 <- 0
-    print_rm(LDC, 1, 0, 0);
+    print_rm_int(LDC, 1, 0, 0);
 
     // Generate the jump assembly instruction
-    print_rm(JNE, 0, dest_assembly_index, 1);
+    print_rm_int(JNE, 0, dest_assembly_index, 1);
   }
   else if (jump_quad->op == goto_op)
   {
@@ -1428,6 +1448,6 @@ void insert_jump_assembly() {
     dest_assembly_index = quad_assembly_index[dest_quad_index];
 
     // Generate the jump assembly instruction
-    print_rm(LDC, program_ctr_reg, dest_assembly_index, 0);
+    print_rm_int(LDC, program_ctr_reg, dest_assembly_index, 0);
   }
 }

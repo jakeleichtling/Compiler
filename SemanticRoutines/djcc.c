@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
     if( strncmp(argv[1], "-d", 2) == 0) {
       djdebug = 1;
     } else {
-      fprintf(stderr, "%s\n","Usage: djcc (-d) assembly_file_name");
+      fprintf(stderr, "%s\n","Usage: djcc [-d] assembly_file_name");
       exit(1);
     }
 
@@ -47,12 +47,13 @@ int main(int argc, char *argv[])
   } else if (argc == 2) {
     if ( argv[1][0] == '-') {
       if( strncmp(argv[1], "-d", 2) == 0) {
-       djdebug = 1;
+        djdebug = 1;
       } else {
-       fprintf(stderr, "%s\n","Usage: djcc (-d) assembly_file_name");
+        fprintf(stderr, "%s\n","Usage: djcc [-d] assembly_file_name");
      }
+    } else {
+      assembly_file_name = argv[1];
     }
-    assembly_file_name = argv[1];
   }
   int haveRoot = 0; // 0 means we have a root
 
@@ -114,3 +115,5 @@ int main(int argc, char *argv[])
 
   return 0;
 }
+
+// TODO: If something breaks, just stop there

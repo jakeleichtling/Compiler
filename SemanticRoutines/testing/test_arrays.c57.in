@@ -1,11 +1,11 @@
-void swap(int a[], int i, int j) {
-	int temp = a[i];
+void swap(double a[], int i, int j) {
+	double temp = a[i];
 	a[i] = a[j];
 	a[j] = temp;
 }
 
 void main(void) {
-	int a[10];
+	double a[10];
 	int i;
 
 	for(i = 0; i < 10; ++i) {
@@ -15,8 +15,8 @@ void main(void) {
 	for(i = 0; i < 9; ++i) {
 		swap(a, i, i + 1);	
 	}
-	for(i = 0; i < 9; ++i) {
+
+	for(i = 0; i < 10; ++i) {
 		print a[i];
 	}
-
 }

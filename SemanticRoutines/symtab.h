@@ -103,4 +103,7 @@ void leave_scope(symboltable symtab);
 
 void print_symboltable(symboltable symtab);
 
+/* Constructs an array of symnodes pointing to every symnode in the symboltable */
+symnode *get_symnode_array(symboltable symtab, int *array_size);
+
 #endif

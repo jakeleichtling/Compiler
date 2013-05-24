@@ -57,7 +57,8 @@ enum quad_op {
   return_op,
   assign_int_literal,
   assign_double_literal,
-  initial_main_call
+  initial_main_call,
+  store_string_op
 };
 
 /* types of quad args */

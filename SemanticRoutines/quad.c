@@ -18,6 +18,7 @@ symnode curr_func_symnode_quad;
 extern int num_global_vars;
 
 extern symboltable flat_id_table;
+extern symboltable stringconst_table;
 
 extern int djdebug;
 
@@ -79,7 +80,8 @@ char *quad_op_string[] = {
   "return_op",
   "assign_int_literal",
   "assign_double_literal",
-  "initial_main_call"
+  "initial_main_call",
+  "store_string_op"
 };
 
 /* ~~~~~~~~~~~~~~~ Function Prototypes ~~~~~~~~~~~~~~~~~~~ */
@@ -201,6 +203,19 @@ quad_arg generate_intermediate_code(ast_node node)
   switch (node->node_type) {
     case ROOT:
     {
+      // Generate code for putting strings in memory
+      int num_strings;
+      symnode *string_symnode_array = get_symnode_array(stringconst_table, &num_strings);
+      symnode string_node;
+      quad_arg string_node_arg;
+      int i;
+      for (i = 0; i < num_strings; i++) {
+        string_node = string_symnode_array[i];
+        string_node_arg = generate_quad_arg(id_arg);
+        string_node_arg->value.var_node = string_node;
+        generate_quad(-1, store_string_op, string_node_arg, NULL, NULL);
+      }
+
       // Generate code for the global variable declarations
       for (child = node->left_child; child != NULL; child = child->right_sibling) {
         if (child->node_type == VAR_DECL) {
@@ -642,7 +657,14 @@ quad_arg generate_intermediate_code(ast_node node)
         // Generate code for the return expression
         quad_arg return_exp_arg = generate_intermediate_code(node->left_child);
 
-        generate_quad(node->line_num, return_op, return_exp_arg, NULL, NULL);
+        // Widen the return variable if necessary
+        quad_arg return_widened_arg = return_exp_arg;
+        if (curr_func_symnode_quad->var_type == doubletype && return_exp_arg->value.var_node->var_type == inttype) {
+          return_widened_arg = get_new_temp(flat_id_table, doubletype);
+          generate_quad(node->line_num, int_to_float_op, return_widened_arg, return_exp_arg, NULL);
+        }
+
+        generate_quad(node->line_num, return_op, return_widened_arg, NULL, NULL);
      }
 
       return NULL;
@@ -706,7 +728,7 @@ quad_arg generate_intermediate_code(ast_node node)
     }
     case FUNC_CALL:
     {
-      // Push the actual parameters from back to front
+      // Push the parameters from back to front, using autowidening when necessary
       push_params_recursively(node->line_num, node->left_child->value.sym_node, node->left_child->right_sibling, 0);
 
       // Put the func symnode in func_id_arg

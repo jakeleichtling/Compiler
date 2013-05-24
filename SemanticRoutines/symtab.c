@@ -257,3 +257,50 @@ void print_symboltable(symboltable symtab)
     print_symhashtable(table);
   }
 }
+
+/* Constructs an array of symnodes pointing to every symnode in the symboltable */
+symnode *get_symnode_array(symboltable symtab, int *array_size_p)
+{
+  // Iterate through all symnodes in all buckets, at all scopes
+  int num_symnodes = 0;
+  symhashtable hashtable;
+  // Iterate over symhashtables
+  for (hashtable = symtab->inner_scope; hashtable != NULL; hashtable = hashtable->outer_scope) {
+    // Iterate over buckets
+    int i;
+    for (i = 0; i < hashtable->size; i++) {
+      // Iterate over linked lists
+      symnode node;
+      for (node = hashtable->table[i]; node != NULL; node = node->next) {
+        // Increment the count
+        num_symnodes++;
+      }
+    }
+  }
+
+  // Allocate the array
+  symnode *symnode_array = calloc(num_symnodes, sizeof(symnode));
+
+  // Fill in the array
+  num_symnodes = 0;
+  // Iterate over symhashtables
+  for (hashtable = symtab->inner_scope; hashtable != NULL; hashtable = hashtable->outer_scope) {
+    // Iterate over buckets
+    int i;
+    for (i = 0; i < hashtable->size; i++) {
+      // Iterate over linked lists
+      symnode node;
+      for (node = hashtable->table[i]; node != NULL; node = node->next) {
+        // Fill in the array
+        symnode_array[num_symnodes] = node;
+
+        // Increment the count
+        num_symnodes++;
+      }
+    }
+  }
+
+  *array_size_p = num_symnodes;
+
+  return symnode_array;
+}

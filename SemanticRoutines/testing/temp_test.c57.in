@@ -1,7 +1,21 @@
-void f(int x, int y) {
-  print x;
+void g(double x[]) {
+  
+}
+
+void f(double x[]) {
+  int i;
+  double d;
+  for (i = 0; i < 10; ++i) {
+    d = i * 1.1;
+    x[i] = d;
+  }
 }
 
 void main(void) {
-  f(17, 59);
+  double a[10];
+  int i;
+  f(a);
+  for (i = 0; i < 10; ++i) {
+    print a[i];
+  }
 }

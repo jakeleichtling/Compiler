@@ -24,17 +24,25 @@ void exchange(double key[], int handle[], int heap_index[], int i, int j) {
 
   /* Exchange the keys in nodes i and j. */
   key_temp = key[i];
+  /* print key_temp; */
   key[i] = key[j];
+  /* print key[i]; */
   key[j] = key_temp;
+  /* print key[j]; */
 
   /* Exchange the handles in nodes i and j. */
   handle_temp = handle[i];
+  /* print handle_temp; */
   handle[i] = handle[j];
+  /* print handle[i]; */
   handle[j] = handle_temp;
+  /* print handle[j]; */
 
   /* Update the heap_index values. */
   heap_index[handle[i]] = i;
+  /* print heap_index[handle[i]]; */
   heap_index[handle[j]] = j;
+  /* print heap_index[handle[j]]; */
 }
 
 /* Make the min-heap rooted at node i obey the min-heap property.
@@ -45,15 +53,24 @@ void heapify(double key[], int handle[], int heap_index[], int i, int size) {
   int r = right(i);
   int smallest;
 
+  /* print l; */
+  /* print r; */
+
   /* Is the left child smaller than node i? */
-  if (l <= size && key[l] < key[i])
+  if (l <= size && key[l] < key[i]) {
     smallest = l;
-  else
+    /* print smallest; */
+  }
+  else {
     smallest = i;
+    /* print smallest; */
+  }
 
   /* Is the right child smaller than node i and i's left child? */
-  if (r <= size && key[r] < key[smallest])
+  if (r <= size && key[r] < key[smallest]) {
     smallest = r;
+    /* print smallest; */
+  }
 
   /* If the min-heap property is violated between node i and one of
      its children, fix it. */
@@ -83,9 +100,11 @@ void extract_min(double key[], int handle[], int heap_index[], int size) {
 void decrease_key(double key[], int handle[], int heap_index[],
 		  int i, int size, double new_key) {
   key[i] = new_key;
+  /* print key[i]; */
   while (i > 1 && key[parent(i)] > key[i]) {
     exchange(key, handle, heap_index, i, parent(i));
     i = parent(i);
+    /* print i; */
   }
 }
 
@@ -94,8 +113,11 @@ void decrease_key(double key[], int handle[], int heap_index[],
 void insert(double key[], int handle[], int heap_index[], 
 	    int vertex, int size, double new_key) {
   key[++size] = 1000000000.0;	/* will be fixed later */
+  /* print key[size]; */
   handle[size] = vertex;
+  /* print handle[size]; */
   heap_index[vertex] = size;
+  /* print heap_index[vertex]; */
   decrease_key(key, handle, heap_index, size, size, new_key); /* here's later */
 }
 
@@ -105,6 +127,7 @@ void relax(int u, int v, double w,
   if (key[heap_index[v]] > key[heap_index[u]] + w) {
     decrease_key(key, handle, heap_index, heap_index[v], size, key[heap_index[u]] + w);
     pi[v] = u;
+    /* print pi[v]; */
   }
 }
 
@@ -114,12 +137,17 @@ void initialize_single_source(double key[], int handle[], int heap_index[],
   int i;
   for (i = 1; i <= n; ++i) {
     key[i] = 1000000000.0;
+    /* print key[i]; */
     handle[i] = i;
+    /* print handle[i]; */
     heap_index[i] = i;
+    /* print heap_index[i]; */
     pi[i] = 0;
+    /* print pi[i]; */
   }
 
   key[s] = 0.0;
+  /* print key[s]; */
   build_heap(key, handle, heap_index, n);
 }
 
@@ -129,16 +157,22 @@ void dijkstra(int first[], int node[], int next[], double w[], double d[],
   int size = n;
   int u, v, i;
 
+  /* print size; */
+
   initialize_single_source(d, handle, heap_index, pi, s, n);
   while (size > 0) {
     u = handle[1];
+    /* print u; */
     extract_min(d, handle, heap_index, size);
     --size;
     i = first[u];
+    /* print i; */
     while (i > 0) {
       v = node[i];
+      /* print v; */
       relax(u, v, w[i], d, handle, heap_index, size, pi);
       i = next[i];
+      /* print i; */
     }
   }
 }
@@ -203,7 +237,7 @@ void main(void) {
   next[9] = 10;
   next[10] = 0;
 
-  print "Enter source node: ";
+  /* prinT "enter source node: "; */
   read s;
 
   dijkstra(first, node, next, w, d, pi, s, 5, handle, heap_index);
