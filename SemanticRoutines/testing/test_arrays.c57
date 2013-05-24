@@ -1,0 +1,22 @@
+void swap(int a[], int i, int j) {
+	int temp = a[i];
+	a[i] = a[j];
+	a[j] = temp;
+}
+
+void main(void) {
+	int a[10];
+	int i;
+
+	for(i = 0; i < 10; ++i) {
+		a[i] = i;
+	}
+
+	for(i = 0; i < 9; ++i) {
+		swap(a, i, i + 1);	
+	}
+	for(i = 0; i < 9; ++i) {
+		print a[i];
+	}
+
+}

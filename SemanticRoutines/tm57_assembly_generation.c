@@ -1433,5 +1433,3 @@ void insert_jump_assembly() {
     print_rm(LDC, program_ctr_reg, dest_assembly_index, 0);
   }
 }
-
-// TODO: mult offset by 8 when indexing into an array

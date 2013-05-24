@@ -1,5 +1,6 @@
 #include <stdlib.h>
 #include <stdio.h>
+#include <string.h>
 #include "bparser.tab.h"
 #include "ast.h"
 #include "symtab.h"
@@ -19,7 +20,7 @@ int parseError = 0;
 
 int error_count = 0;
 
-int djdebug = 1;
+int djdebug = 0;
 
 // Will be provided at the command line, or defaults
 char *assembly_file_name = "assembly.tm57";
@@ -29,8 +30,30 @@ extern symnode main_func_symnode;
 
 int yyparse();
 
-int main()
+int main(int argc, char *argv[])
 {
+  if (argc > 3) {
+    fprintf(stderr, "%s\n", "Illegal number of arguments");
+    exit(1);
+  } else if (argc == 3) {
+    if( strncmp(argv[1], "-d", 2) == 0) {
+      djdebug = 1;
+    } else {
+      fprintf(stderr, "%s\n","Usage: djcc (-d) assembly_file_name");
+      exit(1);
+    }
+
+    assembly_file_name = argv[2];
+  } else if (argc == 2) {
+    if ( argv[1][0] == '-') {
+      if( strncmp(argv[1], "-d", 2) == 0) {
+       djdebug = 1;
+      } else {
+       fprintf(stderr, "%s\n","Usage: djcc (-d) assembly_file_name");
+     }
+    }
+    assembly_file_name = argv[1];
+  }
   int haveRoot = 0; // 0 means we have a root
 
   init_quad_array(-1);
