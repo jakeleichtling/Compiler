@@ -164,7 +164,7 @@ var_decl :
 func_declaration :
   type_specifier ident '(' formal_params ')' compound_statement {
     ast_node t = create_ast_node(FUNC_DECL);
-    t->line_num = lineNumber;
+    t->line_num = $2->line_num;
     t->left_child = $1;
     t->left_child->right_sibling = $2;
     t->left_child->right_sibling->value.sym_node->node_type = func_node;

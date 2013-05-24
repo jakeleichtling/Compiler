@@ -122,10 +122,8 @@ void generate_program_assembly()
     //   bucket of quad_assembly_index
     quad_assembly_index[quad_index] = assembly_index;
 
-    // Print the quad as a comment if debugging
-    if (djdebug) {
-      print_quad_comment();
-    }
+    // Print the quad as a comment
+    print_quad_comment();
 
     generate_quad_assembly();
   }
@@ -180,11 +178,11 @@ void generate_quad_assembly()
       //   load that address into the PC register
       print_rm(LDC, program_ctr_reg, callee_addr, 0);
 
-      // When the callee returns, if there is a return value (r3), store it
+      // When the callee returns, if there is a return value (r4), store it
       if (curr_quad->arg1->value.var_node->var_type == inttype) {
-        gen_store_int(curr_quad->arg2->value.var_node, 3);
+        gen_store_int(curr_quad->arg2->value.var_node, 4);
       } else if (curr_quad->arg1->value.var_node->var_type == doubletype) {
-        gen_store_float(curr_quad->arg2->value.var_node, 3);
+        gen_store_float(curr_quad->arg2->value.var_node, 4);
       }
 
 			return;
@@ -291,7 +289,7 @@ void generate_quad_assembly()
     case assn_int_from_arraysub_op:
     {
       // Get the offset into the array in terms of number of elements and put it in r0
-      gen_load_int(curr_quad->arg2->value.var_node, 0);
+      gen_load_int(curr_quad->arg3->value.var_node, 0);
 
       // r1 <- 8
       print_rm(LDC, 1, 8, 0);
@@ -375,7 +373,7 @@ void generate_quad_assembly()
     case assn_float_from_arraysub_op:
     {
       // Get the offset into the array in terms of number of elements and put it in r0
-      gen_load_int(curr_quad->arg2->value.var_node, 0);
+      gen_load_int(curr_quad->arg3->value.var_node, 0);
 
       // r1 <- 8
       print_rm(LDC, 1, 8, 0);
@@ -1069,7 +1067,7 @@ void generate_quad_assembly()
 		}
     case return_op:
     {
-      //Save value of return expression into r3 if it exists
+      //Save value of return expression into r4 if it exists
       if (curr_quad->arg1 != NULL) {
         symnode retexp = curr_quad->arg1->value.var_node;
         switch(retexp->var_type) {
@@ -1080,12 +1078,12 @@ void generate_quad_assembly()
             //do nothing
             break;
           case inttype:
-            //load int into r3
-            gen_load_int(retexp, 3);
+            //load int into r4
+            gen_load_int(retexp, 4);
             break;
           case doubletype:
-            //load double into r3
-            gen_load_float(retexp, 3);
+            //load double into r4
+            gen_load_float(retexp, 4);
             break;
         }
       }
