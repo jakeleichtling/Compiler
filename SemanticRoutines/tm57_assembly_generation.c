@@ -79,6 +79,8 @@ int assembly_index;
 int quad_index;
 // The assembly index of the initial call to main's control transfer instruction
 int initial_main_call_ctrl_xfer_assembly_index;
+// Space used so far by assembly directives
+int constant_stack_ptr = 0;
 
 // The strings corresponding to quad ops, defined in quad.c
 extern char *quad_op_string[];
@@ -215,17 +217,21 @@ void generate_quad_assembly()
     {
       char *str = curr_quad->arg1->value.var_node->name;
 			int str_len = strlen(str);
+      int start_addr = curr_quad->arg1->value.var_node->var_addr;
+
+      // r0 <- 0
+      print_ro(SUB, 0,0,0);
 
       int i;
-      int ascii;
       for (i = 0; i < str_len; i++) {
-        ascii = (int) str[i];
+        int loc = start_addr + i;
 
-        // Load the ascii code into r0
-        print_rm_int(LDC, 0, ascii, 0);
+        // r1 <- char at loc
+        print_rm_int(LDB, 1, loc, 0);
 
-        // Print the ascii code in r0 as a char
-        print_ro(OUTB, 0, 0, 0);
+        // Print r1
+        print_ro(OUTB, 1, 0, 0);
+
       }
 
 			return;
@@ -1162,7 +1168,16 @@ void generate_quad_assembly()
       // Get the string symnode
       symnode string_node = curr_quad->arg1->value.var_node;
 
+      // Save start address
+      string_node->mem_addr_type = absolute;
+      string_node->var_addr = constant_stack_ptr;
 
+      // Print .STRING directive
+      fprintf(file, "%s\t%d\t\"%s\"", ".STRING", constant_stack_ptr, string_node->name);
+
+      // Increment constant ptr
+      int length = strlen(string_node->name);
+      constant_stack_ptr += length;
 
       return;
     }
