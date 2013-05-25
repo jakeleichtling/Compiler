@@ -172,7 +172,7 @@ quad_arg get_new_temp(symboltable symtab, enum vartype var_type)
     curr_func_symnode_quad->num_temps++;
     temp_symnode->var_addr = -8 * (curr_func_symnode_quad->num_vars + curr_func_symnode_quad->num_temps);
   } else {
-    temp_symnode->mem_addr_type = absolute;
+    temp_symnode->mem_addr_type = global;
     num_global_temps++;
     temp_symnode->var_addr = -8 * (num_global_vars + num_global_temps);
   }

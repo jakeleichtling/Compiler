@@ -70,6 +70,11 @@ extern quad *quad_array;
 // Points to the bucket just after the last quad in quad_array
 extern int next_quad_index;
 
+// The number of global variables, imported from ast_node_processing.c
+extern int num_global_vars;
+// The number of global temps, imported from quad.c
+extern int num_global_temps;
+
 // The symnode of the main function (declared in symtab.h)
 extern symnode main_func_symnode;
 
@@ -91,6 +96,7 @@ extern int djdebug;
 const int program_ctr_reg = 7; // points to the instruction in front of the one currently being executed
 const int stack_ptr_reg = 6; // points to the location of the top element of the stack
 const int frame_ptr_reg = 5;
+const int global_ptr_reg = 4; // points to the highest dMem address, where the global variables begin
 
 /* ~~~~~~~~~~~~~~~ Function Definitions ~~~~~~~~~~~~~~~~~~~ */
 
@@ -116,13 +122,27 @@ void generate_program_assembly()
 
   assembly_index = 0;
 
-  // The first instruction initializes the stack pointer to DADDR_SIZE - 1,
+  // Initializes the stack pointer to DADDR_SIZE - 1,
   //   which is initially stored in dMem[0]
   print_rm_int(LD, stack_ptr_reg, 0, 0);
 
-  // The second instructino: sp <- sp + 1 = DADDR_SIZE
+  // sp <- sp + 1 = DADDR_SIZE
   print_rm_int(LDA, stack_ptr_reg, 1, stack_ptr_reg);
 
+  // global_ptr_reg <- DADDR_SIZE
+  print_rm_int(LDA, global_ptr_reg, 0, stack_ptr_reg);
+
+  // Make room for global variables (including temps)
+  // r0 <- number of global variables/temps
+  print_rm_int(LDC, 0, num_global_vars + num_global_temps, 0);
+  // r1 <- -8
+  print_rm_int(LDC, 1, -8, 0);
+  // r0 <- num global vars * -8
+  print_ro(MUL, 0, 0, 1);
+  // sp <- sp + (num global vars * -8)
+  print_ro(ADD, stack_ptr_reg, stack_ptr_reg, 0);
+
+  // Iterate through quads to generate assembly
   for (quad_index = 0; quad_index < next_quad_index; quad_index++) {
     // Save the assembly index for the start of the quad in the corresponding
     //   bucket of quad_assembly_index
@@ -184,11 +204,11 @@ void generate_quad_assembly()
       //   load that address into the PC register
       print_rm_int(LDC, program_ctr_reg, callee_addr, 0);
 
-      // When the callee returns, if there is a return value (r4), store it
+      // When the callee returns, if there is a return value (r3), store it
       if (curr_quad->arg1->value.var_node->var_type == inttype) {
-        gen_store_int(curr_quad->arg2->value.var_node, 4);
+        gen_store_int(curr_quad->arg2->value.var_node, 3);
       } else if (curr_quad->arg1->value.var_node->var_type == doubletype) {
-        gen_store_float(curr_quad->arg2->value.var_node, 4);
+        gen_store_float(curr_quad->arg2->value.var_node, 3);
       }
 
 			return;
@@ -277,11 +297,8 @@ void generate_quad_assembly()
               print_rm_int(LD, 1, array_id_node->var_addr, frame_ptr_reg);
               break;
 
-          case absolute:
-              //put 0 in reg3
-              print_rm_int(LDC, 3, 0, 0);
-
-              print_rm_int(LD, 1, array_id_node->var_addr, 3);
+          case global:
+              print_rm_int(LD, 1, array_id_node->var_addr, global_ptr_reg);
               break;
       }
 
@@ -314,11 +331,8 @@ void generate_quad_assembly()
               print_rm_int(LD, 1, array_id_node->var_addr, frame_ptr_reg);
               break;
 
-          case absolute:
-              //put 0 in reg3
-              print_rm_int(LDC, 3, 0, 0);
-
-              print_rm_int(LD, 1, array_id_node->var_addr, 3);
+          case global:
+              print_rm_int(LD, 1, array_id_node->var_addr, global_ptr_reg);
               break;
       }
 
@@ -361,12 +375,9 @@ void generate_quad_assembly()
               print_rm_int(LD, 1, array_id_node->var_addr, frame_ptr_reg);
               break;
 
-          case absolute:
-              //put 0 in reg3
-              print_rm_int(LDC, 3, 0, 0);
-
-              print_rm_int(LD, 1, array_id_node->var_addr, 3);
-              break;
+          case global:
+              print_rm_int(LD, 1, array_id_node->var_addr, global_ptr_reg);
+              break;              
       }
 
       // Calculate r0 <- r0 + r1 to get the address of the destination bucket in the array
@@ -398,12 +409,9 @@ void generate_quad_assembly()
               print_rm_int(LD, 1, array_id_node->var_addr, frame_ptr_reg);
               break;
 
-          case absolute:
-              //put 0 in reg3
-              print_rm_int(LDC, 3, 0, 0);
-
-              print_rm_int(LD, 1, array_id_node->var_addr, 3);
-              break;
+          case global:
+              print_rm_int(LD, 1, array_id_node->var_addr, global_ptr_reg);
+              break;              
       }
 
       // Calculate r0 <- r0 + r1 to get the address of the destination bucket in the array
@@ -863,12 +871,9 @@ void generate_quad_assembly()
               print_rm_int(LD, 1, array_id_node->var_addr, frame_ptr_reg);
               break;
 
-          case absolute:
-              //put 0 in reg3
-              print_rm_int(LDC, 3, 0, 0);
-
-              print_rm_int(LD, 1, array_id_node->var_addr, 3);
-              break;
+          case global:
+              print_rm_int(LD, 1, array_id_node->var_addr, global_ptr_reg);
+              break;              
       }
 
       // Calculate r0 <- r0 + r1 to get the address of the destination bucket in the array
@@ -919,12 +924,9 @@ void generate_quad_assembly()
               print_rm_int(LD, 1, array_id_node->var_addr, frame_ptr_reg);
               break;
 
-          case absolute:
-              //put 0 in reg3
-              print_rm_int(LDC, 3, 0, 0);
-
-              print_rm_int(LD, 1, array_id_node->var_addr, 3);
-              break;
+          case global:
+              print_rm_int(LD, 1, array_id_node->var_addr, global_ptr_reg);
+              break;              
       }
 
       // Calculate r0 <- r0 + r1 to get the address of the destination bucket in the array
@@ -947,8 +949,8 @@ void generate_quad_assembly()
       backpatch_jump_quads[quad_index] = assembly_index;
 
       // Increment assembly_index to make room:
-      //   2 instructions for loading the expression and then conditionally jumping
-      assembly_index += 4;
+      //   1 instruction for loading the expression and then 2 for conditionally jumping
+      assembly_index += 3;
 
       return;
 		}
@@ -958,8 +960,8 @@ void generate_quad_assembly()
       backpatch_jump_quads[quad_index] = assembly_index;
 
       // Increment assembly_index to make room:
-      //   2 instructions for loading the expression and then conditionally jumping
-      assembly_index += 4;
+      //   1 instruction for loading the expression and then 2 for conditionally jumping
+      assembly_index += 3;
 
       return;
     }
@@ -1065,9 +1067,9 @@ void generate_quad_assembly()
               print_rm_int(LDA, 1, array_id_node->var_addr, frame_ptr_reg);
               break;
 
-          case absolute:
-              print_rm_int(LDC, 1, array_id_node->var_addr, 0);
-              break;
+          case global:
+              print_rm_int(LDA, 1, array_id_node->var_addr, global_ptr_reg);
+              break;              
       }
 
       // Store the address of element 0 (equal to value of SP) into the array ID's address (in r1)
@@ -1166,7 +1168,7 @@ void generate_quad_assembly()
     case store_string_op:
     {
       // Get the string symnode
-      symnode string_node = curr_quad->arg1->value.var_node;
+//      symnode string_node = curr_quad->arg1->value.var_node;
 
       // Save start address
       string_node->mem_addr_type = absolute;
@@ -1225,38 +1227,24 @@ void gen_standard_float_binary_op(ass_op op, quad_arg dest_arg, quad_arg l_arg, 
 void gen_load_int(symnode node, int dest_r) {
     switch(node->mem_addr_type) {
         case off_fp:
-            // meaningless instruction so we have the same number of instructions as for an absolute address
-            print_rm_int(LDA, 0, 0, 0);
-
             print_rm_int(LD, dest_r, node->var_addr, frame_ptr_reg);
             break;
 
-        case absolute:
-            //put 0 in reg3
-            print_rm_int(LDC, 3, 0, 0);
-
-            //load offset(0) 
-            print_rm_int(LD, dest_r, node->var_addr, 3);
-            break;
+          case global:
+            print_rm_int(LD, dest_r, node->var_addr, global_ptr_reg);
+            break;            
     }
 }
 
 void gen_load_float(symnode node, int dest_r) {
     switch(node->mem_addr_type) {
         case off_fp:
-            // meaningless instruction so we have the same number of instructions as for an absolute address
-            print_rm_int(LDA, 0, 0, 0);
-
             print_rm_int(LDF, dest_r, node->var_addr, frame_ptr_reg);
             break;
 
-        case absolute:
-            //put 0 in reg3
-            print_rm_int(LDC, 3, 0, 0);
-
-            //load offset(0) 
-            print_rm_int(LDF, dest_r, node->var_addr, 3);
-            break;
+        case global:
+            print_rm_int(LDF, dest_r, node->var_addr, global_ptr_reg);
+            break;       
     }
 }
 
@@ -1266,12 +1254,9 @@ void gen_store_int(symnode node, int source_r) {
             print_rm_int(ST, source_r, node->var_addr, frame_ptr_reg);
             break;
 
-        case absolute:
-            //put 0 in reg3
-            print_rm_int(LDC, 3, 0, 0);
-
-            print_rm_int(ST, source_r, node->var_addr, 3);
-            break;
+        case global:
+            print_rm_int(ST, source_r, node->var_addr, global_ptr_reg);
+            break;       
     }
 }
 
@@ -1281,12 +1266,9 @@ void gen_store_float(symnode node, int source_r) {
             print_rm_int(STF, source_r, node->var_addr, frame_ptr_reg);
             break;
 
-        case absolute:
-            //put 0 in reg3
-            print_rm_int(LDC, 3, 0, 0);
-
-            print_rm_int(STF, source_r, node->var_addr, 3);
-            break;
+        case global:
+          print_rm_int(STF, source_r, node->var_addr, global_ptr_reg);
+          break;                
     }
 }
 
@@ -1466,3 +1448,5 @@ void insert_jump_assembly() {
     print_rm_int(LDC, program_ctr_reg, dest_assembly_index, 0);
   }
 }
+
+// TODO: String storage at 0 and printing

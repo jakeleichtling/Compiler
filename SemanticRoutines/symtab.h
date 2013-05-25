@@ -32,7 +32,7 @@ enum nodetype {
 /* Indicates the type of the memory address */
 enum memaddrtype {
   off_fp, // relative to FP for local function variables
-  absolute // for global vars and passing arrays by reference
+  global, // relative to the global variable poitner for global variabls
 };
 
 /* Node in a linked list within the symbol table. */

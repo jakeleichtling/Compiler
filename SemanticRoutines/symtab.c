@@ -29,7 +29,7 @@ char *node_type_string[] = {
 
 char *mem_addr_type_string[] = {
   "off_fp",
-  "absolute"
+  "global"
 };
 
 /*

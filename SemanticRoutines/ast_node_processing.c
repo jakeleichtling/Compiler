@@ -246,9 +246,9 @@ int fill_id_types(ast_node node)
             curr_func_symnode_anp->num_vars++;
             flat_id_symnode->var_addr = -8 * curr_func_symnode_anp->num_vars; // the first variable is at -8(fp)
           } else {
-            flat_id_symnode->mem_addr_type = absolute;
+            flat_id_symnode->mem_addr_type = global;
             num_global_vars++;
-            flat_id_symnode->var_addr = -8 * num_global_vars; // the first variable is at -8 off the global variable pointer
+            flat_id_symnode->var_addr = -8 * num_global_vars; // the first global variable is at -8 off the global variable pointer
           }
 
         } else if (child->node_type == ARRAY_SUB || child->node_type == OP_ASSIGN) {
@@ -296,9 +296,9 @@ int fill_id_types(ast_node node)
             curr_func_symnode_anp->num_vars++;
             flat_id_symnode->var_addr = -8 * curr_func_symnode_anp->num_vars; // the first variable is at -8(fp)
           } else {
-            flat_id_symnode->mem_addr_type = absolute;
+            flat_id_symnode->mem_addr_type = global;
             num_global_vars++;
-            flat_id_symnode->var_addr = -8 * num_global_vars; // the first variable is at -8 off the global variable pointer
+            flat_id_symnode->var_addr = -8 * num_global_vars; // the first global variable is at -8 off the global variable pointer
           }
         }
       }
@@ -736,13 +736,13 @@ int type_check(ast_node node)
 
       return 0;
     case RETURN_STMT:
-      if (is_array_node(node->left_child)) {
-        mark_error(node->line_num, "Cannot return an array variable");
-        return 1;
-      }
-
       if (node->left_child != NULL) {
-        node->return_type = node->left_child->data_type;
+        if (is_array_node(node->left_child)) {
+          mark_error(node->line_num, "Cannot return an array variable");
+          return 1;
+        } else {
+          node->return_type = node->left_child->data_type;
+        }
       } else {
         node->return_type = voidtype;
       }

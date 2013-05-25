@@ -1,0 +1,69 @@
+/* merge_sort.tm57.in */
+
+int n = 30;
+
+void merge_sort(double a[], int low, int high)
+{
+  int mid = (low + high) / 2;
+  int lower_array_size = mid - low + 1;
+  int upper_array_size = high - mid;
+  double lower_array[lower_array_size], upper_array[upper_array_size];
+  int i, i1, i2;
+
+  if (high <= low) {
+    return;
+  }
+
+  merge_sort(a, low, mid);
+  merge_sort(a, mid + 1, high);
+
+  for (i1 = low; i1 <= mid; ++i1) {
+    lower_array[i1 - low] = a[i1];
+  }
+
+  for (i2 = mid + 1; i2 <= high; ++i2) {
+    upper_array[i2 - mid + 1] = a[i2];
+  }
+
+  i1 = 0;
+  i2 = 0;
+  i = low;
+  while (i1 < lower_array_size && i2 < upper_array_size) {
+    if (lower_array[i1] < upper_array[i2]) {
+      a[i] = lower_array[i1];
+      ++i;
+      ++i1;
+    } else if (lower_array[i1] >= upper_array[i2]) {
+      a[i] = upper_array[i2];
+      ++i;
+      ++i2;
+    }
+  }
+
+  while (i1 < lower_array_size) {
+    a[i] = lower_array[i1];
+    ++i;
+    ++i1;
+  }
+
+  while (i2 < upper_array_size) {
+    a[i] = upper_array[i2];
+    ++i;
+    ++i2;
+  }
+}
+
+void main() {
+  double a[n];
+  int i;
+  for (i = 0; i < n; ++i) {
+    a[i] = 5 * i % n / 2.5;
+  }
+
+  merge_sort(a, 0, n - 1);
+
+  for (i = 0; i < n; ++i) {
+    print a[i];
+    print " ";
+  }
+}
