@@ -1,0 +1,18 @@
+Checklist item locations:
+
+In decl_test.c57:
+	-ids with letters, digits, and underscores (20-22)
+	-multiple declarations within a program (20-22)
+	-multiple variables in one declaration (27)
+	-int declared (22)
+	-double declared (20)
+	-declaration with initialization (64)
+	-declaration of an array
+		-constant size (30)
+		-variable size (40)
+		-size that is an array element (37)
+	-global variables
+		-before any function (20-30)
+		-between functions (60)
+	-local variables (64-65)
+	-redifinition of variables in inner scope (34, 49)
