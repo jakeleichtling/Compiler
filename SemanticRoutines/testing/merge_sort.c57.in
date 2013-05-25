@@ -1,6 +1,6 @@
 /* merge_sort.tm57.in */
 
-int n = 30;
+int n = 4;
 
 void merge_sort(double a[], int low, int high)
 {
@@ -17,23 +17,50 @@ void merge_sort(double a[], int low, int high)
   merge_sort(a, low, mid);
   merge_sort(a, mid + 1, high);
 
-  for (i1 = low; i1 <= mid; ++i1) {
-    lower_array[i1 - low] = a[i1];
+  print "merge\n";
+  print "low: ";
+  print low;
+  print "\nhigh: ";
+  print high;
+  print "\n";
+
+  print "a before:\n";
+  for (i = low; i <= high; ++i) {
+    print a[i];
+    print "\n";
   }
 
+  print "---\n";
+
+  print "low array: \n";
+  for (i1 = low; i1 <= mid; ++i1) {
+    lower_array[i1 - low] = a[i1];
+    print a[i1];
+    print "\n";
+  }
+
+  print "high array: \n";
   for (i2 = mid + 1; i2 <= high; ++i2) {
     upper_array[i2 - (mid + 1)] = a[i2];
+    print a[i2];
+    print "\n";
   }
 
   i1 = 0;
   i2 = 0;
   i = low;
   while (i1 < lower_array_size && i2 < upper_array_size) {
+    print "yo: ";
+    print lower_array[i1];
+    print ", ";
+    print upper_array[i2];
     if (lower_array[i1] < upper_array[i2]) {
       a[i] = lower_array[i1];
+      print "lower array wins!\n";
       ++i;
       ++i1;
     } else if (lower_array[i1] >= upper_array[i2]) {
+      print "upper array wins!\n";      
       a[i] = upper_array[i2];
       ++i;
       ++i2;
@@ -51,24 +78,48 @@ void merge_sort(double a[], int low, int high)
     ++i;
     ++i2;
   }
+
+  print "lower array:\n";
+  for (i = 0; i < lower_array_size; ++i) {
+    print lower_array[i];
+    print "\n";    
+  }
+
+  print "\nupper array:\n";
+  for (i = 0; i < upper_array_size; ++i) {
+    print upper_array[i];
+    print "\n";    
+  }
+
+  print "\na after:\n";
+  for (i = low; i <= high; ++i) {
+    print a[i];
+    print "\n";
+  }
+
+  print "--------------------------------------\n";
 }
 
 void main() {
   double a[n];
   int i;
-  for (i = 0; i < n; ++i) {
-    a[i] = 5 * i % n / 2.5;
-  }
+  
+  a[3] = 7;
+  a[2] = 17;
+  a[1] = 27;
+  a[0] = 37;
 
   for (i = 0; i < n; ++i) {
     print a[i];
+    print "\n";
   }
 
-  print "--------------------------";
+  print "\n--------------------------\n\n";
 
   merge_sort(a, 0, n - 1);
 
   for (i = 0; i < n; ++i) {
     print a[i];
+    print "\n";    
   }
 }

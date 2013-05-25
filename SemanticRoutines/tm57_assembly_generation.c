@@ -84,8 +84,9 @@ int assembly_index;
 int quad_index;
 // The assembly index of the initial call to main's control transfer instruction
 int initial_main_call_ctrl_xfer_assembly_index;
-// Space used so far by assembly directives
-int constant_stack_ptr = 0;
+// Space used so far by assembly directives;
+//   starts at 4 so as not to override DADDR_SIZE in dMem[0] at initialization
+int constant_stack_ptr = 4;
 
 // The strings corresponding to quad ops, defined in quad.c
 extern char *quad_op_string[];
@@ -251,7 +252,6 @@ void generate_quad_assembly()
 
         // Print r1
         print_ro(OUTB, 1, 0, 0);
-
       }
 
 			return;
@@ -1168,17 +1168,16 @@ void generate_quad_assembly()
     case store_string_op:
     {
       // Get the string symnode
-//      symnode string_node = curr_quad->arg1->value.var_node;
+      symnode string_node = curr_quad->arg1->value.var_node;
 
       // Save start address
-      string_node->mem_addr_type = absolute;
       string_node->var_addr = constant_stack_ptr;
 
       // Print .STRING directive
-      fprintf(file, "%s\t%d\t\"%s\"", ".STRING", constant_stack_ptr, string_node->name);
+      fprintf(file, "%s\t%d\t\"%s\"\n", ".STRING", constant_stack_ptr, string_node->name);
 
       // Increment constant ptr
-      int length = strlen(string_node->name);
+      int length = strlen(string_node->name) + 1; // + 1 because it is null terminated
       constant_stack_ptr += length;
 
       return;
@@ -1366,7 +1365,7 @@ void print_quad_arg_comment(quad_arg the_quad_arg)
       fprintf(file, "double: %f", the_quad_arg->value.double_value);
       break;
     case id_arg:
-      fprintf(file, "ID: %s", the_quad_arg->value.var_node->name);
+      fprintf(file, "ID: %s (addr: %d)", the_quad_arg->value.var_node->name, the_quad_arg->value.var_node->var_addr);
       break;
     default:
       fprintf(file, "arg type not specified");
@@ -1411,8 +1410,13 @@ void insert_jump_assembly() {
     // r1 <- 0
     print_rm_int(LDC, 1, 0, 0);
 
-    // Generate the jump assembly instruction
-    print_rm_int(JEQ, 0, dest_assembly_index, 1);
+    // Generate the jump assembly instruction;
+    //   op depends on type of expression
+    if (exp_symnode->var_type == inttype) {
+      print_rm_int(JEQ, 0, dest_assembly_index, 1);
+    } else if (exp_symnode->var_type == doubletype) {
+      print_rm_int(JFEQ, 0, dest_assembly_index, 1);
+    }
   }
   else if (jump_quad->op == if_true_op)
   {
@@ -1433,8 +1437,13 @@ void insert_jump_assembly() {
     // r1 <- 0
     print_rm_int(LDC, 1, 0, 0);
 
-    // Generate the jump assembly instruction
-    print_rm_int(JNE, 0, dest_assembly_index, 1);
+    // Generate the jump assembly instruction;
+    //   op depends on type of expression
+    if (exp_symnode->var_type == inttype) {
+      print_rm_int(JNE, 0, dest_assembly_index, 1);
+    } else if (exp_symnode->var_type == doubletype) {
+      print_rm_int(JFNE, 0, dest_assembly_index, 1);
+    }
   }
   else if (jump_quad->op == goto_op)
   {
