@@ -45,12 +45,29 @@ int bellman_ford(int first[], int node[], int next[], double w[], double d[],
 
     while (j > 0) {
       v = node[j];
-      if (d[v] > d[u] + w[j])
-	return 0;
+      if (d[v] > d[u] + w[j]) {
+        print "\n@@@\n\nv: ";
+        print v;
+        print "\nd[v]: ";
+        print d[v];
+        print "\nu: ";
+        print u;
+        print "\nd[u]: ";
+        print d[u];
+        print "\nj: ";
+        print j;
+        print "\nd[j]: ";
+        print d[j];
+        print "\n\n@@@\n";
+
+	      return 0;
+      }
+
       j = next[j];
     }
   }
 
+  print "hey!";
   return 1;
 }
 

@@ -1079,7 +1079,7 @@ void generate_quad_assembly()
 		}
     case return_op:
     {
-      //Save value of return expression into r4 if it exists
+      //Save value of return expression into r3 if it exists
       if (curr_quad->arg1 != NULL) {
         symnode retexp = curr_quad->arg1->value.var_node;
         switch(retexp->var_type) {
@@ -1090,12 +1090,12 @@ void generate_quad_assembly()
             //do nothing
             break;
           case inttype:
-            //load int into r4
-            gen_load_int(retexp, 4);
+            //load int into r3
+            gen_load_int(retexp, 3);
             break;
           case doubletype:
-            //load double into r4
-            gen_load_float(retexp, 4);
+            //load double into r3
+            gen_load_float(retexp, 3);
             break;
         }
       }
