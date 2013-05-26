@@ -23,9 +23,8 @@ int _id_started_by_;
 
 /* global variables */
 
-/* declaration with init */
-int y = 10;
-int x = 0;
+/* declaration with init & multiple declarations */
+int y = 10, x = 0, z;
 
 /* array of constant size */
 int a[5];

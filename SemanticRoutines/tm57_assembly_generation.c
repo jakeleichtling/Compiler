@@ -1091,11 +1091,11 @@ void generate_quad_assembly()
             break;
           case inttype:
             //load int into r4
-            gen_load_int(retexp, 4);
+            gen_load_int(retexp, 3);
             break;
           case doubletype:
             //load double into r4
-            gen_load_float(retexp, 4);
+            gen_load_float(retexp, 3);
             break;
         }
       }
