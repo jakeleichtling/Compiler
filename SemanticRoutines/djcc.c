@@ -1,3 +1,16 @@
+/* djcc.c
+ *
+ * Defines the main function of the C57 compiler. The main function
+ * is how the compiler is invoked from the command line, and the arguments
+ * passed define the input C57 file and the output TM57 assembly file. Debugging
+ * mode can also be set.
+ *
+ * Usage: djcc [-d] input_C57_file_path [output_TM57_file_path]
+ *
+ * Jake Leichtling & Derek Salama
+ * 5/29/2013
+*/
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>
@@ -21,6 +34,13 @@ int parseError = 0;
 int error_count = 0;
 
 int djdebug = 0;
+extern int yydebug;
+
+extern FILE *yyin;
+
+// Will be provided at the command line
+char *input_file_name;
+FILE *input_file_handle = NULL;
 
 // Will be provided at the command line, or defaults
 char *assembly_file_name = "assembly.tm57";
@@ -32,29 +52,45 @@ int yyparse();
 
 int main(int argc, char *argv[])
 {
-  if (argc > 3) {
-    fprintf(stderr, "%s\n", "Illegal number of arguments");
+  if (argc > 4 || argc < 2) {
+    fprintf(stderr, "%s\n", "Usage: djcc [-d] input_C57_file_path [output_TM57_file_path]");
     exit(1);
-  } else if (argc == 3) {
-    if( strncmp(argv[1], "-d", 2) == 0) {
+  } else if (argc == 4) {
+    if(strncmp(argv[1], "-d", 2) == 0) {
       djdebug = 1;
+      input_file_name = argv[2];
+      assembly_file_name = argv[3];
     } else {
-      fprintf(stderr, "%s\n","Usage: djcc [-d] assembly_file_name");
+      fprintf(stderr, "%s\n","Usage: djcc [-d] input_C57_file_path [output_TM57_file_path]");
       exit(1);
     }
-
-    assembly_file_name = argv[2];
-  } else if (argc == 2) {
-    if ( argv[1][0] == '-') {
-      if( strncmp(argv[1], "-d", 2) == 0) {
-        djdebug = 1;
-      } else {
-        fprintf(stderr, "%s\n","Usage: djcc [-d] assembly_file_name");
-     }
+  } else if (argc == 3) {
+    if(strncmp(argv[1], "-d", 2) == 0) {
+      djdebug = 1;
+      input_file_name = argv[2];
     } else {
-      assembly_file_name = argv[1];
+      input_file_name = argv[1];
+      assembly_file_name = argv[2];
+    }
+  } else if (argc == 2) {
+    if(strncmp(argv[1], "-d", 2) == 0) {
+      fprintf(stderr, "%s\n","Usage: djcc [-d] input_C57_file_path [output_TM57_file_path]");
+      exit(1);
+    } else {
+      input_file_name = argv[1];
     }
   }
+
+  // Open the input C57 file for reading
+  input_file_handle = fopen(input_file_name, "r");
+  if (!input_file_handle) {
+    fprintf(stderr, "Unable to read from C57 input file of name %s\n", input_file_name);
+    exit(1);
+  }
+
+  // Set yyin to parse from the input file
+  yyin = input_file_handle;
+
   int haveRoot = 0; // 0 means we have a root
 
   init_quad_array(-1);
@@ -64,25 +100,37 @@ int main(int argc, char *argv[])
   stringconst_table = create_symboltable();
   id_name_table = create_symboltable();
 
-  // yydebug = 1;
+  yydebug = djdebug;
+
   haveRoot = yyparse();
 
-  if (parseError) {
-      fprintf(stderr, "WARING: There were parse errors.\nParse tree may be ill-formed.\n");
-  } else if (haveRoot == 0) {
+  if (parseError || haveRoot != 0) {
+      fprintf(stderr, "Error: There were parse errors.\n");
+      exit(1);
+  } else {
       main_func_symnode = NULL;
-
-      // TODO: make sure we have a main function and that it takes no parameters
 
       if (djdebug) {
         printf("\n~~~~~~~~~~~~~~ fill_id_types ~~~~~~~~~~\n");
       }
-      fill_id_types(root);
+      if (fill_id_types(root) != 0) {
+        exit (1);
+      }
+
+      if (main_func_symnode == NULL) {
+        fprintf(stderr, "%s\n", "Error: No main method is defined.");
+        exit(1);
+      } else if (main_func_symnode->num_params != 0) {
+        fprintf(stderr, "%s\n", "Error: The main function cannot take any parameters.");
+        exit(1);
+      }
 
       if (djdebug) {
         printf("\n~~~~~~~~~~~ type_check ~~~~~~~~~~~~\n");
       }
-      type_check(root);
+      if (type_check(root) != 0) {
+        exit (1);
+      }
 
       if (djdebug) {
         printf("\n~~~~~~~~~~~~ generate_intermediate_code ~~~~~~~~~~~\n");
@@ -108,12 +156,7 @@ int main(int argc, char *argv[])
         printf("\n~~~~~~~~~~~ generate_quad_assembly ~~~~~~~~~~~~\n");
       }
       generate_program_assembly();
-
-  } else {
-      fprintf(stderr, "%s\n", "No root :(\n");
   }
 
   return 0;
 }
-
-// TODO: If something breaks, just stop there

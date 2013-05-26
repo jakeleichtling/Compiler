@@ -1,13 +1,10 @@
-/*
- * bparser.y
+/* bparser.y
  *
- * Bison file for C57 Parser
- * -generates parse tree using yyless()
- * -node type: ast_node
+ * A Bison input file for generating a C57 parser. The parser generates an abstract syntax tree
+ * using token inputs from the lexical analyzer.
  * 
  * Derek Salama & Jake Leichtling
- * CS57
- * 4/19/2013
+ * 5/29/2013
  */
 
 %{

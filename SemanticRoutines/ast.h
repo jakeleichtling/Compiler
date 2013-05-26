@@ -1,18 +1,14 @@
-/* 
- * ast.h
+/* ast.h
  *
  * File defining an enum and a struct for node types in an abstract
  * syntax tree.
  *
- * Written by THC for CS 57.  You should modify this file as
- * appropriate.
+ * Written by THC for CS 57
+ *
  * -------------------------------------------------------------
  *
- *  Modified by Derek Salama and Jake Leichtling
- *  for use with their parser
- *  CS57
- *  4/19/2013
- *
+ * Modified by Derek Salama and Jake Leichtling
+ * 5/29/2013
  */
 
 #ifndef AST_H_

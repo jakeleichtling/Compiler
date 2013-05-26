@@ -1,3 +1,12 @@
+/* tm57_assembly_generation.h
+ * 
+ * Declarations for generating assembly code from
+ * intermediate code.
+ *
+ * Jake Leichtling & Derek Salama
+ * 5/29/2013
+ */
+
 #ifndef TM57_ASSEMBLY_GENERATION_H_
 #define TM57_ASSEMBLY_GENERATION_H_
 

@@ -1,3 +1,12 @@
+/* quad.c
+ * 
+ * Function definitions for generating intermediate code
+ * from an abstract syntax tree and the corresponding symbol table.
+ *
+ * Jake Leichtling & Derek Salama
+ * 5/29/2013
+ */
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>

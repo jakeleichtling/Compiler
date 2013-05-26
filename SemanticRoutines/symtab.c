@@ -1,9 +1,17 @@
 /* symtab.c
  * Functions for the symbol table.
  * Written by THC for CS 57.
- * -------------------------
- * Modified by Derek Salama & Jake Leichtling
- * 4/29/2013
+ * 
+ * This file has been modified extensively by Jake Leichtling and Derek Salama
+ * to serve the purposes of a C57 compiler. The symbol table
+ * keeps track of identifier scoping and unique symbol table nodes (symnodes)
+ * for each identifier declaration. The symnodes encapsulate attributes
+ * about each identifier, including the address in memory of the variable
+ * or function, the type of addressing (global vs. off FP), variable or function
+ * return type, and parameter types for functions.
+ *
+ * Jake Leichtling & Derek Salama
+ * 5/29/2013
  */
 
 #include <stdlib.h>

@@ -1,3 +1,12 @@
+/* quad.h
+ * 
+ * Declarations for generating intermediate code
+ * from an abstract syntax tree and the corresponding symbol table.
+ *
+ * Jake Leichtling & Derek Salama
+ * 5/29/2013
+ */
+
 #ifndef QUAD_H_
 #define QUAD_H_
 

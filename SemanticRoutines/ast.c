@@ -1,18 +1,17 @@
 /* ast.c
  *
- * Written by THC for CS 57.  Relies on an enum and a struct for
- * various node types that appear in ast.h.  You should modify the
- * enum and struct as appropriate.
+ * Relies on an enum and a struct for
+ * various node types that appear in ast.h.
  *
  * This file contains functions to create a node and to print out an
  * abstract syntax tree, for debugging.
+ *
+ * Written by THC for CS 5
+ *
  * ----------------------------------------------------------------
  *
- *  Modified by Derek Salama and Jake Leichtling
- *  for use with their parser
- *  CS57
- *  4/19/2013
- *
+ * Modified by Derek Salama and Jake Leichtling
+ * 5/29/2013
  */
 
 #include <stdio.h>

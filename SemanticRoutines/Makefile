@@ -1,11 +1,10 @@
 # Name: Makefile
 #
-# Purpose: A program defining dependencies among the Compilers's constituent code files, also providing
-#					 commands of the form "make <command name>" to build the Compiler and/or its constituent parts
-# 				 or to clean the directory of compilation output.
+# A program defining dependencies among the Compilers's constituent code files, also providing
+#	commands of the form "make <command name>" to build the Compiler and/or its constituent parts
+# or to clean the directory of compilation output.
 #
 # Derek Salama & Jake Leichtling
-# CS57
 # 5/29/2013
 
 BISONFlAGS = -d -v

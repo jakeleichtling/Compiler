@@ -1,3 +1,12 @@
+/* tm57_assembly_generation.c
+ * 
+ * Function definitions for generating assembly code from
+ * intermediate code.
+ *
+ * Jake Leichtling & Derek Salama
+ * 5/29/2013
+ */
+
 #include <stdlib.h>
 #include <stdio.h>
 #include <string.h>

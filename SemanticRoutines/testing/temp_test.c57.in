@@ -1,7 +1,9 @@
-void main() {
+void main(int x) {
   if (1 && 1/0) {
     print 1;
   } else {
     print 0;
   }
+
+  print "hi";
 }
