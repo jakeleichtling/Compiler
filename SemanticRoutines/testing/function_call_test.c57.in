@@ -1,0 +1,117 @@
+/*
+	Parameters
+	-int
+	-double
+	-array of int
+	-array of double
+	-Function declaration
+	-Function with void param
+	-Function with empty parens
+	-Function with multiple params
+	-Function with array param
+	Function returning
+	-void
+	-int
+	-double
+	Actual parameters that are
+	-Global arrays
+	-Local arrays
+	-Formal array parameters
+*/
+
+int global_int_array[10];
+double global_double_array[10];
+
+/* void return type*/
+/* int[] parameter */
+/* int parameter */
+/* multiple parameters */
+void f0(int aa[], int a_size) {
+	int i;
+	print "\tf0: printing array param\n";
+	for (i = 0; i < a_size; ++i) {
+		print "\t\t";
+		print aa[i];
+		print "\n";
+	} 
+	return;
+}
+
+
+/* double return type */
+/* double parameter */
+double f1(double a) {
+	print "\tf1:";
+	print "\t a =";
+	print a;
+	print "\n";
+
+	a = 5;
+	print "\tNow a = ";
+	print a;
+	print "\n";
+	return a;
+}
+
+/* int return type*/
+/* double[] parameter */
+int f2(int aa[], int a_size, double bb[], int b_size) {
+	int i;
+
+	print "\tf2:\n";
+	print "\tprinting int[] param\n";
+	for (i = 0; i < a_size; ++i) {
+		print "\t\t";
+		print aa[i];
+		print "\n";
+	} 
+	print "\tprinting double[] param\n";
+	for (i = 0; i < b_size; ++i) {
+		print "\t\t";
+		print bb[i];
+		print "\n";
+	} 
+
+
+	print "\tcalling f0 with parameter array\n";
+	f0(aa, a_size);
+
+	return 1;
+}
+
+/* void parameter */
+void voidftn(void) {
+	return;
+}
+
+void main(void) {
+	int local_int_array[10];
+	double local_double_array[10];
+	double a = 12.3;
+	double result;
+	int i;
+
+	print "Main: initializing arrays s.t. a[i] = i\n";
+	for (i = 0; i < 10; ++i) {
+		local_int_array[i] = i;
+		global_int_array[i] = i;
+		local_double_array[i] = i;
+		global_double_array[i] = i;
+	}
+
+	print "\tCalling f2 with local arrays\n";
+	f2(local_int_array, 10, local_double_array, 10);
+
+	print "\tCalling f2 with global arrays\n";
+	f2(global_int_array, 10, global_double_array, 10);
+
+	voidftn();
+
+	print "\tCalling f1 with a=";
+	print a;
+	print "\n";
+	result = f1(a);
+	print "\t\tresult of r1 = ";
+	print result;
+	print "\n";
+}
