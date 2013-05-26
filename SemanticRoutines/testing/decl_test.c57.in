@@ -1,0 +1,74 @@
+/* Testing for:
+	-ids with letters, digits, and underscores
+	-multiple declarations within a program
+	-multiple variables in one declaration
+	-int declared
+	-double declared
+	-declaration with initialization
+	-declaration of an array
+		-constant size
+		-variable size
+		-size that is an array element
+	-global variables
+		-before any function
+		-between functions
+	-local variables
+	-redifinition of variables in inner scope
+*/
+
+/* ids */
+double id_with_underscore;
+double id_with_987654321;
+int _id_started_by_;
+
+/* global variables */
+
+/* declaration with init & multiple declarations */
+int y = 10, x = 0, z;
+
+/* array of constant size */
+int a[5];
+
+int f() {
+	/* inner scope var */
+	int x = a[0];
+
+	/* array with size from array element */
+	double b[a[0]];
+
+	/* array with variable size */
+	double c[x];
+
+	print "In f(), x <- a[0]\n";
+	print "x=";
+	print x;
+	print "\n";
+
+	{
+		/* inner scope again */
+		int x = 3;
+		print "In inner scope, x <- 3\n";
+		print "x=";
+		print x;
+		print "\n";
+	}
+
+	return x;	
+}
+
+/* global between functions */
+int y2;
+
+void main(void) {
+	/* local variables */
+	int x = 5;
+	int y;
+
+	print "At start of main, x=";
+	print x;
+	print "\n";
+
+	a[0] = 12;
+	print "a[0] <-- 12\n";
+	f();
+}

@@ -1,0 +1,101 @@
+Checklist item locations:
+
+In decl_test.c57:
+	-ids with letters, digits, and underscores (20-22)
+	-multiple declarations within a program (20-22)
+	-multiple variables in one declaration (27)
+	-int declared (22)
+	-double declared (20)
+	-declaration with initialization (64)
+	-declaration of an array
+		-constant size (30)
+		-variable size (40)
+		-size that is an array element (37)
+	-global variables
+		-before any function (20-30)
+		-between functions (60)
+	-local variables (64-65)
+	-redifinition of variables in inner scope (34, 49)
+
+TODO:
+Parameters
+☐	int
+☐	double
+☐	array of int
+☐	array of double
+☐ Function declaration
+☐ Function with void param
+☐ Function with empty parens
+☐ Function with multiple params
+☐ Function with array param
+Function returning
+☐	void
+☐	int
+☐	double
+Actual parameters that are
+☐	Global arrays
+☐	Local arrays
+☐	Formal array parameters
+☐ Recursive function
+☐ If-then
+☐ If-then-else
+☐	Nested
+☐ While
+☐ Do-While
+☐ For-loop
+☐	With empty header parts
+☐ Return with value
+☐ Return without value
+☐ Return in the middle of a function
+☐ Read
+☐ Print expression
+☐ Print string
+☐ Assignment into unsubscripted var
+☐ Assignment into subscripted var
+binary +
+☐	int
+☐	double
+binary –
+☐	int
+☐	double
+binary *
+☐	int
+☐	double
+binary /
+☐	int
+☐	double
+☐ binary % (int only)
+binary <
+☐	int
+☐	double
+binary <=
+☐	int
+☐	double
+binary >
+☐	int
+☐	double
+binary >=
+☐	int
+☐	double
+binary ==
+☐	int
+☐	double
+binary !=
+☐	int
+☐	double
+☐ binary &&
+☐ binary ||
+☐ unary !
+☐ unary –
+☐	int
+☐	double
+☐ prefix ++
+☐ prefix – –
+☐ convert int to double
+☐ convert double to int
+☐ Function call with no args
+☐ Function call with multiple args
+☐ Function call with array parameter
+☐ Function call in the midst of an expression
+☐ NUM
+☐ FNUM
