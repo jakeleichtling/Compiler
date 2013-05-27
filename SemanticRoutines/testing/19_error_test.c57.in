@@ -1,0 +1,21 @@
+/*
+
+Error test for:
+  19.) Return types of function declaration and function body don't match
+
+ */
+
+double f()
+{
+  return 5;
+}
+
+int g()
+{
+  return 5.0;
+}
+
+void main()
+{
+
+}

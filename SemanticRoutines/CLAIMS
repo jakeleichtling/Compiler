@@ -1,0 +1,15 @@
+CLAIMS
+------------------------
+
+Variable-size arrays in the stack are supported. For example, the following code is valid and functions correctly.
+
+{
+  ...
+
+  int n = 5;
+  int array[n];
+
+  ...
+}
+
+This feature is demonstrated in testing/variable_size_array_test.c57.in, which is one of the inputs included in the testing suite run by testing/run_all_tests.sh.

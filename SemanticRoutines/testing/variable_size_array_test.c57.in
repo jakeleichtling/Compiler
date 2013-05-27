@@ -1,0 +1,49 @@
+/*
+
+variable_size_array_test.c57.in
+
+Demonstrates the ability of the djcc compiler to support
+arrays (global and local) for which the size is determined at run time.
+
+ */
+
+int global_int_array_size = 25;
+int global_int_array[global_int_array_size];
+
+void main()
+{
+  int i;
+  int local_int_var = -26;
+  int local_dbl_array_size = (local_int_var * global_int_array_size * -72 - 13) % 29;
+  double local_dbl_array[local_dbl_array_size];
+
+  for (i = 0; i < global_int_array_size; ++i)
+  {
+    global_int_array[i] = i * 3;
+  }
+
+  for (i = 0; i < local_dbl_array_size; ++i)
+  {
+    local_dbl_array[i] = i * 5;
+  }
+
+  print "\n------------------------------\nsize: ";
+  print global_int_array_size;
+  print "\n\n";
+
+  for (i = 0; i < global_int_array_size; ++i)
+  {
+    print global_int_array[i];
+    print "\n";
+  }
+
+  print "\n------------------------------\nsize: ";
+  print local_dbl_array_size;
+  print "\n\n";
+
+  for (i = 0; i < local_dbl_array_size; ++i)
+  {
+    print local_dbl_array[i];
+    print "\n";    
+  }
+}

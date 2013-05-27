@@ -1,0 +1,12 @@
+/*
+
+Error test for:
+  9.) Two variables of the same name in the same scope
+
+ */
+
+void main()
+{
+  int x;
+  double x[20];
+}

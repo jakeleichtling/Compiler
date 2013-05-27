@@ -1,0 +1,15 @@
+/*
+
+Error test for:
+  11.) Initialization of variable in outter scope of a function with same name as a parameter
+
+ */
+
+void f(int x) {
+  double x = 5.0;
+}
+
+void main()
+{
+
+}

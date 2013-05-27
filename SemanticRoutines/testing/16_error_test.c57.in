@@ -1,0 +1,11 @@
+/*
+
+Error test for:
+  16.) Implicit cast of double to int
+
+ */
+
+void main()
+{
+  int x = 5.0;
+}

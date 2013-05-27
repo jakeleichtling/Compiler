@@ -1,0 +1,12 @@
+/*
+
+Error test for:
+  Increment an array pointer
+
+ */
+
+void main()
+{
+  int array[10];
+  ++array;
+}

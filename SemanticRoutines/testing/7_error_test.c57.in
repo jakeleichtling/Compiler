@@ -1,0 +1,12 @@
+/*
+
+Error test for:
+  7.) Array variable in mathematical operation
+
+ */
+
+void main()
+{
+  int x[5];
+  int y = 10 + x;
+}

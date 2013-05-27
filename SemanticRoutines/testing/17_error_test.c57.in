@@ -1,0 +1,16 @@
+/*
+
+Error test for:
+  17.) Logical operation with float
+
+ */
+
+void main()
+{
+  double d = 4.9;
+  int x = 1;
+  
+  if (d && x) {
+    print "d and x are both nonzero";
+  }
+}

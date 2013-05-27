@@ -1,0 +1,12 @@
+/*
+
+Error test for:
+  13.) Subscript a non-array variable
+
+ */
+
+void main()
+{
+  int x;
+  int y = x[2];
+}

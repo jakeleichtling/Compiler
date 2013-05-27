@@ -1,0 +1,12 @@
+/*
+
+Error test for:
+  14.) Assign to an array pointer
+
+ */
+
+void main()
+{
+  int x[5];
+  x = 10;
+}

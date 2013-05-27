@@ -1,0 +1,11 @@
+/*
+
+Error test for:
+  2.) Main function that takes parameters
+
+ */
+
+void main(int x)
+{
+
+}

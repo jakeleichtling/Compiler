@@ -1,0 +1,17 @@
+/*
+
+Error test for:
+  6a.) Pass array when value expected
+
+ */
+
+void f(int x)
+{
+
+}
+
+void main()
+{
+  int array[10];
+  f(array);
+}

@@ -1,0 +1,11 @@
+/*
+
+Error test for:
+  4.) No main function
+
+ */
+
+void f()
+{
+
+}

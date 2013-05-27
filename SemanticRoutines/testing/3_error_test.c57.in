@@ -1,0 +1,11 @@
+/*
+
+Error test for:
+  3.) Main function that has a return type
+
+ */
+
+int main()
+{
+  return 42;
+}

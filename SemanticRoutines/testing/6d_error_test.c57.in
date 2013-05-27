@@ -1,0 +1,17 @@
+/*
+
+Error test for:
+  6d.) Pass the wrong number of parameters
+
+ */
+
+void f(int x, int y)
+{
+
+}
+
+void main()
+{
+  int i;
+  f(i);
+}

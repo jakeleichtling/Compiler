@@ -1,0 +1,11 @@
+/*
+
+Error test for:
+  5.) Call an undefined function
+
+ */
+
+void main()
+{
+  int x = f();
+}

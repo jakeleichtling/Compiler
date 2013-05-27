@@ -105,11 +105,11 @@ int fill_id_types(ast_node node)
       // Get the func ID's ast node
       ast_node id_astnode = node->left_child->right_sibling;
 
-      // Look up the name in the ID name table and make sure it doesn't already exist in the same scope
+      // Look up the name in the ID name table and make sure it doesn't already exist in this scope
       char *basename = id_astnode->value.sym_node->name;
       symnode prev_scoped_id_symnode = lookup_in_symboltable(scoped_id_table, basename, &scoped_id_table_level);
       if (prev_scoped_id_symnode != NULL && scoped_id_table_level == scoped_id_table->inner_scope->level) {
-        mark_error(node->line_num, "An ID of this name already exists in the same scope");
+        mark_error(node->line_num, "An ID of the same name already exists in this scope");
         return 1;
       }
 
@@ -181,11 +181,11 @@ int fill_id_types(ast_node node)
       // Get the param ID's ast node
       ast_node id_astnode = node->left_child->right_sibling;
 
-      // Look up the name in the ID name table and make sure it doesn't already exist in the same scope
+      // Look up the name in the ID name table and make sure it doesn't already exist in this scope
       char *basename = id_astnode->value.sym_node->name;
       symnode prev_scoped_id_symnode = lookup_in_symboltable(scoped_id_table, basename, &scoped_id_table_level);
       if (prev_scoped_id_symnode != NULL && scoped_id_table_level == scoped_id_table->inner_scope->level) {
-        mark_error(node->line_num, "A formal parameter of this name already exists in this function declaration");
+        mark_error(node->line_num, "A formal parameter of the same name already exists in this function declaration");
         return 1;
       }
 
@@ -236,11 +236,11 @@ int fill_id_types(ast_node node)
             printf("\t--> id: %s\n", id_astnode->value.sym_node->name);
           }
 
-          // Look up the name in the ID name table and make sure it doesn't already exist in the same scope
+          // Look up the name in the ID name table and make sure it doesn't already exist in this scope
           char *basename = id_astnode->value.sym_node->name;
           symnode prev_scoped_id_symnode = lookup_in_symboltable(scoped_id_table, basename, &scoped_id_table_level);
           if (prev_scoped_id_symnode != NULL && scoped_id_table_level == scoped_id_table->inner_scope->level) {
-            mark_error(node->line_num, "An ID of this name already exists in the same scope");
+            mark_error(node->line_num, "An ID of the same name already exists in this scope");
             return 1;
           }
 
@@ -272,11 +272,11 @@ int fill_id_types(ast_node node)
             printf("\t--> id: %s\n", id_astnode->value.sym_node->name);
           }
 
-          // Look up the name in the ID name table and make sure it doesn't already exist in the same scope
+          // Look up the name in the ID name table and make sure it doesn't already exist in this scope
           char *basename = id_astnode->value.sym_node->name;
           symnode prev_scoped_id_symnode = lookup_in_symboltable(scoped_id_table, basename, &scoped_id_table_level);
           if (prev_scoped_id_symnode != NULL && scoped_id_table_level == scoped_id_table->inner_scope->level) {
-            mark_error(node->line_num, "An ID of this name already exists in the same scope");
+            mark_error(node->line_num, "An ID of the same name already exists in this scope");
             return 1;
           }
 
@@ -334,11 +334,11 @@ int fill_id_types(ast_node node)
       // Get the param ID's ast node
       ast_node id_astnode = node->left_child->right_sibling;
 
-      // Look up the name in the ID name table and make sure it doesn't already exist in the same scope
+      // Look up the name in the ID name table and make sure it doesn't already exist in this scope
       char *basename = id_astnode->value.sym_node->name;
       symnode prev_scoped_id_symnode = lookup_in_symboltable(scoped_id_table, basename, &scoped_id_table_level);
       if (prev_scoped_id_symnode != NULL && scoped_id_table_level == scoped_id_table->inner_scope->level) {
-        mark_error(node->line_num, "A formal parameter of this name already exists in this function declaration");
+        mark_error(node->line_num, "A formal parameter of the same name already exists in this function declaration");
         return 1;
       }
 
@@ -385,7 +385,7 @@ int fill_id_types(ast_node node)
       char *basename = id_astnode->value.sym_node->name;
       symnode prev_scoped_id_symnode = lookup_in_symboltable(scoped_id_table, basename, &scoped_id_table_level);
       if (prev_scoped_id_symnode == NULL) {
-        mark_error(node->line_num, "A variable is referenced but never declared in an accessible scope");
+        mark_error(node->line_num, "A variable or function is referenced but never declared in an accessible scope");
         return 1;
       }
 
@@ -810,7 +810,7 @@ int type_check(ast_node node)
 
         // if the function doesn't want an array pointer but gets one
         if (func_sym_node->param_symnode_array[i]->node_type != array_node && (actual_param_node->node_type == ID && actual_param_node->value.sym_node->node_type == array_node)) {
-          mark_error(node->line_num, "A formal parameter is not an array pointer, but the corresponding actual parameter is");
+          mark_error(node->line_num, "A formal parameter is not an array pointer, but the corresponding actual parameter passed is");
         }
 
         enum vartype actual_type = actual_param_node->data_type;
@@ -818,7 +818,7 @@ int type_check(ast_node node)
 
         // error if you are expecting an int and get a double
         if (formal_type == inttype && actual_type == doubletype) {
-          mark_error(node->line_num, "An actual parameter passed is a double, but the corresponding formal parameter expects an int");
+          mark_error(node->line_num, "An actual parameter passed is a double, but the corresponding formal parameter is an int");
           return 1;
         } else if (actual_type == voidtype) { // error if a parameter passed is of type void
           mark_error(node->line_num, "You can't pass a parameter of type void");

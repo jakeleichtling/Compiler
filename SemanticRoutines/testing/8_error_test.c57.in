@@ -1,0 +1,15 @@
+/*
+
+Error test for:
+  8.) Array variable in mathematical comparison
+
+ */
+
+void main()
+{
+  int x[5];
+  if (x < 10)
+  {
+    print "x is less than 10";
+  }
+}

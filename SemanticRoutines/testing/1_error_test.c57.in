@@ -1,0 +1,12 @@
+/*
+
+Error test for:
+  1.) Newline in string
+
+ */
+
+void main()
+{
+  print "Newline
+    in a string";
+}

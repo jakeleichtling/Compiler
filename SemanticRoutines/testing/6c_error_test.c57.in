@@ -1,0 +1,17 @@
+/*
+
+Error test for:
+  6c.) Pass double when int expected
+
+ */
+
+void f(int x)
+{
+
+}
+
+void main()
+{
+  double d;
+  f(d);
+}

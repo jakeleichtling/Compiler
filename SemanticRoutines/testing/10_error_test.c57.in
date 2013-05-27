@@ -1,0 +1,11 @@
+/*
+
+Error test for:
+  10.) Use an undeclared variable
+
+ */
+
+void main()
+{
+  int y = x;
+}

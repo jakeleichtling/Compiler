@@ -1,0 +1,16 @@
+/*
+
+Error test for:
+  20.) Non-void function without a return statement
+
+ */
+
+int f()
+{
+  print "no return statement!";
+}
+
+void main()
+{
+
+}
