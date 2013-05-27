@@ -58,8 +58,8 @@ In misc_test.c57:
 	-Assignment into unsubscripted var (73)
 	-Assignment into subscripted var (32)
 
-TODO:
-☐ Recursive function
+In op_test.c57:
+//TODO: line numbers!!
 binary +
 ☐	int
 ☐	double
@@ -100,6 +100,9 @@ binary !=
 ☐ prefix ++
 ☐ prefix – –
 ☐ convert int to double
-☐ convert double to int
-☐ NUM
-☐ FNUM
+
+TODO:
+☐ Recursive function
+☐ convert double to int ?
+☐ NUM ?
+☐ FNUM ?

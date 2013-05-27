@@ -142,6 +142,15 @@ void main(void) {
 	print y;
 	print "\n";
 
+
+	print "\n";
+	print "Now to show some widening,\n";
+	print "int x = 1; double y = x; y = ";
+	x = 1;
+	y = x;
+	print y;
+	print "\n";
+
 	print "\n\n";
 	print "Just for kicks, lets show off our short-circuiting\n";
 	print "0 && 1/0 = ";
