@@ -17,25 +17,26 @@ In decl_test.c57:
 	-local variables (64-65)
 	-redifinition of variables in inner scope (34, 49)
 
+In function_call_test.c57:
+	-Parameters
+		-int (29)
+		-double (43)
+		-array of int (29)
+		-array of double (58)
+	-Function declaration (29)
+	-Function with void param (83)
+	-Function with empty parens (88)
+	-Function with multiple params (29)
+	-Function with array param (29)
+	-Function returning
+		-void (29)
+		-int (58)
+		-double (43)
+	-Actual parameters that are
+		-Global arrays (111)
+		-Local arrays (108)
+		-Formal array parameters (77)
 TODO:
-Parameters
-☐	int
-☐	double
-☐	array of int
-☐	array of double
-☐ Function declaration
-☐ Function with void param
-☐ Function with empty parens
-☐ Function with multiple params
-☐ Function with array param
-Function returning
-☐	void
-☐	int
-☐	double
-Actual parameters that are
-☐	Global arrays
-☐	Local arrays
-☐	Formal array parameters
 ☐ Recursive function
 ☐ If-then
 ☐ If-then-else

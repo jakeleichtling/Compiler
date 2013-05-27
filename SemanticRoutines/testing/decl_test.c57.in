@@ -1,19 +1,29 @@
-/* Testing for:
-	-ids with letters, digits, and underscores
-	-multiple declarations within a program
-	-multiple variables in one declaration
-	-int declared
-	-double declared
-	-declaration with initialization
+/* 
+decl_test.c57.in
+-contains examples of various declarations in c57
+
+Derek Salama & Jake Leichtling
+CS57
+5/29/2013
+
+--------------------------------------------------
+
+Testing for:
+	-ids with letters, digits, and underscores (20-22)
+	-multiple declarations within a program (20-22)
+	-multiple variables in one declaration (27)
+	-int declared (22)
+	-double declared (20)
+	-declaration with initialization (64)
 	-declaration of an array
-		-constant size
-		-variable size
-		-size that is an array element
+		-constant size (30)
+		-variable size (40)
+		-size that is an array element (37)
 	-global variables
-		-before any function
-		-between functions
-	-local variables
-	-redifinition of variables in inner scope
+		-before any function (20-30)
+		-between functions (60)
+	-local variables (64-65)
+	-redifinition of variables in inner scope (34, 49)
 */
 
 /* ids */
