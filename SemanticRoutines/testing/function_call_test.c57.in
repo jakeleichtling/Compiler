@@ -11,23 +11,30 @@ CS57
 
 Testing for:
 	-Parameters
-		-int (29)
-		-double (43)
-		-array of int (29)
-		-array of double (58)
-	-Function declaration (29)
-	-Function with void param (83)
-	-Function with empty parens (88)
-	-Function with multiple params (29)
-	-Function with array param (29)
+		-int (47)
+		-double (61)
+		-array of int (47)
+		-array of double (78)
+	-Function declaration (47)
+	-Function with void param (103)
+	-Function with empty parens (109)
+	-Function with multiple params (47)
+	-Function with array param (47)
 	-Function returning
-		-void (29)
-		-int (58)
-		-double (43)
+		-void (47)
+		-int (78)
+		-double (61)
 	-Actual parameters that are
-		-Global arrays (111)
-		-Local arrays (108)
-		-Formal array parameters (77)
+		-Global arrays (140)
+		-Local arrays (136)
+		-Formal array parameters (97)
+	-Function call with no args (143)
+	-Function call with multiple args (136)
+	-Function call with array parameter (136)
+	-Function call in the midst of an expression (146)
+	-Return with value (72)
+	-Return without value (104)
+	-Return in the middle of a function (109)
 */
 
 int global_int_array[10];
@@ -61,6 +68,8 @@ double f1(double a) {
 	print "\tNow a = ";
 	print a;
 	print "\n";
+
+	/* return with a value */
 	return a;
 }
 
@@ -92,12 +101,17 @@ int f2(int aa[], int a_size, double bb[], int b_size) {
 
 /* void parameter */
 void voidftn(void) {
+	/* return without a value */
 	return;
 }
 
-/* empty parents */
-void emptyftn() {
-	return;
+/* empty parens */
+int emptyftn() {
+	if (1) {
+		return 36;
+	} else {
+		return 46;
+	}
 }
 
 void main(void) {
@@ -116,13 +130,20 @@ void main(void) {
 	}
 
 	print "\tCalling f2 with local arrays\n";
+	/* ftn call with multiple args */
+	/* ftn call with array parameter */
+	/* local array actual param */
 	f2(local_int_array, 10, local_double_array, 10);
 
 	print "\tCalling f2 with global arrays\n";
+	/* global array actual param */
 	f2(global_int_array, 10, global_double_array, 10);
 
+	/* ftn call with no args */
 	voidftn();
-	emptyftn();
+
+	/* ftn call in middle of an expression */
+	a = a + emptyftn();
 
 	print "\tCalling f1 with a=";
 	print a;

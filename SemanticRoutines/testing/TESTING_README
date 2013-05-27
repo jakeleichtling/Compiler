@@ -19,23 +19,31 @@ In decl_test.c57:
 
 In function_call_test.c57:
 	-Parameters
-		-int (29)
-		-double (43)
-		-array of int (29)
-		-array of double (58)
-	-Function declaration (29)
-	-Function with void param (83)
-	-Function with empty parens (88)
-	-Function with multiple params (29)
-	-Function with array param (29)
+		-int (47)
+		-double (61)
+		-array of int (47)
+		-array of double (78)
+	-Function declaration (47)
+	-Function with void param (103)
+	-Function with empty parens (109)
+	-Function with multiple params (47)
+	-Function with array param (47)
 	-Function returning
-		-void (29)
-		-int (58)
-		-double (43)
+		-void (47)
+		-int (78)
+		-double (61)
 	-Actual parameters that are
-		-Global arrays (111)
-		-Local arrays (108)
-		-Formal array parameters (77)
+		-Global arrays (140)
+		-Local arrays (136)
+		-Formal array parameters (97)
+	-Function call with no args (143)
+	-Function call with multiple args (136)
+	-Function call with array parameter (136)
+	-Function call in the midst of an expression (146)
+	-Return with value (72)
+	-Return without value (104)
+	-Return in the middle of a function (109)
+
 TODO:
 ☐ Recursive function
 ☐ If-then
@@ -45,9 +53,6 @@ TODO:
 ☐ Do-While
 ☐ For-loop
 ☐	With empty header parts
-☐ Return with value
-☐ Return without value
-☐ Return in the middle of a function
 ☐ Read
 ☐ Print expression
 ☐ Print string
@@ -94,9 +99,5 @@ binary !=
 ☐ prefix – –
 ☐ convert int to double
 ☐ convert double to int
-☐ Function call with no args
-☐ Function call with multiple args
-☐ Function call with array parameter
-☐ Function call in the midst of an expression
 ☐ NUM
 ☐ FNUM
