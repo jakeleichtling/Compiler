@@ -9,6 +9,7 @@ arrays (global and local) for which the size is determined at run time.
 
 int global_int_array_size = 25;
 int global_int_array[global_int_array_size];
+double random_global_dbl = 42.729; /* To see if we can find this variable after the variable-size array declaration */
 
 void main()
 {
@@ -16,6 +17,7 @@ void main()
   int local_int_var = -26;
   int local_dbl_array_size = (local_int_var * global_int_array_size * -72 - 13) % 29;
   double local_dbl_array[local_dbl_array_size];
+  double random_local_dbl = 23.0; /* To see if we can find this variable after the variable-size array declaration */
 
   for (i = 0; i < global_int_array_size; ++i)
   {
@@ -46,4 +48,12 @@ void main()
     print local_dbl_array[i];
     print "\n";    
   }
+
+  print "\n------------------------------\nrandom global double: ";
+  print random_global_dbl;
+  print "\n";
+
+  print "random local double: ";
+  print random_local_dbl;
+  print "\n";
 }
