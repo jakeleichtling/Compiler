@@ -1,0 +1,110 @@
+/*
+misc_test.c57.in
+-tests if, if-else, loops, reading and printing
+
+Derek Salama & Jake Leichtling
+CS57
+5/29/2013
+
+--------------------------------------------------
+
+Testing:
+	-If-then (50)
+	-If-then-else (57)
+		-Nested (65)
+	-While (72)
+	-Do-While (82)
+	-For-loop (92)
+		-With empty header parts (100)
+	-Read (107)
+	-Print expression (38)
+	-Print string (35)
+	-Assignment into unsubscripted var (73)
+	-Assignment into subscripted var (32)
+
+*/
+void f0(int size) {
+	int array[size];
+	int i;
+
+	for (i=0; i < size; ++i) {
+		/* assignment into subscripted var */
+		array[i] = i * 2;
+
+		/* print string */
+		print "\ta[";
+
+		/* print expression */
+		print i;
+		print "] = ";
+		print array[i];
+		print "\n";
+	}
+}
+
+void main(void) {
+	int a = 1;	
+	int array_size;
+
+	/* if - then */
+	if (a)
+		print "Lets test some if-statements\n\n";
+
+	if (!a)
+		print "I should never be printed!\n\n";
+
+	/* if - then - else */
+	if (!a) {
+		print "I should never be printed!\n\n";
+	} else {
+		print "Hello! I live in an else-statement\n\n";
+	}
+
+	/* nested if - then - else */
+	if(a)
+		if(!a)
+			5 + 5;
+		else
+			print "I hope this dangling else prints me!\n\n";
+
+	print "Now, for a while-loop\n";
+	print "Lets start 'a' at 1 and +5 while less than 10 \n";
+	while ( a < 10 ) {
+		a = a + 5;
+		print "\ta=";
+		print a;
+		print "\n";
+	}
+
+	print "Same thing with a do-while:\n";
+	print "Lets start 'a' at 1 and +5 while less than 10 \n";
+	a = 1;
+	do {
+		a = a + 5;
+		print "\ta=";
+		print a;
+		print "\n";
+	}
+	while ( a < 10 );
+
+	print "For-loop time\n";
+	print "for (a=1; a<10; a=a+5)\n";
+	for (a = 1; a < 10; a = a + 5) {
+		print "\ta=";
+		print a;
+		print "\n";
+	}
+
+	print "And a for-loop with empty-header parts\n";
+	print "for (; a > 0; a = a - 5)\n";
+	for (; a > 0; a = a - 5) {
+		print "\ta=";
+		print a;
+		print "\n";
+	}
+
+	print "Choose an array size!: ";
+	read array_size;
+	f0(array_size);	
+
+}

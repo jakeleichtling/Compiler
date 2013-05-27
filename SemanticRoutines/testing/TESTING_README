@@ -44,20 +44,22 @@ In function_call_test.c57:
 	-Return without value (104)
 	-Return in the middle of a function (109)
 
+In misc_test.c57:
+	-If-then (50)
+	-If-then-else (57)
+		-Nested (65)
+	-While (72)
+	-Do-While (82)
+	-For-loop (92)
+		-With empty header parts (100)
+	-Read (107)
+	-Print expression (38)
+	-Print string (35)
+	-Assignment into unsubscripted var (73)
+	-Assignment into subscripted var (32)
+
 TODO:
 ☐ Recursive function
-☐ If-then
-☐ If-then-else
-☐	Nested
-☐ While
-☐ Do-While
-☐ For-loop
-☐	With empty header parts
-☐ Read
-☐ Print expression
-☐ Print string
-☐ Assignment into unsubscripted var
-☐ Assignment into subscripted var
 binary +
 ☐	int
 ☐	double
