@@ -26,6 +26,9 @@ void gen_standard_int_binary_op(ass_op op, quad_arg dest_arg, quad_arg l_arg, qu
 // Generate assembly for standard float binary ops
 void gen_standard_float_binary_op(ass_op op, quad_arg dest_arg, quad_arg l_arg, quad_arg r_arg);
 
+// Generate assembly for standard float comparisn ops
+void gen_standard_float_comparison_op(ass_op op, quad_arg dest_arg, quad_arg l_arg, quad_arg r_arg);
+
 // Method to print RO instructions
 // increments assebly line # after print
 void print_ro(ass_op op, int dest_r, int r1, int r2);
@@ -508,28 +511,7 @@ void generate_quad_assembly()
 		}
     case lt_floats_op:
     {
-      // Load the left float argument into fr0
-      gen_load_float(curr_quad->arg2->value.var_node, 0);
-
-      // Load the right float argument into fr1
-      gen_load_float(curr_quad->arg3->value.var_node, 1);
-
-      // fr0 <- fr0 - fr1
-      print_ro(SUBF, 0, 0, 1);
-
-      // If fr0 < 0, jump to L1 (2 instructions)
-      print_rm_int(JFLT, 0, 2, program_ctr_reg);
-
-      // Put 0.0 in fr0 and jump to L2 (1 instruction)
-      print_rm_float(LDFC, 0, 0.0, 0);
-      print_rm_int(LDA, program_ctr_reg, 1, program_ctr_reg);
-
-      // L1: Put 1.0 in fr0
-      print_rm_int(LDC, 0, 1.0, 0);
-
-      // L2: Store fr0 into the double variable
-      gen_store_float(curr_quad->arg1->value.var_node, 0);
-
+      gen_standard_float_comparison_op(JFLT, curr_quad->arg1, curr_quad->arg2, curr_quad->arg3);
       return;
     }
     case leq_ints_op:
@@ -560,28 +542,7 @@ void generate_quad_assembly()
     }
     case leq_floats_op:
     {
-      // Load the left float argument into fr0
-      gen_load_float(curr_quad->arg2->value.var_node, 0);
-
-      // Load the right float argument into fr1
-      gen_load_float(curr_quad->arg3->value.var_node, 1);
-
-      // fr0 <- fr0 - fr1
-      print_ro(SUBF, 0, 0, 1);
-
-      // If fr0 <= 0, jump to L1 (2 instructions)
-      print_rm_int(JFLE, 0, 2, program_ctr_reg);
-
-      // Put 0.0 in fr0 and jump to L2 (1 instruction)
-      print_rm_float(LDFC, 0, 0.0, 0);
-      print_rm_int(LDA, program_ctr_reg, 1, program_ctr_reg);
-
-      // L1: Put 1.0 in fr0
-      print_rm_int(LDC, 0, 1.0, 0);
-
-      // L2: Store fr0 into the double variable
-      gen_store_float(curr_quad->arg1->value.var_node, 0);
-
+      gen_standard_float_comparison_op(JFLE, curr_quad->arg1, curr_quad->arg2, curr_quad->arg3);
       return;
     }
     case gt_ints_op:
@@ -612,28 +573,7 @@ void generate_quad_assembly()
     }
     case gt_floats_op:
     {
-      // Load the left float argument into fr0
-      gen_load_float(curr_quad->arg2->value.var_node, 0);
-
-      // Load the right float argument into fr1
-      gen_load_float(curr_quad->arg3->value.var_node, 1);
-
-      // fr0 <- fr0 - fr1
-      print_ro(SUBF, 0, 0, 1);
-
-      // If fr0 > 0, jump to L1 (2 instructions)
-      print_rm_int(JFGT, 0, 2, program_ctr_reg);
-
-      // Put 0.0 in fr0 and jump to L2 (1 instruction)
-      print_rm_float(LDFC, 0, 0.0, 0);
-      print_rm_int(LDA, program_ctr_reg, 1, program_ctr_reg);
-
-      // L1: Put 1.0 in fr0
-      print_rm_int(LDC, 0, 1.0, 0);
-
-      // L2: Store fr0 into the double variable
-      gen_store_float(curr_quad->arg1->value.var_node, 0);
-
+      gen_standard_float_comparison_op(JFGT, curr_quad->arg1, curr_quad->arg2, curr_quad->arg3);
       return;
     }
     case geq_ints_op:
@@ -664,28 +604,7 @@ void generate_quad_assembly()
     }
     case geq_floats_op:
     {
-      // Load the left float argument into fr0
-      gen_load_float(curr_quad->arg2->value.var_node, 0);
-
-      // Load the right float argument into fr1
-      gen_load_float(curr_quad->arg3->value.var_node, 1);
-
-      // fr0 <- fr0 - fr1
-      print_ro(SUBF, 0, 0, 1);
-
-      // If fr0 >= 0, jump to L1 (2 instructions)
-      print_rm_int(JFGE, 0, 2, program_ctr_reg);
-
-      // Put 0.0 in fr0 and jump to L2 (1 instruction)
-      print_rm_float(LDFC, 0, 0.0, 0);
-      print_rm_int(LDA, program_ctr_reg, 1, program_ctr_reg);
-
-      // L1: Put 1.0 in fr0
-      print_rm_int(LDC, 0, 1.0, 0);
-
-      // L2: Store fr0 into the double variable
-      gen_store_float(curr_quad->arg1->value.var_node, 0);
-
+      gen_standard_float_comparison_op(JFGE, curr_quad->arg1, curr_quad->arg2, curr_quad->arg3);
       return;
     }
     case eq_ints_op:
@@ -716,28 +635,7 @@ void generate_quad_assembly()
     }
     case eq_floats_op:
     {
-      // Load the left float argument into fr0
-      gen_load_float(curr_quad->arg2->value.var_node, 0);
-
-      // Load the right float argument into fr1
-      gen_load_float(curr_quad->arg3->value.var_node, 1);
-
-      // fr0 <- fr0 - fr1
-      print_ro(SUBF, 0, 0, 1);
-
-      // If fr0 == 0, jump to L1 (2 instructions)
-      print_rm_int(JFEQ, 0, 2, program_ctr_reg);
-
-      // Put 0.0 in fr0 and jump to L2 (1 instruction)
-      print_rm_float(LDFC, 0, 0.0, 0);
-      print_rm_int(LDA, program_ctr_reg, 1, program_ctr_reg);
-
-      // L1: Put 1.0 in fr0
-      print_rm_int(LDC, 0, 1.0, 0);
-
-      // L2: Store fr0 into the double variable
-      gen_store_float(curr_quad->arg1->value.var_node, 0);
-
+      gen_standard_float_comparison_op(JFEQ, curr_quad->arg1, curr_quad->arg2, curr_quad->arg3);
       return;
     }
     case neq_ints_op:
@@ -768,28 +666,7 @@ void generate_quad_assembly()
     }
     case neq_floats_op:
     {
-      // Load the left float argument into fr0
-      gen_load_float(curr_quad->arg2->value.var_node, 0);
-
-      // Load the right float argument into fr1
-      gen_load_float(curr_quad->arg3->value.var_node, 1);
-
-      // fr0 <- fr0 - fr1
-      print_ro(SUBF, 0, 0, 1);
-
-      // If fr0 != 0, jump to L1 (2 instructions)
-      print_rm_int(JFNE, 0, 2, program_ctr_reg);
-
-      // Put 0.0 in fr0 and jump to L2 (1 instruction)
-      print_rm_float(LDFC, 0, 0.0, 0);
-      print_rm_int(LDA, program_ctr_reg, 1, program_ctr_reg);
-
-      // L1: Put 1.0 in fr0
-      print_rm_int(LDC, 0, 1.0, 0);
-
-      // L2: Store fr0 into the double variable
-      gen_store_float(curr_quad->arg1->value.var_node, 0);
-
+      gen_standard_float_comparison_op(JFNE, curr_quad->arg1, curr_quad->arg2, curr_quad->arg3);
       return;
     }
     case bang_op:
@@ -1230,6 +1107,35 @@ void gen_standard_float_binary_op(ass_op op, quad_arg dest_arg, quad_arg l_arg, 
 
     //store in destination
     gen_store_float(dest_symnode, 0);
+}
+
+// Generate assembly for standard float binary ops
+void gen_standard_float_comparison_op(ass_op op, quad_arg dest_arg, quad_arg l_arg, quad_arg r_arg) {
+    symnode l_symnode = l_arg->value.var_node;
+    symnode r_symnode = r_arg->value.var_node;
+    symnode dest_symnode = dest_arg->value.var_node;
+
+    // Load the left float argument into fr0
+    gen_load_float(l_symnode, 0);
+
+    // Load the right float argument into fr1
+    gen_load_float(r_symnode, 1);
+
+    // fr0 <- fr0 - fr1
+    print_ro(SUBF, 0, 0, 1);
+
+    // If fr0 < 0, jump to L1 (2 instructions)
+    print_rm_int(op, 0, 2, program_ctr_reg);
+
+    // Put 0 in r0 and jump to L2 (1 instruction)
+    print_rm_int(LDC, 0, 0, 0);
+    print_rm_int(LDA, program_ctr_reg, 1, program_ctr_reg);
+
+    // L1: Put 1 in r0
+    print_rm_int(LDC, 0, 1, 0);
+
+    // L2: Store r0 into the int variable
+    gen_store_int(dest_symnode, 0);
 }
 
 void gen_load_int(symnode node, int dest_r) {

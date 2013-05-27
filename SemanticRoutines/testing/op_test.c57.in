@@ -1,0 +1,156 @@
+void main(void) {
+	int x;
+	double y;
+
+	print "Int operations: \n";
+	print "5 + 5 = ";
+	x = 5 + 5;
+	print x;
+	print "\n";
+
+	print "5 - 5 = ";
+	x = 5 - 5;
+	print x;
+	print "\n";
+
+	print "5 * 5 = ";
+	x = 5 * 5;
+	print x;
+	print "\n";
+
+	print "5 / 6 = ";
+	x = 5 / 6;
+	print x;
+	print "\n";
+
+	print "5 % 2 = ";
+	x = 5 / 2;
+	print x;
+	print "\n";
+
+	print "5 < 4 = ";
+	x = 5 < 4;
+	print x;
+	print "\n";
+
+	print "5 <= 5 = ";
+	x = 5 <= 5;
+	print x;
+	print "\n";
+
+	print "5 > 4 = ";
+	x = 5 > 4;
+	print x;
+	print "\n";
+
+	print "5 >= 5 = ";
+	x = 5 >= 5;
+	print x;
+	print "\n";
+
+	print "5 == 5 = ";
+	x = 5 >= 5;
+	print x;
+	print "\n";
+
+	print "5 != 5 = ";
+	x = 5 != 5;
+	print x;
+	print "\n";
+
+	print "0 && 1 = ";
+	x = 0 && 1;
+	print x;
+	print "\n";
+
+	print "!1 = ";
+	x = !1;
+	print x;
+	print "\n";
+
+	print "-1 = ";
+	x = -1;
+	print x;
+	print "\n";
+
+	print "x=1, ++x = ";
+	x = 1;
+	++x;
+	print x;
+	print "\n";
+
+	print "x=1, --x = ";
+	x = 1;
+	--x;
+	print x;
+	print "\n";
+
+	print "\n\n";
+	print "Double operations: \n";
+	print "5.1 + 5.0 = ";
+	y = 5.1 + 5.0;
+	print y;
+	print "\n";
+
+	print "5.0 - 5.1 = ";
+	y = 5.0 - 5.1;
+	print y;
+	print "\n";
+
+	print "5.1 * 5.0 = ";
+	y = 5.1 * 5.0;
+	print y;
+	print "\n";
+
+	print "5.0 / 6.0 = ";
+	y = 5.0 / 6.0;
+	print y;
+	print "\n";
+
+	print "5.0 < 4.8 = ";
+	y = 5.0 < 4.8;
+	print y;
+	print "\n";
+
+	print "5.0 <= 5.0 = ";
+	y = 5.0 <= 5.0;
+	print y;
+	print "\n";
+
+	print "5.0 > 4.3 = ";
+	y = 5.0 > 4.3;
+	print y;
+	print "\n";
+
+	print "5.0 >= 5.0 = ";
+	y = 5.0 >= 5.0;
+	print y;
+	print "\n";
+
+	print "5.0 == 5.0 = ";
+	y = 5.0 >= 5.0;
+	print y;
+	print "\n";
+
+	print "5.0 != 5.0 = ";
+	y = 5.0 != 5.0;
+	print y;
+	print "\n";
+
+	print "-1.0 = ";
+	y = -1.0;
+	print y;
+	print "\n";
+
+	print "\n\n";
+	print "Just for kicks, lets show off our short-circuiting\n";
+	print "0 && 1/0 = ";
+	x = 0 && 1/0;
+	print x;
+	print "\n";
+
+	print "1 || 1/0 = ";
+	x = 1 || 1/0;
+	print x;
+	print "\n";
+}

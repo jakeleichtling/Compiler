@@ -99,6 +99,11 @@ char *quad_op_string[] = {
 //  +, -, *, /
 quad_arg generate_binary_op_with_widening(ast_node node, enum quad_op quad_op_ints, enum quad_op quad_op_floats);
 
+// Generates code for the standard binary comparison operation with widening
+//  <, <=, >, >=, ==, != 
+// result is an INT regardless of float/int input
+quad_arg generate_binary_comparison_with_widening(ast_node node, enum quad_op quad_op_ints, enum quad_op quad_op_floats);
+
 // Generates code for the standard single operand operation
 //  !, - (neg), ++, --
 quad_arg generate_single_operand(ast_node node, enum quad_op quad_op_int, enum quad_op quad_op_float);
@@ -357,17 +362,17 @@ quad_arg generate_intermediate_code(ast_node node)
       //  ensures both operands are ints.
       return generate_binary_op_with_widening(node, mod_op, -1);
     case OP_LT:
-      return generate_binary_op_with_widening(node, lt_ints_op, lt_floats_op);
+      return generate_binary_comparison_with_widening(node, lt_ints_op, lt_floats_op);
     case OP_LEQ:
-      return generate_binary_op_with_widening(node, leq_ints_op, leq_floats_op);
+      return generate_binary_comparison_with_widening(node, leq_ints_op, leq_floats_op);
     case OP_GT:
-      return generate_binary_op_with_widening(node, gt_ints_op, gt_floats_op);
+      return generate_binary_comparison_with_widening(node, gt_ints_op, gt_floats_op);
     case OP_GEQ:
-      return generate_binary_op_with_widening(node, geq_ints_op, geq_floats_op);
+      return generate_binary_comparison_with_widening(node, geq_ints_op, geq_floats_op);
     case OP_EQ:
-      return generate_binary_op_with_widening(node, eq_ints_op, eq_floats_op);
+      return generate_binary_comparison_with_widening(node, eq_ints_op, eq_floats_op);
     case OP_NEQ:
-      return generate_binary_op_with_widening(node, neq_ints_op, neq_floats_op);
+      return generate_binary_comparison_with_widening(node, neq_ints_op, neq_floats_op);
     case OP_AND:
       {
         quad_arg result_arg = get_new_temp(flat_id_table, inttype);
@@ -784,6 +789,37 @@ quad_arg generate_binary_op_with_widening(ast_node node, enum quad_op quad_op_in
   } else {
     result_arg = get_new_temp(flat_id_table, doubletype);
 
+    if (node->left_child->data_type == doubletype && node->left_child->right_sibling->data_type == doubletype) {
+      generate_quad(node->line_num, quad_op_floats, result_arg, left_arg, right_arg);
+    } else if (node->left_child->data_type == doubletype) {
+      temp1 = get_new_temp(flat_id_table, doubletype);
+      generate_quad(node->line_num, int_to_float_op, temp1, right_arg, NULL);
+      generate_quad(node->line_num, quad_op_floats, result_arg, left_arg, temp1);
+    } else if (node->left_child->right_sibling->data_type == doubletype) {
+      temp1 = get_new_temp(flat_id_table, doubletype);
+      generate_quad(node->line_num, int_to_float_op, temp1, left_arg, NULL);
+      generate_quad(node->line_num, quad_op_floats, result_arg, temp1, right_arg);
+    }
+  }
+
+  return result_arg;
+}
+
+// Generates code for the standard binary comparison operation with widening
+//  <, <=, >, >=, ==, != 
+// result is an INT regardless of float/int input
+quad_arg generate_binary_comparison_with_widening(ast_node node, enum quad_op quad_op_ints, enum quad_op quad_op_floats)
+{
+  quad_arg result_arg;
+  quad_arg temp1;
+
+  quad_arg left_arg = generate_intermediate_code(node->left_child);
+  quad_arg right_arg = generate_intermediate_code(node->left_child->right_sibling);
+
+  result_arg = get_new_temp(flat_id_table, inttype);
+  if (node->left_child->data_type == inttype && node->left_child->right_sibling->data_type == inttype) {
+    generate_quad(node->line_num, quad_op_ints, result_arg, left_arg, right_arg);
+  } else {
     if (node->left_child->data_type == doubletype && node->left_child->right_sibling->data_type == doubletype) {
       generate_quad(node->line_num, quad_op_floats, result_arg, left_arg, right_arg);
     } else if (node->left_child->data_type == doubletype) {
