@@ -808,6 +808,11 @@ int type_check(ast_node node)
           return 1;
         }
 
+        // if the function doesn't want an array pointer but gets one
+        if (func_sym_node->param_symnode_array[i]->node_type != array_node && (actual_param_node->node_type == ID && actual_param_node->value.sym_node->node_type == array_node)) {
+          mark_error(node->line_num, "A formal parameter is not an array pointer, but the corresponding actual parameter is");
+        }
+
         enum vartype actual_type = actual_param_node->data_type;
         enum vartype formal_type = func_sym_node->param_symnode_array[i]->var_type;
 

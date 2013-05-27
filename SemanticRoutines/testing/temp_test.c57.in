@@ -1,6 +1,7 @@
-void main() {
-	int x;
-	double y = 5.0;
-	double z = 5.0;
-	x = y == z;
+void main()
+{
+  int x[1], y[1];
+  x[0] = 0;
+  y[0] = 5;
+  print y[x];
 }

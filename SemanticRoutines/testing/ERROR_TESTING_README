@@ -1,0 +1,40 @@
+The djcc compiler catches various types of errors that are present in the input C57 code. Upon identifying an error, the compiler prints a correpsonding error message indicating where things went wrong, and then immediately exits so that other errors will not be revealed until the first one is fixed.
+
+Sine only one error can be identified per input file, there are 23 input files, labeled {1-5,6a-6d,7-20}_error_test.c57.in, that deomnstrate the compiler's ability to detect the following errors:
+
+------------------------------------------------------------------------
+
+1.) Newline in string
+2.) Main function that takes parameters
+3.) Main function that has a return type
+4.) No main function
+5.) Call an undefined function
+
+Parameter errors
+  6a.) Pass array when value expected
+  6b.) Pass value when array expected
+  6c.) Pass double when int expected
+  6d.) Pass the wrong number of parameters
+
+7.) Array variable in mathematical operation
+8.) Array variable in mathematical comparison
+9.) Two variables of the same name in the same scope
+10.) Use an undeclared variable
+11.) Initialization of variable in outter scope of a function with same name as a parameter
+12.) Index into an array with a float
+13.) Subscript a non-array variable
+14.) Assign to an array pointer
+15.) Assign from an array pointer
+16.) Implicit cast of double to int
+17.) Logical operation with float
+18.) Increment an array pointer
+19.) Return types of function declaration and function body don't match
+20.) Non-void function without a return statement
+
+------------------------------------------------------------------------
+
+All of these tests can be run at once, in order, using the script testing/run_all_error_tests.sh.
+
+Happy testing!
+
+Derek and Jake
