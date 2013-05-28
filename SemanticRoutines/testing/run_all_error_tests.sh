@@ -36,19 +36,19 @@ echo "5.) Call an undefined function (5_error_test.c57.in)"
 ../djcc 5_error_test.c57.in
 echo
 
-echo "  6a.) Pass array when value expected (6a_error_test.c57.in)"
+echo "6a.) Pass array when value expected (6a_error_test.c57.in)"
 ../djcc 6a_error_test.c57.in
 echo
 
-echo "  6b.) Pass value when array expected (6b_error_test.c57.in)"
+echo "6b.) Pass value when array expected (6b_error_test.c57.in)"
 ../djcc 6b_error_test.c57.in
 echo
 
-echo "  6c.) Pass double when int expected (6c_error_test.c57.in)"
+echo "6c.) Pass double when int expected (6c_error_test.c57.in)"
 ../djcc 6c_error_test.c57.in
 echo
 
-echo "  6d.) Pass the wrong number of parameters (6d_error_test.c57.in)"
+echo "6d.) Pass the wrong number of parameters (6d_error_test.c57.in)"
 ../djcc 6d_error_test.c57.in
 echo
 

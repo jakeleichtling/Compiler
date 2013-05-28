@@ -1,29 +1,37 @@
 Semantic Routines
 -----------------
 
-Believe it or not, it appears that we have a working compiler on our hands. The use for the Derek-Jake c57 compiler is:
+Believe it or not, it appears that we have a working compiler on our hands. The Derek-Jake C57 compiler is invoked from the command line with:
 
 djcc [-d] input_C57_file_path [output_TM57_file_path]
 
-If no output path is specified, the output will be written to assembly.tm57. Any compilation errors will be printed to stdout with a line number. 
+Note:
 
+-d (must be the first argument) turns on debugging mode, in which debugging statements are printed to stdout.
+
+If no output path is specified, the output will be written to assembly.tm57 in the current directory. Any compilation errors will be printed to stderr with a corresponding line number.
+
+-----------------------------------------------------
 Files:
 
-bparser.y - bison parser
+bparser.y - Bison parser input file
 
-djcc.c - Main function for the Derek-Jake c57 compiler
+djcc.c - Main function for the Derek-Jake C57 compiler
 
-flexer.l - flex lexical analyzer
+flexer.l - Flex lexical analyzer input file
 
-quad.c & h - Handles generation of intermediate code
+quad{.h, .c} - Declarations/definitions for generation of intermediate code from the abstract syntax tree
 
-symtab.c & h - Definition and functions for the symbol table
+symtab{.h, .c} - Declarations/definitions for the symbol table
 
-tm57_assemgly_generation.c & h - Creates assembly code from intermediate code
+ast{.h, .c} - Declarations/definitions for the abstract syntax tree data structure
 
+tm57_assemgly_generation{.h, .c} - Declarations/definitions for generating assembly instructions from intermediate code
 
+ast_node_processing{.h, .c} - Declarations/definitions for generating symbols from the abstract syntax tree and for error checking (including type checking)
+-----------------------------------------------------
 
-For testing, please see the /testing file. Further instructions can be found in the TESTING_README and ERROR_TESTING_README.
+For testing, please see the testing directory. Further instructions can be found in TESTING_README and ERROR_TESTING_README.
 
 Thanks for the great class!
 
