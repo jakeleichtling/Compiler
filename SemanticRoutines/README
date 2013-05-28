@@ -1,0 +1,31 @@
+Semantic Routines
+-----------------
+
+Believe it or not, it appears that we have a working compiler on our hands. The use for the Derek-Jake c57 compiler is:
+
+djcc [-d] input_C57_file_path [output_TM57_file_path]
+
+If no output path is specified, the output will be written to assembly.tm57. Any compilation errors will be printed to stdout with a line number. 
+
+Files:
+
+bparser.y - bison parser
+
+djcc.c - Main function for the Derek-Jake c57 compiler
+
+flexer.l - flex lexical analyzer
+
+quad.c & h - Handles generation of intermediate code
+
+symtab.c & h - Definition and functions for the symbol table
+
+tm57_assemgly_generation.c & h - Creates assembly code from intermediate code
+
+
+
+For testing, please see the /testing file. Further instructions can be found in the TESTING_README and ERROR_TESTING_README.
+
+Thanks for the great class!
+
+Cheers,
+Derek Salama & Jake Leichtling

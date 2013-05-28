@@ -1,4 +1,16 @@
-Checklist item locations:
+TESTING README
+--------------
+
+Our approach to testing the Semantic Routines is threefold. First, we created a handful of files to demonstrate the functionality of every core element. With the fundemental elements in place, we ran the provided Dijkstra and Bellman-Ford algorithms to ensure that the operations worked together. Those algorithms were also augmented by merge_sort.c57 to test recursive functionality. Finally, we created several tests for the most important error cases. Please see the ERROR_TESTING_README for mroe on error testing.
+
+You can quickly compile all the tests by executing ./run_all_tests.sh. If you wish to see some of the information we used while debugging the compiler, compile a program with ./djcc -d input_file_name.c57 output_file_name.tm57.
+
+Below you will find an enumeration of what functionality is tested in each file.
+
+Cheers,
+Derek and Jake
+--------------
+
 
 In decl_test.c57:
 	-ids with letters, digits, and underscores (20-22)

@@ -12,4 +12,4 @@ Variable-size arrays in the stack are supported. For example, the following code
   ...
 }
 
-This feature is demonstrated in testing/variable_size_array_test.c57.in, which is one of the inputs included in the testing suite run by testing/run_all_tests.sh.
+This feature is demonstrated in testing/variable_size_array_test.c57, which is one of the inputs included in the testing suite run by testing/run_all_tests.sh.

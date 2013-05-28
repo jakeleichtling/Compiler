@@ -1,6 +1,6 @@
 /*
 
-variable_size_array_test.c57.in
+variable_size_array_test.c57
 
 Demonstrates the ability of the djcc compiler to support
 arrays (global and local) for which the size is determined at run time.
