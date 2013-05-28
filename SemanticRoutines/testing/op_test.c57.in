@@ -1,84 +1,164 @@
+/*
+op_test.c57.in
+-test file for binary and unary operators on floats and ints
+
+Derek Salama & Jake Leichtling
+CS57
+5/29/2013
+
+--------------------------------------------------
+
+Testing for:
+	-binary +
+		-int (66)
+		-double (174)
+	-binary –
+		-int (72)
+		-double (180)
+	-binary *
+		-int (78)
+		-double (186)
+	-binary /
+		-int (84)
+		-double (192)
+	-binary % (int only) (90)
+	-binary <
+		-int (96)
+		-double (198)
+	-binary <=
+		-int (102)
+		-double (204)
+	-binary >
+		-int (108)
+		-double (210)
+	-binary >=
+		-int (114)
+		-double (216)
+	-binary ==
+		-int (120)
+		-double (222)
+	-binary !=
+		-int (126)
+		-double (228)
+	-binary && (132)
+	-binary || (138)
+	-unary ! (144)
+	-unary – (150)
+	-int (58)
+	-double (59)
+	-prefix ++ (157)
+	-prefix – – (164)
+	-convert int to double (244)
+	-NUM (66)
+	-FNUM (174) 
+
+
+*/
 void main(void) {
-	int x;
-	double y;
+	int x; /* int */
+	double y; /* double */
 
 	print "Int operations: \n";
+
+	/* int + */
+	/* NUM */
 	print "5 + 5 = ";
 	x = 5 + 5;
 	print x;
 	print "\n";
 
+	/* int - */
 	print "5 - 5 = ";
 	x = 5 - 5;
 	print x;
 	print "\n";
 
+	/* int * */
 	print "5 * 5 = ";
 	x = 5 * 5;
 	print x;
 	print "\n";
 
+	/* int / */
 	print "5 / 6 = ";
 	x = 5 / 6;
 	print x;
 	print "\n";
 
+	/* % */
 	print "5 % 2 = ";
 	x = 5 / 2;
 	print x;
 	print "\n";
 
+	/* int < */
 	print "5 < 4 = ";
 	x = 5 < 4;
 	print x;
 	print "\n";
 
+	/* int <= */
 	print "5 <= 5 = ";
 	x = 5 <= 5;
 	print x;
 	print "\n";
 
+	/* int > */
 	print "5 > 4 = ";
 	x = 5 > 4;
 	print x;
 	print "\n";
 
+	/* int >= */
 	print "5 >= 5 = ";
 	x = 5 >= 5;
 	print x;
 	print "\n";
 
+	/* int == */
 	print "5 == 5 = ";
 	x = 5 >= 5;
 	print x;
 	print "\n";
 
+	/* int != */
 	print "5 != 5 = ";
 	x = 5 != 5;
 	print x;
 	print "\n";
 
+	/* &&  */
 	print "0 && 1 = ";
 	x = 0 && 1;
 	print x;
 	print "\n";
 
+	/* || */
+	print "0 || 1 = ";
+	x = 0 || 1;
+	print x;
+	print "\n";
+
+	/* !  */
 	print "!1 = ";
 	x = !1;
 	print x;
 	print "\n";
 
+	/* - (unary minus) */
 	print "-1 = ";
-	x = -1;
+	x = -(1);
 	print x;
 	print "\n";
 
+	/* prefix ++ */
 	print "x=1, ++x = ";
 	x = 1;
 	++x;
 	print x;
 	print "\n";
 
+	/* prefix -- */
 	print "x=1, --x = ";
 	x = 1;
 	--x;
@@ -87,62 +167,76 @@ void main(void) {
 
 	print "\n\n";
 	print "Double operations: \n";
+
+	/* FNUM */
+	/* double + */
 	print "5.1 + 5.0 = ";
 	y = 5.1 + 5.0;
 	print y;
 	print "\n";
 
+	/* double - */
 	print "5.0 - 5.1 = ";
 	y = 5.0 - 5.1;
 	print y;
 	print "\n";
 
+	/* double * */
 	print "5.1 * 5.0 = ";
 	y = 5.1 * 5.0;
 	print y;
 	print "\n";
 
+	/* double / */
 	print "5.0 / 6.0 = ";
 	y = 5.0 / 6.0;
 	print y;
 	print "\n";
 
+	/* double < */
 	print "5.0 < 4.8 = ";
 	y = 5.0 < 4.8;
 	print y;
 	print "\n";
 
+	/* double <= */
 	print "5.0 <= 5.0 = ";
 	y = 5.0 <= 5.0;
 	print y;
 	print "\n";
 
+	/* double > */
 	print "5.0 > 4.3 = ";
 	y = 5.0 > 4.3;
 	print y;
 	print "\n";
 
+	/* double >= */
 	print "5.0 >= 5.0 = ";
 	y = 5.0 >= 5.0;
 	print y;
 	print "\n";
 
+	/* double == */
 	print "5.0 == 5.0 = ";
 	y = 5.0 >= 5.0;
 	print y;
 	print "\n";
 
+	/* double != */
 	print "5.0 != 5.0 = ";
 	y = 5.0 != 5.0;
 	print y;
 	print "\n";
 
+	/* double - (unary minus) */
 	print "-1.0 = ";
-	y = -1.0;
+	y = -(1.0);
 	print y;
 	print "\n";
 
 
+	/* convert int to double */
 	print "\n";
 	print "Now to show some widening,\n";
 	print "int x = 1; double y = x; y = ";

@@ -67,7 +67,6 @@ int bellman_ford(int first[], int node[], int next[], double w[], double d[],
     }
   }
 
-  print "hey!";
   return 1;
 }
 

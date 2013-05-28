@@ -59,49 +59,48 @@ In misc_test.c57:
 	-Assignment into subscripted var (32)
 
 In op_test.c57:
-//TODO: line numbers!!
-binary +
-☐	int
-☐	double
-binary –
-☐	int
-☐	double
-binary *
-☐	int
-☐	double
-binary /
-☐	int
-☐	double
-☐ binary % (int only)
-binary <
-☐	int
-☐	double
-binary <=
-☐	int
-☐	double
-binary >
-☐	int
-☐	double
-binary >=
-☐	int
-☐	double
-binary ==
-☐	int
-☐	double
-binary !=
-☐	int
-☐	double
-☐ binary &&
-☐ binary ||
-☐ unary !
-☐ unary –
-☐	int
-☐	double
-☐ prefix ++
-☐ prefix – –
-☐ convert int to double
+	-binary +
+		-int (66)
+		-double (174)
+	-binary –
+		-int (72)
+		-double (180)
+	-binary *
+		-int (78)
+		-double (186)
+	-binary /
+		-int (84)
+		-double (192)
+	-binary % (int only) (90)
+	-binary <
+		-int (96)
+		-double (198)
+	-binary <=
+		-int (102)
+		-double (204)
+	-binary >
+		-int (108)
+		-double (210)
+	-binary >=
+		-int (114)
+		-double (216)
+	-binary ==
+		-int (120)
+		-double (222)
+	-binary !=
+		-int (126)
+		-double (228)
+	-binary && (132)
+	-binary || (138)
+	-unary ! (144)
+	-unary – (150)
+	-int (58)
+	-double (59)
+	-prefix ++ (157)
+	-prefix – – (164)
+	-convert int to double (244)
+	-NUM (66)
+	-FNUM (174)
 
-TODO:
-☐ Recursive function
-☐ NUM ?
-☐ FNUM ?
+In merge_sort.c57
+	-Recursive function (11)
