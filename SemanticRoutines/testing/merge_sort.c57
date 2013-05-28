@@ -8,13 +8,17 @@
   5/29/2013
 
 */
+
+int n = 20;
+double a[20];
+
 void merge_sort(double a[], int low, int high)
 {
   int mid = (low + high) / 2;
   int lower_array_size = mid - low + 1;
   int upper_array_size = high - mid;
   double lower_array[lower_array_size], upper_array[upper_array_size];
-  int i, i1, i2;
+  int i, i_1, i_2;
 
   if (high <= low) {
     return;
@@ -23,56 +27,53 @@ void merge_sort(double a[], int low, int high)
   merge_sort(a, low, mid);
   merge_sort(a, mid + 1, high);
 
-  for (i1 = low; i1 <= mid; ++i1) {
-    lower_array[i1 - low] = a[i1];
+  for (i_1 = low; i_1 <= mid; ++i_1) {
+    lower_array[i_1 - low] = a[i_1];
   }
 
-  for (i2 = mid + 1; i2 <= high; ++i2) {
-    upper_array[i2 - (mid + 1)] = a[i2];
+  for (i_2 = mid + 1; i_2 <= high; ++i_2) {
+    upper_array[i_2 - (mid + 1)] = a[i_2];
   }
 
-  i1 = 0;
-  i2 = 0;
+  i_1 = 0;
+  i_2 = 0;
   i = low;
-  while (i1 < lower_array_size && i2 < upper_array_size) {
-    if (lower_array[i1] < upper_array[i2]) {
-      a[i] = lower_array[i1];
+  while (i_1 < lower_array_size && i_2 < upper_array_size) {
+    if (lower_array[i_1] < upper_array[i_2]) {
+      a[i] = lower_array[i_1];
       ++i;
-      ++i1;
-    } else if (lower_array[i1] >= upper_array[i2]) {
-      a[i] = upper_array[i2];
+      ++i_1;
+    } else if (lower_array[i_1] >= upper_array[i_2]) {
+      a[i] = upper_array[i_2];
       ++i;
-      ++i2;
+      ++i_2;
     }
   }
 
-  while (i1 < lower_array_size) {
-    a[i] = lower_array[i1];
+  while (i_1 < lower_array_size) {
+    a[i] = lower_array[i_1];
     ++i;
-    ++i1;
+    ++i_1;
   }
 
-  while (i2 < upper_array_size) {
-    a[i] = upper_array[i2];
+  while (i_2 < upper_array_size) {
+    a[i] = upper_array[i_2];
     ++i;
-    ++i2;
+    ++i_2;
   }
-
 }
 
-void main() {
-  int n = 20;
-  double a[n];
-  int i;
-  int j;
+int i;
+int j;
 
+void main() {
   /* attempt to generate interesting numbers */
   for (i = 0; i < n; i = i + 3) {
-    a[i] = n * n - i * i + i / 100.0;
+    a[i] = n * n + 5.2 - 4.3 * i * i + i / 100.0;
   }
 
   for (i = 1; i < n; i = i + 3) {
-    a[i] = n * n * i;
+    a[i] = n * n * i + 17;
   }
 
   for (i = 2; i < n; i = i + 3) {

@@ -40,4 +40,7 @@ echo "~~~~~~~~~~~~~~~~~~~ function_call_test.c57 ~~~~~~~~~~~~~~~~~~~~~"
 echo "~~~~~~~~~~~~~~~~~~~ variable_size_array_test.c57 ~~~~~~~~~~~~~~~~~~~~~"
 ../djcc variable_size_array_test.c57 variable_size_array_test.tm57
 
+echo "~~~~~~~~~~~~~~~~~~~ test_array_decl.c57 ~~~~~~~~~~~~~~~~~~~~~"
+../djcc test_array_decl.c57 test_array_decl.tm57
+
 echo "---------------------------------------------------------"

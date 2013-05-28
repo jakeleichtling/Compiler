@@ -1,0 +1,33 @@
+/* 
+  test_array_decl.c57
+  -tests declaring an array with size as an element of another array
+
+  Derek Salama & Jake Leichtling
+  CS57
+  5/29/2013
+
+*/
+
+int a[10];
+
+void f()
+{
+  int i;
+  int b[a[4]];
+  for (i = 0; i < a[4]; ++i)
+  {
+    b[i] = i;
+  }
+
+  for (i = 0; i < a[4]; ++i)
+  {
+    print b[i];
+    print "\n";
+  }
+}
+
+void main()
+{
+  a[4] = 12;
+  f();
+}

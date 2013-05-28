@@ -11,23 +11,24 @@ Cheers,
 Derek and Jake
 --------------
 
+Note: The first line number(s) indicate where the feature is tested in a relatively isolated and contrived environment. The file and line number following the semicolon to a more realistic use case of the feature.
 
 In decl_test.c57:
-	-ids with letters, digits, and underscores (20-22)
-	-multiple declarations within a program (20-22)
-	-multiple variables in one declaration (27)
-	-int declared (22)
-	-double declared (20)
-	-declaration with initialization (64)
+	-ids with letters, digits, and underscores (20-22; merge_sort.c57: 17-21)
+	-multiple declarations within a program (20-22, merge_sort.c57: 17-21)
+	-multiple variables in one declaration (27; merge_sort.c57: 20)
+	-int declared (22; merge_sort.c57: 17-19)
+	-double declared (20; dijkstra.c57: 22)
+	-declaration with initialization (64; merge_sort.c57: 17-19)
 	-declaration of an array
-		-constant size (30)
-		-variable size (40)
-		-size that is an array element (37)
+		-constant size (30; merge_sort.c57: 13)
+		-variable size (40; merge_sort.c57: 20)
+		-size that is an array element (47; test_array_decl.c57)
 	-global variables
-		-before any function (20-30)
-		-between functions (60)
-	-local variables (64-65)
-	-redifinition of variables in inner scope (34, 49)
+		-before any function (20-30; merge_sort.c57: 12-13)
+		-between functions (60; merge_sort.c57: 66-67)
+	-local variables (64-65; merge_sort.c57: 17-21)
+	-redifinition of variables in inner scope (34, 49; merge_sort.c57: 15)
 
 In function_call_test.c57:
 	-Parameters
@@ -72,47 +73,47 @@ In misc_test.c57:
 
 In op_test.c57:
 	-binary +
-		-int (66)
-		-double (174)
+		-int (66; merge_sort.c57: 71, 75, 79)
+		-double (174; dijkstra.c57: 127)
 	-binary –
-		-int (72)
-		-double (180)
+		-int (72; dijkstra.c57: 95)
+		-double (180; merge_sort.c57: 72)
 	-binary *
-		-int (78)
-		-double (186)
+		-int (78; dijkstra.c57: 16)
+		-double (186; merge_sort.c57: 72)
 	-binary /
-		-int (84)
-		-double (192)
+		-int (84; dijkstra.c57: 6)
+		-double (192; merge_sort.c57: 72)
 	-binary % (int only) (90)
 	-binary <
-		-int (96)
-		-double (198)
+		-int (96; dijkstra.c57: 60)
+		-double (198; dijkstra.c57: 70)
 	-binary <=
-		-int (102)
-		-double (204)
+		-int (102; dijkstra.c57: 138)
+		-double (204; )
 	-binary >
-		-int (108)
-		-double (210)
+		-int (108; dijkstra.c57: 104)
+		-double (210; dijkstra.c57: 104)
 	-binary >=
 		-int (114)
-		-double (216)
+		-double (216; merge_sort.c57: 46)
 	-binary ==
 		-int (120)
 		-double (222)
 	-binary !=
 		-int (126)
 		-double (228)
-	-binary && (132)
+	-binary && (132; merge_sort.c57: 41)
 	-binary || (138)
 	-unary ! (144)
 	-unary – (150)
-	-int (58)
-	-double (59)
-	-prefix ++ (157)
-	-prefix – – (164)
-	-convert int to double (244)
-	-NUM (66)
-	-FNUM (174)
+	-int (58; bellman-ford.c57: 5)
+	-double (59; bellman-ford.c57: 5)
+	-prefix ++ (157; merge_sort.c57: 30)
+	-prefix –– (164; dijkstra.c57: 87)
+	-convert int to double (244; merge_sort.c57: 72, 76, 80);
+	-NUM (66; merge_sort.c57: 72)
+	-FNUM (174; merge_sort.c57: 76)
 
 In merge_sort.c57
-	-Recursive function (11)
+	-Recursive function (27-28)
