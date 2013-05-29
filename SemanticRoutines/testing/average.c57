@@ -1,0 +1,80 @@
+/*
+ average.c57
+ -compute the average of 1 - n
+
+ Derek Salama & Jake Leichtling
+ CS57
+ 5/39/2013
+
+*/
+
+int n = 9974;
+int mod = 10;
+int a[n];
+
+/* double ret type */
+double average(int input[]) {
+	int i;
+	double sum;
+	double avg;
+
+	/* do-while */
+	i = 0;
+	do {
+		sum = sum + input[i];
+		++i;
+	} while ( i < n);
+
+	avg = sum / n;
+
+	return avg;
+} 
+
+int mod_sum(int input[]) {
+	int sum = 0;
+	int i;	
+
+	for (i = 0; i < n; ++i) {
+		/* % */
+		sum = sum + (input[i] % mod);
+	}
+
+	return sum;
+}
+
+void fill_input_array() {
+	int i = 0;
+	 /* for loop with missing parts */
+	for (; i < n; ) {
+		a[i] = i;
+		++i;
+	}
+}
+
+
+void main(void) {
+	/* int >= */
+	if ( 0 >= n) {
+		print "Need size of at least 1";
+		return;
+	}
+
+	/* ftn call with no params */
+	fill_input_array();
+
+	print "The average of the numbers 1 - ";
+	print (n - 1);
+	print " is ";
+	print average(a);
+	print ". \n";
+
+	print "The modular base ";
+	print mod;
+	print " sum of the numbers 1 - ";
+	print (n - 1);
+	print " is ";
+	print mod_sum(a);
+	print ". \n";
+
+	return;
+}

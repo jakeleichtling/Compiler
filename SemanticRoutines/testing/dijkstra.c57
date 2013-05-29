@@ -237,7 +237,7 @@ void main(void) {
   next[9] = 10;
   next[10] = 0;
 
-  /* prinT "enter source node: "; */
+  print "Enter source node: "; 
   read s;
 
   dijkstra(first, node, next, w, d, pi, s, 5, handle, heap_index);

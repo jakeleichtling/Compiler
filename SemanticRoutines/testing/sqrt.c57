@@ -1,0 +1,72 @@
+/*
+sqrt.c57
+-a relatively naive way to roughly compute a square root
+-finds i s.t. i^2 <= n and j s.t. j^2 >= n
+-if i==j, then i is the sqrt, else it is somewhere in between
+
+ Derek Salama & Jake Leichtling
+ CS57
+ 5/29/2013
+*/
+int smaller_sqrt(double n) {
+	int i;
+	int sqr;
+	for(i = 0; i < n; ++i) {
+		sqr = (i + 1) * (i + 1);
+		if (n == sqr) {
+			return i + 1;
+		} else if (n < sqr) {
+			return i;
+		}
+	}
+	return -1;
+}
+
+int larger_sqrt(double n) {
+	int i;
+	int sqr;
+	for(i = 0; i < n; ++i) {
+		sqr = i * i;
+		if (n <= sqr) {
+			return i;
+		}
+	}
+	return -1;
+}
+
+void main() {
+	double n;
+	int lower;
+	int upper;
+
+	do {
+		print "Input the number for which we should bound the square root: ";
+		read n;
+		print "\n";
+
+		if (n > 0) {
+			lower = smaller_sqrt(n);
+			upper = larger_sqrt(n);
+			if (lower == -1 || !(upper != -1.0)) { /* sorry about this stupid expression */
+				print "ERROR!!!";
+				return;
+			}
+			if (lower != upper) {
+				print "The square root is more than ";
+				print lower;
+				print " and less than ";
+				print upper;
+				print ". Thanks for playing!";
+				return;
+			} else {
+				print "The square root is exactly ";
+				print lower;
+				print " !!\n";
+				return;
+			}
+
+		}
+
+		print "Please input a positive number greater than zero.\n\n";
+	} while (1);
+}

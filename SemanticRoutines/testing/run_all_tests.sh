@@ -43,4 +43,10 @@ echo "~~~~~~~~~~~~~~~~~~~ variable_size_array_test.c57 ~~~~~~~~~~~~~~~~~~~~~"
 echo "~~~~~~~~~~~~~~~~~~~ test_array_decl.c57 ~~~~~~~~~~~~~~~~~~~~~"
 ../djcc test_array_decl.c57 test_array_decl.tm57
 
+echo "~~~~~~~~~~~~~~~~~~~ average.c57 ~~~~~~~~~~~~~~~~~~~~~"
+../djcc average.c57 average.tm57
+
+echo "~~~~~~~~~~~~~~~~~~~ sqrt.c57 ~~~~~~~~~~~~~~~~~~~~~"
+../djcc sqrt.c57 sqrt.tm57
+
 echo "---------------------------------------------------------"

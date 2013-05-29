@@ -91,7 +91,7 @@ int fill_id_types(ast_node node)
     {
       // Find the return type of the function declaration
       enum vartype var_type;
-      enum nodetype ret_node_type = node->left_child->node_type;
+      ast_node_type ret_node_type = node->left_child->node_type;
       if (ret_node_type == INT_TYPE) {
         var_type = inttype;
       } else if (ret_node_type == DBL_TYPE) {
@@ -169,7 +169,7 @@ int fill_id_types(ast_node node)
     {
       // Find the type of the param
       enum vartype var_type;
-      enum nodetype ret_node_type = node->left_child->node_type;
+      ast_node_type ret_node_type = node->left_child->node_type;
       if (ret_node_type == INT_TYPE) {
         var_type = inttype;
       } else if (ret_node_type == DBL_TYPE) {
@@ -216,7 +216,7 @@ int fill_id_types(ast_node node)
     {
       // Find the type of the variables
       enum vartype var_type;
-      enum nodetype var_node_type = node->left_child->node_type;
+      ast_node_type var_node_type = node->left_child->node_type;
       if (var_node_type == INT_TYPE) {
         var_type = inttype;
       } else if (var_node_type == DBL_TYPE) {
@@ -322,7 +322,7 @@ int fill_id_types(ast_node node)
     {
       // Find the type of the param
       enum vartype var_type;
-      enum nodetype ret_node_type = node->left_child->node_type;
+      ast_node_type ret_node_type = node->left_child->node_type;
       if (ret_node_type == INT_TYPE) {
         var_type = inttype;
       } else if (ret_node_type == DBL_TYPE) {
