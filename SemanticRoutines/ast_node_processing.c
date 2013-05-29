@@ -52,7 +52,7 @@ extern symnode main_func_symnode;
 /* ~~~~~~~~~~~~~~~ Function Definitions ~~~~~~~~~~~~~~~~~~~ */
 
 void mark_error(int ln, char *msg) {
-  fprintf(stderr, "Type error found at line %d: %s\n", ln, msg);
+  fprintf(stderr, "Error found at line %d: %s\n", ln, msg);
   error_count++;
 
   if (djdebug) {
@@ -385,7 +385,7 @@ int fill_id_types(ast_node node)
       char *basename = id_astnode->value.sym_node->name;
       symnode prev_scoped_id_symnode = lookup_in_symboltable(scoped_id_table, basename, &scoped_id_table_level);
       if (prev_scoped_id_symnode == NULL) {
-        mark_error(node->line_num, "A variable or function is referenced but never declared in an accessible scope");
+        mark_error(node->line_num, "A variable or function is referenced but not yet declared in an accessible scope");
         return 1;
       }
 
@@ -667,7 +667,7 @@ int type_check(ast_node node)
         mark_error(node->line_num, "The operand of ++ is not an int");  
         return 1;
       } else if (is_array_node(node->left_child)) {
-        mark_error(node->line_num, "The ++ operator cannot act on an array identifier operand");
+        mark_error(node->line_num, "The ++ operator cannot act on an array pointer");
         return 1;
       }
 

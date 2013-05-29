@@ -70,6 +70,11 @@ int bellman_ford(int first[], int node[], int next[], double w[], double d[],
   return 1;
 }
 
+void void_params_test(void)
+{
+  print "Testing that a function with void parameter works";
+}
+
 void main(void) {
   int first[6], node[11], next[11], pi[6];
   double w[11], d[6];
@@ -146,6 +151,12 @@ void main(void) {
     print pi[i];
     print "\n";
   }
+
+  void_params_test();
+
+  return;
+
+  print "This line should not be printed.";
 }
 
 /* Correct outputs (format might not be exactly the same):

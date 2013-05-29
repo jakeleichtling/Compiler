@@ -6,9 +6,9 @@ Sine only one error can be identified per input file, there are 23 input files, 
 
 1.) Newline in string
 2.) Main function that takes parameters
-3.) Main function that has a return type
+3.) Main function that has a non-void return type
 4.) No main function
-5.) Call an undefined function
+5.) Call an undeclared function
 
 Parameter errors
   6a.) Pass array when value expected

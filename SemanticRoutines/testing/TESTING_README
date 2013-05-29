@@ -37,7 +37,7 @@ In function_call_test.c57:
 		-array of int (47; bellman-ford.c57: 5)
 		-array of double (78; bellman-ford.c57: 5)
 	-Function declaration (47; bellman-ford.c57: 5)
-	-Function with void param (103; bellman-ford.c57: 73)
+	-Function with void param (103; bellman-ford.c57: 73, 155)
 	-Function with empty parens (109; merge_sort.c57: 69)
 	-Function with multiple params (47; bellman-ford.c57: 5)
 	-Function with array param (47; bellman-ford.c57: 5)
@@ -47,7 +47,7 @@ In function_call_test.c57:
 		-double (61; average.c57: 16) 
 	-Actual parameters that are
 		-Global arrays (140; average.c57: 68) 
-		-Local arrays (136; bellman-ford.c57: 135)
+		-Local arrays (136; bellman-ford.c57: 140)
 		-Formal array parameters (97; bellman-ford.c57: 29)
 	-Function call with no args (143; average.c57: 63) 
 	-Function call with multiple args (136; merge_sort.c57: 27)
@@ -117,3 +117,5 @@ In op_test.c57:
 
 In merge_sort.c57
 	-Recursive function (27-28)
+
+Coercion is listed above as "convert int to double" and is tested in op_test.c57: 244 and merge_sort.c57: 72, 76, 80, among other locations. Precedence and associativity are tested throughout these examples, but are assessed directly in prec_and_assoc_test.c57.

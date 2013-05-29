@@ -118,7 +118,7 @@ int main(int argc, char *argv[])
       }
 
       if (main_func_symnode == NULL) {
-        fprintf(stderr, "%s\n", "Error: No main method is defined.");
+        fprintf(stderr, "%s\n", "Error: No main function is defined.");
         exit(1);
       } else if (main_func_symnode->num_params != 0) {
         fprintf(stderr, "%s\n", "Error: The main function cannot take any parameters.");

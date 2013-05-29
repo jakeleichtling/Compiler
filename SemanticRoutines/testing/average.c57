@@ -15,7 +15,7 @@ int a[n];
 /* double ret type */
 double average(int input[]) {
 	int i;
-	double sum;
+	double sum = 0;
 	double avg;
 
 	/* do-while */
